@@ -38,7 +38,7 @@ password = node['daris']['download_password']
 pkgs = node['daris']['pkgs']
 
 installers = "#{mflux_home}/daris_installers"
-bin = "#{mflux_user_home}/bin"
+mfcommand = "#{mflux_user_home}/bin/mfcommand"
 
 package "wget" do
   action :install
@@ -56,10 +56,10 @@ pkgs.each() do | pkg, file |
     not_if { ::File.exists?("#{installers}/#{file}") }
   end
   bash "install-#{pkg}" do
-    user mflux_user
-    code ". /etc/mediaflux/servicerc && "
-         "#{bin}/mfcommand logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && "
-         "#{bin}/mfcommand package.install :in file:#{installers}/#{file} && "
-         "#{bin}/mfcommand logoff"
+    user root
+    code ". /etc/mediaflux/servicerc && " +
+         "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
+         "#{mfcommand} package.install :in file:#{installers}/#{file} && " +
+         "#{mfcommand} logoff"
   end
 end 
