@@ -30,5 +30,23 @@
 include_recipe "daris"
 
 mflux_home = node['mediaflux']['home']
+mflux_user = node['mediaflux']['user']
 url = node['daris']['download_url']
+pkgs = node['daris']['pkgs']
+installers = "#{mflux_home}/daris_installers"
 
+package "wget" do
+  action :install
+end
+
+directory installers do
+  owner mflux_user
+end
+
+pkgs.each() do | pkg, file | 
+  bash "fetch-#{pkg}" do
+    user mflux_user
+    code "wget --user=#{user} --password=#{password} -O #{file} #{url}/${file}"
+  not_if { ::File.exists?("#{installers}/#{file}") }
+  end
+end 
