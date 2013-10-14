@@ -32,6 +32,8 @@ include_recipe "daris"
 mflux_home = node['mediaflux']['home']
 mflux_user = node['mediaflux']['user']
 url = node['daris']['download_url']
+user = node['daris']['download_user']
+password = node['daris']['download_password']
 pkgs = node['daris']['pkgs']
 installers = "#{mflux_home}/daris_installers"
 
