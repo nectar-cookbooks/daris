@@ -5,12 +5,12 @@ node.default['daris']['download_url'] =
 node.default['daris']['download_user'] = 'guest@www-public'
 node.default['daris']['download_password'] = 'nIg4!871'
 
-node.default['daris']['pkg']['nig_essentials'] = 
+node.default['daris']['pkgs']['nig_essentials'] = 
   'mfpkg-nig_essentials-0.19-mf3.8.029-stable.zip'
-node.default['daris']['pkg']['nig_transcoder'] = 
+node.default['daris']['pkgs']['nig_transcoder'] = 
   'mfpkg-nig_transcode-0.33-mf3.8.029-stable.zip'
-node.default['daris']['pkg']['pssd'] = 
+node.default['daris']['pkgs']['pssd'] = 
   'mfpkg-pssd-2.04-mf3.8.029-stable.zip'
-node.default['daris']['pkg']['daris_portal'] = 
+node.default['daris']['pkgs']['daris_portal'] = 
   'mfpkg-daris-0.29-mf3.8.029-stable.zip'
 
