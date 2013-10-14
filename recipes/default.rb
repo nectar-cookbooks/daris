@@ -42,6 +42,7 @@ mfcommand = "#{mflux_user_home}/bin/mfcommand"
 
 package "wget" do
   action :install
+  not_if { ::File.exists?("/usr/bin/xauth") }
 end
 
 directory installers do
@@ -56,7 +57,7 @@ pkgs.each() do | pkg, file |
     not_if { ::File.exists?("#{installers}/#{file}") }
   end
   bash "install-#{pkg}" do
-    user root
+    user "root"
     code ". /etc/mediaflux/servicerc && " +
          "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
          "#{mfcommand} package.install :in file:#{installers}/#{file} && " +
