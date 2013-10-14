@@ -31,11 +31,14 @@ include_recipe "daris"
 
 mflux_home = node['mediaflux']['home']
 mflux_user = node['mediaflux']['user']
+mflux_user_home = node['mediaflux']['user_home']
 url = node['daris']['download_url']
 user = node['daris']['download_user']
 password = node['daris']['download_password']
 pkgs = node['daris']['pkgs']
+
 installers = "#{mflux_home}/daris_installers"
+bin = "#{mflux_user_home}/bin"
 
 package "wget" do
   action :install
@@ -48,8 +51,15 @@ end
 pkgs.each() do | pkg, file | 
   bash "fetch-#{pkg}" do
     user mflux_user
-    code "wget --user=#{user} --password=#{password} --no-check-certificate " +
+    code "wget --user=#{user} --password=#{password} --no-check-certificate "
          "-O #{installers}/#{file} #{url}/#{file}"
-  not_if { ::File.exists?("#{installers}/#{file}") }
+    not_if { ::File.exists?("#{installers}/#{file}") }
+  end
+  bash "install-#{pkg}" do
+    user mflux_user
+    code ". /etc/mediaflux/servicerc && "
+         "#{bin}/mfcommand logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && "
+         "#{bin}/mfcommand package.install :in file:#{installers}/#{file} && "
+         "#{bin}/mfcommand logoff"
   end
 end 
