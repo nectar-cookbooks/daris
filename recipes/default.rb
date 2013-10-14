@@ -48,7 +48,7 @@ end
 pkgs.each() do | pkg, file | 
   bash "fetch-#{pkg}" do
     user mflux_user
-    code "wget --user=#{user} --password=#{password} -O #{file} #{url}/${file}"
+    code "wget --user=#{user} --password=#{password} -O #{file} #{url}/#{file}"
   not_if { ::File.exists?("#{installers}/#{file}") }
   end
 end 
