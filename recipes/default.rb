@@ -98,7 +98,10 @@ template "#{mflux_home}/plugin/pvconv" do
   owner mflux_user
   group mflux_user
   mode 0555
-  source 'pvconv.sh'
+  source 'pvconv.erb'
+  variables ({
+    :pvconv_command => pvconv_bin
+  })
 end
 
 file = node.default['daris']['server_config']
