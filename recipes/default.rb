@@ -51,17 +51,17 @@ directory installers do
   owner mflux_user
 end
 
-bash "create-asset-stores" do
-  user "root"
-  code ". /etc/mediaflux/servicerc && " +
-       "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
-       "#{mfcommand} asset.store.create :name pssd :local true " +
-       "    :type #{node['daris']['file_system_type']} " +
-       "    :automount true  && " +
-       "#{mfcommand} asset.store.create :name dicom :local true " +
-       "    :type #{node['daris']['file_system_type']} " +
-       "    :automount true  && " +
-       "#{mfcommand} logoff"
+['pssd', 'dicom'].each() do |store| 
+  bash "create-#{store}-store" do
+    user "root"
+    code ". /etc/mediaflux/servicerc && " +
+         "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
+         "#{mfcommand} asset.store.create :name #{store} :local true " +
+         "    :type #{node['daris']['file_system_type']} " +
+         "    :automount true  && " +
+         "#{mfcommand} logoff"
+    not_if { ::File.exists?( "#{mflux_home}/volatile/stores/#{store}" ) }
+  end
 end
 
 pkgs.each() do | pkg, file | 
