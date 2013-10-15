@@ -49,6 +49,19 @@ directory installers do
   owner mflux_user
 end
 
+bash "create-asset-stores" do
+  user "root"
+  code ". /etc/mediaflux/servicerc && " +
+       "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
+       "#{mfcommand} asset.store.create :name pssd :local true " +
+       "    :type #{node['daris']['file_system_type']} " +
+       "    :automount true  && " +
+       "#{mfcommand} asset.store.create :name dicom :local true " +
+       "    :type #{node['daris']['file_system_type']} " +
+       "    :automount true  && " +
+       "#{mfcommand} logoff"
+end
+
 pkgs.each() do | pkg, file | 
   bash "fetch-#{pkg}" do
     user mflux_user
@@ -64,3 +77,12 @@ pkgs.each() do | pkg, file |
          "#{mfcommand} logoff"
   end
 end 
+
+bash "srefresh" do
+  user "root"
+  code ". /etc/mediaflux/servicerc && " +
+       "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
+       "#{mfcommand} srefresh && " +
+       "#{mfcommand} logoff"
+end
+
