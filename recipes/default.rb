@@ -121,9 +121,9 @@ bash "extract-server-config" do
   code "unzip #{installers}/#{file} server-config.jar"
 end
 
-coookbook_file "#{mflux_user_home}/bin/server_config.sh" do
+coookbook_file "#{mflux_user_home}/bin/server-config.sh" do
   owner mflux_user
   group mflux_user
   mode 0750
-  source "server_config.sh"
+  source "server-config.sh"
 end
