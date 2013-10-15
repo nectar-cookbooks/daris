@@ -26,8 +26,8 @@ fi
 # Uncomment the following to enable general tracing.
 # MF_VERBOSE=-verbose
 
-$JAVA -Dmf.host=$MF_HOST -Dmf.port=$MF_PORT -Dmf.transport=$MF_TRANSPORT \
-    -jar $JAR
+$JAVA -Dmf.host=$MFLUX_HOST -Dmf.port=$MFLUX_PORT \
+    -Dmf.transport=$MFLUX_TRANSPORT -jar $JAR
 
 RETVAL=$?
 exit $RETVAL
