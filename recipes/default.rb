@@ -78,11 +78,14 @@ pkgs.each() do | pkg, file |
   end
 end 
 
-bash "srefresh" do
-  user "root"
-  code ". /etc/mediaflux/servicerc && " +
-       "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
-       "#{mfcommand} srefresh && " +
-       "#{mfcommand} logoff"
+# I don't think this is necessary when using mfcommand ...
+if false then
+  bash "srefresh" do
+    user "root"
+    code ". /etc/mediaflux/servicerc && " +
+         "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
+         "#{mfcommand} srefresh && " +
+         "#{mfcommand} logoff"
+  end
 end
 
