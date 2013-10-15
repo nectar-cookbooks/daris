@@ -27,7 +27,9 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-include_recipe "daris"
+if ! ::File.exists?( '/usr/local/bin/pvconv.pl' ) then
+  include_recipe "pvconv"
+end
 
 mflux_home = node['mediaflux']['home']
 mflux_user = node['mediaflux']['user']
