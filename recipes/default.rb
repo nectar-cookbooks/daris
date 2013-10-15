@@ -27,12 +27,7 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-perl_site_bin = `perl -V:installsitebin`
-pvconv_bin = "#{perl_site_bin}/pvconv.pl"
-
-if ! ::File.exists?( pvconv_bin ) then
-  include_recipe "pvconv"
-end
+include_recipe "pvconv"
 
 mflux_home = node['mediaflux']['home']
 mflux_user = node['mediaflux']['user']
@@ -44,6 +39,7 @@ pkgs = node['daris']['pkgs']
 
 installers = "#{mflux_home}/daris_installers"
 mfcommand = "#{mflux_user_home}/bin/mfcommand"
+pvconv = node['pvconv']['command']
 
 package "wget" do
   action :install
@@ -100,7 +96,7 @@ template "#{mflux_home}/plugin/pvconv" do
   mode 0555
   source 'pvconv.erb'
   variables ({
-    :pvconv_command => pvconv_bin
+    :pvconv_command => pvconv
   })
 end
 
