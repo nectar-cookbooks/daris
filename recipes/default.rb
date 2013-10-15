@@ -37,7 +37,11 @@ user = node['daris']['download_user']
 password = node['daris']['download_password']
 pkgs = node['daris']['pkgs']
 
-installers = "#{mflux_home}/daris_installers"
+installers = node['mediaflux']['installers']
+if ! installers.start_with?('/') then
+  installers = mflux_user_home + '/' + installers
+end
+
 mfcommand = "#{mflux_user_home}/bin/mfcommand"
 pvconv = node['pvconv']['command']
 
@@ -90,7 +94,7 @@ if false then
   end
 end
 
-template "#{mflux_home}/plugin/pvconv" do
+template "#{mflux_home}/plugin/bin/pvconv.pl" do
   owner mflux_user
   group mflux_user
   mode 0555
