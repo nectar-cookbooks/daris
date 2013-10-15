@@ -14,3 +14,5 @@ node.default['daris']['pkgs']['pssd'] =
 node.default['daris']['pkgs']['daris_portal'] = 
   'mfpkg-daris-0.29-mf3.8.029-stable.zip'
 
+node.default['daris']['server_config'] =
+  'server-config-1.0-stable.zip'

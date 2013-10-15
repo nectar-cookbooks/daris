@@ -27,7 +27,10 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-if ! ::File.exists?( '/usr/local/bin/pvconv.pl' ) then
+perl_site_bin = `perl -V:installsitebin`
+pvconv_bin = "#{perl_site_bin}/pvconv.pl"
+
+if ! ::File.exists?( pvconv_bin ) then
   include_recipe "pvconv"
 end
 
@@ -91,3 +94,36 @@ if false then
   end
 end
 
+template "#{mflux_home}/plugin/pvconv" do
+  owner mflux_user
+  group mflux_user
+  mode 0555
+  source 'pvconv.sh'
+end
+
+file = node.default['daris']['server_config']
+bash "fetch-server-config" do
+  user mflux_user
+  code "wget --user=#{user} --password=#{password} --no-check-certificate " +
+       "-O #{installers}/#{file} #{url}/#{file}"
+  not_if { ::File.exists?("#{installers}/#{file}") }
+end
+
+package "unzip" do
+  action :install
+  not_if { ::File.exists?('/usr/bin/unzip') }
+end
+
+bash "extract-server-config" do
+  cwd "#{mflux_user_home}/bin"
+  user mflux_user
+  group mflux_user
+  code "unzip #{installers}/#{file} server-config.jar"
+end
+
+coookbook_file "#{mflux_user_home}/bin/server_config.sh" do
+  owner mflux_user
+  group mflux_user
+  mode 0750
+  source "server_config.sh"
+end
