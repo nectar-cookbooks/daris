@@ -161,21 +161,21 @@ template "#{mflux_user_home}/initial_daris_conf" do
   group mflux_user
   mode 0400
   variables ({
-    password => node['mediaflux']['admin_password'],
-    server_name => node['mediaflux']['server_name'],
-    server_organization => node['mediaflux']['server_organization'],
-    jvm_memory_max => node['mediaflux']['jvm_memory_max'],
-    jvm_memory_perm_max => node['mediaflux']['jvm_memory_max'],
-    mail_smtp_host => node['mediaflux']['mail_smtp_host'],
-    mail_smtp_port => node['mediaflux']['mail_smtp_port'],
-    mail_from => node['mediaflux']['mail_from'],
-    notification_from => node['mediaflux']['notification_from'],
-    authentication_domain => node['mediaflux']['authentication_domain'],
-    dicom_namespace => node['daris']['dicom_domain'],
-    dicom_store => node['daris']['dicom_store'],
-    dicom_proxy_domain => node['daris']['dicom_proxy_domain'],
-    dicom_proxy_user_names => node['daris']['dicom_proxy_user_names'],
-    dicom_notifications => node['daris']['dicom_ingest_notifications']
+    :password => node['mediaflux']['admin_password'],
+    :server_name => node['mediaflux']['server_name'],
+    :server_organization => node['mediaflux']['server_organization'],
+    :jvm_memory_max => node['mediaflux']['jvm_memory_max'],
+    :jvm_memory_perm_max => node['mediaflux']['jvm_memory_max'],
+    :mail_smtp_host => node['mediaflux']['mail_smtp_host'],
+    :mail_smtp_port => node['mediaflux']['mail_smtp_port'],
+    :mail_from => node['mediaflux']['mail_from'],
+    :notification_from => node['mediaflux']['notification_from'],
+    :authentication_domain => node['mediaflux']['authentication_domain'],
+    :dicom_namespace => node['daris']['dicom_domain'],
+    :dicom_store => node['daris']['dicom_store'],
+    :dicom_proxy_domain => node['daris']['dicom_proxy_domain'],
+    :dicom_proxy_user_names => node['daris']['dicom_proxy_user_names'],
+    :dicom_notifications => node['daris']['dicom_ingest_notifications']
   })
 end
 
