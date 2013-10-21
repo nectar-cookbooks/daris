@@ -1,8 +1,8 @@
 module DarisHelpers
   def java_memory_model()
     version = `java -version`
-    if /.*64-BIT.*/.matches(version) then '64'
-    elsif /.*32-BIT.*/.matches(version) then '32'
+    if /.*64-BIT.*/.match(version) then '64'
+    elsif /.*32-BIT.*/.match(version) then '32'
     else raise 'Cannot figure out memory model for java' end
   end
 
