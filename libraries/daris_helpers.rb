@@ -17,7 +17,7 @@ module DarisHelpers
       if java_memory_model() == '32' then
         max = if platform?("windows") then 1500 else 2048 end
       else
-        max = (/([0-9]+)kB/.match(node['memory']['total'])[1] / 1024) - 512
+        max = (int(/([0-9]+)kB/.match(node['memory']['total'])[1]) / 1024) - 512
       end
     end
     return max
