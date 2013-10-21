@@ -45,30 +45,6 @@ end
 mfcommand = "#{mflux_user_home}/bin/mfcommand"
 pvconv = node['pvconv']['command']
 
-def java_memory_model()
-  version = `java -version`
-  if /.*64-BIT.*/.matches(version) then '64'
-  elsif /.*32-BIT.*/.matches(version) then '32'
-  else raise 'Cannot figure out memory model for java' end
-end
-
-def java_memory_max(arg) 
-  if arg && arg != '' then
-    max_memory = int(arg)
-    if max_memory < 128 then
-      raise 'The JVM max memory size is too small'
-    end
-  else
-    # Intuit a sensible memory size from the platform and the available memory.
-    if java_memory_model() == '32' then
-      max_memory = if platform?("windows") then 1500 else 2048 end
-    else
-      max_memory = (/([0-9]+)kB/.match(node['memory']['total'])[1] / 1024) - 512
-    end
-  end
-  return max_memory
-end
-
 template "#{mflux_user_home}/initial_daris_conf" do 
   source "initial_daris_conf.erb"
   owner mflux_user
