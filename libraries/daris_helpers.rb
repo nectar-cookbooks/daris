@@ -8,7 +8,7 @@ module DarisHelpers
 
   def java_memory_max(arg) 
     if arg && arg != '' then
-      max = int(arg)
+      max = arg.to_i
       if max < 128 then
         raise 'The JVM max memory size is too small'
       end
@@ -17,7 +17,7 @@ module DarisHelpers
       if java_memory_model() == '32' then
         max = if platform?("windows") then 1500 else 2048 end
       else
-        max = (int(/([0-9]+)kB/.match(node['memory']['total'])[1]) / 1024) - 512
+        max = (/([0-9]+)kB/.match(node['memory']['total'])[1].to_i / 1024) - 512
       end
     end
     return max
