@@ -50,6 +50,7 @@ template "#{mflux_user_home}/initial_daris_conf" do
   owner mflux_user
   group mflux_user
   mode 0400
+  helpers (DarisHelpers)
   variables ({
     :password => node['mediaflux']['admin_password'],
     :server_name => node['mediaflux']['server_name'],
