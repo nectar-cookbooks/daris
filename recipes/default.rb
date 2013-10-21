@@ -131,14 +131,14 @@ cookbook_file "#{mflux_user_home}/bin/server-config.sh" do
   source "server-config.sh"
 end
 
-def java_memory_model() do
+def java_memory_model()
   version = `java -version`
   if /.*64-BIT.*/.matches(version) then '64'
   elsif /.*32-BIT.*/.matches(version) then '32'
   else raise 'Cannot figure out memory model for java' end
 end
 
-def java_memory_max(arg) do
+def java_memory_max(arg) 
   if arg && arg != '' then
     max_memory = int(arg)
     if max_memory < 128 then
