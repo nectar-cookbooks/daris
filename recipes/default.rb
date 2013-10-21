@@ -130,3 +130,58 @@ cookbook_file "#{mflux_user_home}/bin/server-config.sh" do
   mode 0750
   source "server-config.sh"
 end
+
+def java_memory_model() do
+  version = `java -version`
+  if /.*64-BIT.*/.matches(version) then '64'
+  elsif /.*32-BIT.*/.matches(version) then '32'
+  else raise 'Cannot figure out memory model for java' end
+end
+
+def java_memory_max(arg) do
+  if arg && arg != '' then
+    max_memory = int(arg)
+    if max_memory < 128 then
+      raise 'The JVM max memory size is too small'
+    end
+  else
+    # Intuit a sensible memory size from the platform and the available memory.
+    if java_memory_model() == '32' then
+      max_memory = if platform?("windows") then 1500 else 2048 end
+    else
+      max_memory = (/([0-9]+)kB/.match(node['memory']['total'])[1] / 1024) - 512
+    end
+  end
+  return max_memory
+end
+
+template "#{mflux_user_home}/initial_daris_conf" do 
+  source "initial_daris_conf.erb"
+  owner mflux_user
+  group mflux_user
+  mode 0400
+  variables ({
+    password => node['mediaflux']['admin_password'],
+    server_name => node['mediaflux']['server_name'],
+    server_organization => node['mediaflux']['server_organization'],
+    jvm_memory_max => node['mediaflux']['jvm_memory_max'],
+    jvm_memory_perm_max => node['mediaflux']['jvm_memory_max'],
+    mail_smtp_host => node['mediaflux']['mail_smtp_host'],
+    mail_smtp_port => node['mediaflux']['mail_smtp_port'],
+    mail_from => node['mediaflux']['mail_from'],
+    notification_from => node['mediaflux']['notification_from'],
+    authentication_domain => node['mediaflux']['authentication_domain'],
+    dicom_namespace => node['daris']['dicom_domain'],
+    dicom_store => node['daris']['dicom_store'],
+    dicom_proxy_domain => node['daris']['dicom_proxy_domain'],
+    dicom_proxy_user_names => node['daris']['dicom_proxy_user_names'],
+    dicom_notifications => node['daris']['dicom_ingest_notifications']
+  })
+end
+
+bash "run-server-config" do
+  user mflux_user
+  group mflux_user
+  code "#{mflux_user_home}/bin/server-config.sh " +
+       "    < #{mflux_user_home}/initial_daris_conf"
+end

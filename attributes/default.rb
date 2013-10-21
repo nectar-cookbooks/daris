@@ -5,6 +5,13 @@ node.default['daris']['download_url'] =
 node.default['daris']['download_user'] = 'guest@www-public'
 node.default['daris']['download_password'] = 'nIg4!871'
 
+node.default['daris']['dicom_namespace'] = 'dicom'
+node.default['daris']['dicom_store'] = 'dicom'
+node.default['daris']['dicom_proxy_domain'] = 'dicom'
+node.default['daris']['dicom_proxy_user_names'] = ['dicom']
+node.default['daris']['dicom_ingest_notifications'] = []
+
+# The standard DaRIS packages.
 node.default['daris']['pkgs']['nig_essentials'] = 
   'mfpkg-nig_essentials-0.19-mf3.8.029-stable.zip'
 node.default['daris']['pkgs']['nig_transcoder'] = 
