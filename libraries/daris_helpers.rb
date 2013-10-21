@@ -3,7 +3,7 @@ module DarisHelpers
     version = `java -version`
     if /.*64-BIT.*/.match(version) then '64'
     elsif /.*32-BIT.*/.match(version) then '32'
-    else raise 'Cannot figure out memory model for java' end
+    else raise "Cannot figure out jvm memory model from #{version}" end
   end
 
   def java_memory_max(arg) 
