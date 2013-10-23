@@ -72,24 +72,11 @@ end
 
 package "wget" do
   action :install
-  not_if { ::File.exists?("/usr/bin/xauth") }
+  not_if { ::File.exists?("/usr/bin/wget") }
 end
 
 directory installers do
   owner mflux_user
-end
-
-['pssd', 'dicom'].each() do |store| 
-  bash "create-#{store}-store" do
-    user "root"
-    code ". /etc/mediaflux/servicerc && " +
-         "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
-         "#{mfcommand} asset.store.create :name #{store} :local true " +
-         "    :type #{node['daris']['file_system_type']} " +
-         "    :automount true  && " +
-         "#{mfcommand} logoff"
-    not_if { ::File.exists?( "#{mflux_home}/volatile/stores/#{store}" ) }
-  end
 end
 
 pkgs.each() do | pkg, file | 
@@ -98,24 +85,6 @@ pkgs.each() do | pkg, file |
     code "wget --user=#{user} --password=#{password} --no-check-certificate " +
          "-O #{installers}/#{file} #{url}/#{file}"
     not_if { ::File.exists?("#{installers}/#{file}") }
-  end
-  bash "install-#{pkg}" do
-    user "root"
-    code ". /etc/mediaflux/servicerc && " +
-         "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
-         "#{mfcommand} package.install :in file:#{installers}/#{file} && " +
-         "#{mfcommand} logoff"
-  end
-end 
-
-# I don't think this is necessary when using mfcommand ...
-if false then
-  bash "srefresh" do
-    user "root"
-    code ". /etc/mediaflux/servicerc && " +
-         "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
-         "#{mfcommand} srefresh && " +
-         "#{mfcommand} logoff"
   end
 end
 
@@ -164,19 +133,15 @@ template "#{mflux_home}/config/services/network.tcl" do
     :https_port => node['mediaflux']['https_port'],
     :dicom_port => node['daris']['dicom_port']
   })
-  # notifies :restart, "service[mediaflux]", :immediately
 end
 
 service "mediaflux-restart" do
   service_name "mediaflux"
   action :nothing
-  notifies :run, "bash[mediaflux-restarted]", :immediately
+  subscribes :restart, "template[#{mflux_home}/config/services/network.tcl]", :immediately
 end
 
-# This is a bit crude, but following recipes may require that the 
-# Mediaflux service is 'up'.  
-bash "mediaflux-restarted" do
-  action :nothing
+bash "mediaflux-running" do
   user mflux_user
   code ". /etc/mediaflux/mfluxrc ; " +
        "wget ${MFLUX_TRANSPORT}://${MFLUX_HOST}:${MFLUX_PORT}/ " +
@@ -191,3 +156,25 @@ bash "run-server-config" do
        "    < #{mflux_user_home}/initial_daris_conf"
 end
 
+['pssd', 'dicom'].each() do |store| 
+  bash "create-#{store}-store" do
+    user "root"
+    code ". /etc/mediaflux/servicerc && " +
+         "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
+         "#{mfcommand} asset.store.create :name #{store} :local true " +
+         "    :type #{node['daris']['file_system_type']} " +
+         "    :automount true  && " +
+         "#{mfcommand} logoff"
+    not_if { ::File.exists?( "#{mflux_home}/volatile/stores/#{store}" ) }
+  end
+end
+
+pkgs.each() do | pkg, file | 
+  bash "install-#{pkg}" do
+    user "root"
+    code ". /etc/mediaflux/servicerc && " +
+         "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
+         "#{mfcommand} package.install :in file:#{installers}/#{file} && " +
+         "#{mfcommand} logoff"
+  end
+end 
