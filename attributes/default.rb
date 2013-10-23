@@ -1,5 +1,7 @@
 node.default['daris']['file_system_type'] = 'file-system'
 
+node.default['daris']['dicom_port'] = '6666'
+
 node.default['daris']['download_url'] = 
   'https://daris-1.rvm.nectar.org.au:8443/daris-downloads/stable'
 node.default['daris']['download_user'] = 'guest@www-public'

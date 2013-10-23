@@ -156,9 +156,20 @@ cookbook_file "#{mflux_user_home}/bin/server-config.sh" do
   source "server-config.sh"
 end
 
+template "#{mflux_home}/config/services/network.tcl" do 
+  owner mflux_user
+  source "network-tcl.erb"
+  variables({
+    :http_port => node['mediaflux']['http_port'],
+    :https_port => node['mediaflux']['https_port'],
+    :dicom_port => node['daris']['dicom_port']
+  })
+end
+
 bash "run-server-config" do
   user mflux_user
   group mflux_user
   code "#{mflux_user_home}/bin/server-config.sh " +
        "    < #{mflux_user_home}/initial_daris_conf"
 end
+
