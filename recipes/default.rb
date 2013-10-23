@@ -137,8 +137,7 @@ end
 
 service "mediaflux-restart" do
   service_name "mediaflux"
-  action :nothing
-  subscribes :restart, "template[#{mflux_home}/config/services/network.tcl]", :immediately
+  action :restart
 end
 
 bash "mediaflux-running" do
