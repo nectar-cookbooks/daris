@@ -164,7 +164,25 @@ template "#{mflux_home}/config/services/network.tcl" do
     :https_port => node['mediaflux']['https_port'],
     :dicom_port => node['daris']['dicom_port']
   })
+  notifies :restart, "service[mediaflux]", :immediately
 end
+
+service "mediaflux-restart" do
+  service_name "mediaflux"
+  action :nothing
+  notifies :run, "bash[mediaflux-restarted]", :immediately
+end
+
+# This is a bit crude, but following recipes may require that the 
+# Mediaflux service is 'up'.  
+bash "mediaflux-restarted" do
+  action :nothing
+  user mflux_user
+  code ". /etc/mediaflux/mfluxrc ; " +
+       "wget ${MFLUX_TRANSPORT}://${MFLUX_HOST}:${MFLUX_PORT}/ " +
+       "    --retry-connrefused --no-check-certificate -O /dev/null " +
+       "    --waitretry=1 --timeout=2 --tries=10"
+end 
 
 bash "run-server-config" do
   user mflux_user
