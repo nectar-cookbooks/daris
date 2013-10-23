@@ -25,3 +25,5 @@ node.default['daris']['pkgs']['daris_portal'] =
 
 node.default['daris']['server_config'] =
   'server-config-1.0-stable.zip'
+
+node.override['mediaflux']['defer_start'] = true
