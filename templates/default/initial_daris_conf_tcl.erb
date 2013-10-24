@@ -30,7 +30,7 @@ proc init_daris_conf { } {
 }
 
 proc set_property { name, value } {
-    if { $value == '' } { 
+    if { $value == "" } { 
        server.property.unset :name $name
     } else { 
        server.property.set :property -name $name $value
