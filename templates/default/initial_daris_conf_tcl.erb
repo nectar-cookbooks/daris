@@ -12,7 +12,7 @@ proc init_daris_conf { } {
     if { $org == "" } {
         set org [ xvalue identity "server/organization" ]
     }
-    server.identity.set :server < :name $name :organization $org >
+    server.identity.set :name $name :organization $org
 
 #<%= java_memory_model() %>
 #<%= java_memory_max(@jvm_memory_max)  %>
