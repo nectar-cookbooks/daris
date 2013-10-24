@@ -1,4 +1,4 @@
-proc init_daris_conf() {
+proc init_daris_conf { } {
     if { [ xvalue exists [ package.exists :package "PSSD" ] ] == "false" } {
 	error "Package PSSD has not been installed.  You must install it first"
     } 
