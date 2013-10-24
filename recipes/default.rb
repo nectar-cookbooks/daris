@@ -149,9 +149,7 @@ bash "mediaflux-running" do
 end 
 
 bash "run-server-config" do
-  user mflux_user
-  group mflux_user
-    code ". /etc/mediaflux/servicerc && " +
+  code ". /etc/mediaflux/servicerc && " +
          "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
          "#{mfcommand} source #{mflux_user_home}/initial_daris_conf.tcl && " +
          "#{mfcommand} logoff"
