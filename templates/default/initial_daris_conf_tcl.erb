@@ -6,20 +6,20 @@ proc init_daris_conf { } {
     set name "<%= fillIn(@server_name, 'unknown') %>"
     set org "<%= fillIn(@server_organization, 'Unknown organization') %>"
     server.identity.set :name $name :organization $org
-    server.property.set :property -name 'jvm.data.model' \
-	'<%= java_memory_model() %>'
-    server.property.set :property -name 'jvm.memory.max' \
-	'<%= java_memory_max(@jvm_memory_max) %>'
-    server.property.set :property -name 'jvm.memory.perm.max' \
-	'<%= fillIn(@jvm_memory_perm_max, '512') %>'
-    server.property.set :property -name 'mail.smtp.host' \
-	'<%= fillIn(@mail_smtp_host, '') %>'
-    server.property.set :property -name 'mail.smtp.port' \
-	'<%= fillIn(@mail_smtp_port, '25') %>'
-    server.property.set :property -name 'mail.from' \
-	'<%= fillIn(@mail_from, 'nobody@nowhere') %>'
-    server.property.set :property -name 'notification.from' \
-	'<%= fillIn(@notification_from, 'nobody@nowhere') %>'
+    server.property.set :property -name "jvm.data.model" \
+	"<%= java_memory_model() %>"
+    server.property.set :property -name "jvm.memory.max" \
+	"<%= java_memory_max(@jvm_memory_max) %>"
+    server.property.set :property -name "jvm.memory.perm.max" \
+	"<%= fillIn(@jvm_memory_perm_max, '512') %>"
+    set_property "mail.smtp.host" "<%= fillIn(@mail_smtp_host, '') %>"
+    server.property.set :property -name "mail.smtp.port" \
+	"<%= fillIn(@mail_smtp_port, '25') %>"
+    server.property.set :property -name "mail.from" \
+	"<%= fillIn(@mail_from, 'nobody@nowhere') %>"
+    server.property.set :property -name "notification.from" \
+	"<%= fillIn(@notification_from, 'nobody@nowhere') %>"
+
 #<%= @authentication_domain %>
 #<%= @dicom_namespace %>
 #<%= @dicom_store %>
@@ -28,6 +28,15 @@ proc init_daris_conf { } {
 #<% @dicom_ingest_notifications.each() do |addr| %><%= addr + "\n" %><% end %>
 
 }
+
+proc set_property { name, value } {
+    if { $value == '' } { 
+       server.property.unset :name $name
+    } else { 
+       server.property.set :property -name $name $value
+    }
+}
+
 
 init_daris_conf
 
