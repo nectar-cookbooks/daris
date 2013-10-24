@@ -6,21 +6,20 @@ proc init_daris_conf { } {
     set name "<%= fillIn(@server_name, 'unknown') %>"
     set org "<%= fillIn(@server_organization, 'Unknown organization') %>"
     server.identity.set :name $name :organization $org
-    server.property.set :property -name "jvm.data.model" \
-	"<%= java_memory_model() %>"
-    server.property.set :property -name "jvm.memory.max" \
-	"<%= java_memory_max(@jvm_memory_max) %>"
-    server.property.set :property -name "jvm.memory.perm.max" \
+    set_property "jvm.data.model" "<%= java_memory_model() %>"
+    set_property "jvm.memory.max" "<%= java_memory_max(@jvm_memory_max) %>"
+    set_property "jvm.memory.perm.max" \
 	"<%= fillIn(@jvm_memory_perm_max, '512') %>"
     set_property "mail.smtp.host" "<%= fillIn(@mail_smtp_host, '') %>"
-    server.property.set :property -name "mail.smtp.port" \
-	"<%= fillIn(@mail_smtp_port, '25') %>"
-    server.property.set :property -name "mail.from" \
-	"<%= fillIn(@mail_from, 'nobody@nowhere') %>"
-    server.property.set :property -name "notification.from" \
+    set_property "mail.smtp.port" "<%= fillIn(@mail_smtp_port, '25') %>"
+    set_property "mail.from" "<%= fillIn(@mail_from, 'nobody@nowhere') %>"
+    set_property "notification.from" \
 	"<%= fillIn(@notification_from, 'nobody@nowhere') %>"
 
-#<%= @authentication_domain %>
+    set domain "<%= fillIn(@authentication_domain, '') %>"
+    if { $domain != "" } {
+        authentication.domain.create :domain $domain :ifexists ignore
+    }
 #<%= @dicom_namespace %>
 #<%= @dicom_store %>
 #<%= @dicom_proxy_domain %>
