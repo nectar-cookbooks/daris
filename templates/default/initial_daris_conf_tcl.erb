@@ -1,0 +1,37 @@
+proc init_daris_conf() {
+    if { [ xvalue exists [ package.exists :package "PSSD" ] ] == "false" } {
+	error "Package PSSD has not been installed.  You must install it first"
+    } 
+
+    set identity [ server.identity ]
+    set name "<%= ( if @server_name then @server_name else "" end ) %>"
+    if { $name == "" } {
+        set name [ xvalue identity "server/name" ]
+    }
+    set org "<%= ( if @server_organization then @server_organization else "" end ) %>"
+    if { $org == "" } {
+        set org [ xvalue identity "server/organization" ]
+    }
+    server.identity.set :server < :name $name :organization $org >
+
+#<%= java_memory_model() %>
+#<%= java_memory_max(@jvm_memory_max)  %>
+#<%= @jvm_memory_perm_max %>
+#<%= @mail_smtp_host %>
+#<%= @mail_smtp_port %>
+#<%= @mail_from %>
+#<%= @notification_from %>
+#<%= @authentication_domain %>
+#<%= @dicom_namespace %>
+#<%= @dicom_store %>
+#<%= @dicom_proxy_domain %>
+#<% @dicom_proxy_user_names.each() do |name| %><%= name + "\n" %><% end %> 
+#<% @dicom_ingest_notifications.each() do |addr| %><%= addr + "\n" %><% end %>
+
+}
+
+proc
+
+init_daris_conf()
+
+

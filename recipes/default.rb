@@ -45,8 +45,8 @@ end
 mfcommand = "#{mflux_user_home}/bin/mfcommand"
 pvconv = node['pvconv']['command']
 
-template "#{mflux_user_home}/initial_daris_conf" do 
-  source "initial_daris_conf.erb"
+template "#{mflux_user_home}/initial_daris_conf.tcl" do 
+  source "initial_daris_conf_tcl.erb"
   owner mflux_user
   group mflux_user
   mode 0400
@@ -151,8 +151,10 @@ end
 bash "run-server-config" do
   user mflux_user
   group mflux_user
-  code "#{mflux_user_home}/bin/server-config.sh " +
-       "    < #{mflux_user_home}/initial_daris_conf"
+    code ". /etc/mediaflux/servicerc && " +
+         "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
+         "#{mfcommand} source #{mflux_user_home}/initial_daris_conf.tcl && " +
+         "#{mfcommand} logoff"
 end
 
 ['pssd', 'dicom'].each() do |store| 
