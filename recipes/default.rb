@@ -45,6 +45,11 @@ end
 mfcommand = "#{mflux_user_home}/bin/mfcommand"
 pvconv = node['pvconv']['command']
 
+dicom_store = node['daris']['dicom_store']
+if ! dicom_store || dicom_store == '' then
+  dicom_store = 'dicom'
+end
+
 template "#{mflux_user_home}/initial_daris_conf.tcl" do 
   source "initial_daris_conf_tcl.erb"
   owner mflux_user
@@ -62,8 +67,8 @@ template "#{mflux_user_home}/initial_daris_conf.tcl" do
     :mail_from => node['mediaflux']['mail_from'],
     :notification_from => node['mediaflux']['notification_from'],
     :authentication_domain => node['mediaflux']['authentication_domain'],
-    :dicom_namespace => node['daris']['dicom_domain'],
-    :dicom_store => node['daris']['dicom_store'],
+    :dicom_namespace => node['daris']['dicom_namespace'],
+    :dicom_store => dicom_store,
     :dicom_proxy_domain => node['daris']['dicom_proxy_domain'],
     :dicom_proxy_user_names => node['daris']['dicom_proxy_user_names'],
     :dicom_ingest_notifications => node['daris']['dicom_ingest_notifications']
@@ -148,14 +153,7 @@ bash "mediaflux-running" do
        "    --waitretry=1 --timeout=2 --tries=10"
 end 
 
-bash "run-server-config" do
-  code ". /etc/mediaflux/servicerc && " +
-         "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
-         "#{mfcommand} source #{mflux_user_home}/initial_daris_conf.tcl && " +
-         "#{mfcommand} logoff"
-end
-
-['pssd', 'dicom'].each() do |store| 
+['pssd', dicom_store ].each() do |store| 
   bash "create-#{store}-store" do
     user "root"
     code ". /etc/mediaflux/servicerc && " +
@@ -166,6 +164,13 @@ end
          "#{mfcommand} logoff"
     not_if { ::File.exists?( "#{mflux_home}/volatile/stores/#{store}" ) }
   end
+end
+
+bash "run-server-config" do
+  code ". /etc/mediaflux/servicerc && " +
+         "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
+         "#{mfcommand} source #{mflux_user_home}/initial_daris_conf.tcl && " +
+         "#{mfcommand} logoff"
 end
 
 pkgs.each() do | pkg, file | 

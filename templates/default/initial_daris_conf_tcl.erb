@@ -20,8 +20,18 @@ proc init_daris_conf { } {
     if { $domain != "" } {
         authentication.domain.create :domain $domain :ifexists ignore
     }
-#<%= @dicom_namespace %>
-#<%= @dicom_store %>
+    set store "<%= @dicom_store %>"
+    set store_exists [ xvalue exists [ asset.store.exists :name $store ] ]
+    if { $store_exists == "false" } then {
+	error "Dicom store $store has not been created.  You must create it first"
+    }
+    set namespace "<%= fillIn(@dicom_namespace, 'dicom') %>"
+    set namespace_exists [ xvalue exists [ asset.namespace.exists \
+					       :namespace $namespace ] ]
+    if { $namespace_exists == "false" } then {
+	asset.namespace.create :namespace $namespace \
+	    :store $store :description "DICOM namespace"
+    }
 #<%= @dicom_proxy_domain %>
 #<% @dicom_proxy_user_names.each() do |name| %><%= name + "\n" %><% end %> 
 #<% @dicom_ingest_notifications.each() do |addr| %><%= addr + "\n" %><% end %>
