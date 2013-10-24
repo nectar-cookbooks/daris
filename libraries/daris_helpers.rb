@@ -22,4 +22,8 @@ module DarisHelpers
     end
     return max
   end
+
+  def fillIn(arg, default) 
+    ( if arg && arg != '' then arg else default end )
+  end
 end

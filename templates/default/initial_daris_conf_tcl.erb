@@ -3,15 +3,8 @@ proc init_daris_conf { } {
 	error "Package PSSD has not been installed.  You must install it first"
     } 
 
-    set identity [ server.identity ]
-    set name "<%= ( if @server_name then @server_name else "" end ) %>"
-    if { $name == "" } {
-        set name [ xvalue identity "server/name" ]
-    }
-    set org "<%= ( if @server_organization then @server_organization else "" end ) %>"
-    if { $org == "" } {
-        set org [ xvalue identity "server/organization" ]
-    }
+    set name "<%= fillIn(@server_name, 'unknown') %>"
+    set org "<%= fillIn(@server_organization, 'Unknown organization') %>"
     server.identity.set :name $name :organization $org
 
 #<%= java_memory_model() %>
