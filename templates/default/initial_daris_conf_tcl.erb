@@ -6,10 +6,12 @@ proc init_daris_conf { } {
     set name "<%= fillIn(@server_name, 'unknown') %>"
     set org "<%= fillIn(@server_organization, 'Unknown organization') %>"
     server.identity.set :name $name :organization $org
-
-#<%= java_memory_model() %>
-#<%= java_memory_max(@jvm_memory_max)  %>
-#<%= @jvm_memory_perm_max %>
+    server.property.set :property -name "jvm.data.model" \
+                                  "<%= java_memory_model() %>"
+    server.property.set :property -name "jvm.memory.max" \
+                                  "<%= java_memory_max(@jvm_memory_max) %>"
+    server.property.set :property -name "jvm.memory.perm.max" \
+                                  "<%= @jvm_memory_perm_max %>"
 #<%= @mail_smtp_host %>
 #<%= @mail_smtp_port %>
 #<%= @mail_from %>
