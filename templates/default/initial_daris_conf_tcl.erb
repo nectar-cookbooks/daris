@@ -11,7 +11,7 @@ proc init_daris_conf { } {
     server.property.set :property -name "jvm.memory.max" \
                                   "<%= java_memory_max(@jvm_memory_max) %>"
     server.property.set :property -name "jvm.memory.perm.max" \
-                                  "<%= @jvm_memory_perm_max %>"
+                                  "<%= fillIn(@jvm_memory_perm_max, '512') %>"
 #<%= @mail_smtp_host %>
 #<%= @mail_smtp_port %>
 #<%= @mail_from %>
