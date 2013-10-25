@@ -21,19 +21,20 @@ Attributes
 
 See `attributes/default.rb` for the default values.
 
-* `node['daris']['download_url']` - 
-* `node['daris']['version']` -
-* `node['daris']['download_user']` - 
-* `node['daris']['download_password']` - 
-* `node['mediaflux']['server_name']` -
-* `node['mediaflux']['server_organization']` -
-* `node['mediaflux']['server_organization']` -
-* `node['mediaflux']['mail_smtp_host']` -
-* `node['mediaflux']['mail_smtp_port']` -
-* `node['mediaflux']['mail_from']` -
-* `node['mediaflux']['notification_from']` -
-* `node['mediaflux']['authentication_domain']` -
-
-* `node['mediaflux']['jvm_memory_max']` -
-* `node['mediaflux']['jvm_memory_perm_max']` -
-
+* `node['daris']['download_url']` - This gives the base URL for downloading DaRIS software.
+* `node['daris']['version']` - This gives the DaRIS version
+* `node['daris']['download_user']` - The account name for downloading from the DaRIS site.
+* `node['daris']['download_password']` - The password for downloading from the DaRIS site.
+* `node['mediaflux']['server_name']` - The name of the DaRIS server
+* `node['mediaflux']['server_organization']` - The organization string for the server
+* `node['mediaflux']['mail_smtp_host']` - The mail relay host for sending mail.
+* `node['mediaflux']['mail_smtp_port']` - The corresponding port.
+* `node['mediaflux']['mail_from']` - The "from:" address for regular mail sent by the server.
+* `node['mediaflux']['notification_from']` - The "from:" address for notifications.
+* `node['mediaflux']['authentication_domain']` - A Mediaflux authentication domain name for users.  Set this if you want to create a custom local domain for user accounts.
+* `node['mediaflux']['jvm_memory_max']` - The server's heap size (in Mbytes)
+* `node['mediaflux']['jvm_memory_perm_max']` - The server's permgen size (in Mbytes)
+* `node['daris']['dicom_namespace']` - The namespace used for DICOM.
+* `node['daris']['dicom_proxy_domain']` - The domain to be used for the DICOM proxy users.
+* `node['daris']['dicom_proxy_user_names']` - A list of DICOM proxy users to be created.
+* `node['daris']['dicom_ingest_notifications']` - A list of user emails to be notified of DICOM ingestion events.

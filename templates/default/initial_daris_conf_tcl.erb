@@ -32,10 +32,19 @@ proc init_daris_conf { } {
 	asset.namespace.create :namespace $namespace \
 	    :store $store :description "DICOM namespace"
     }
-#<%= @dicom_proxy_domain %>
-#<% @dicom_proxy_user_names.each() do |name| %><%= name + "\n" %><% end %> 
+    set proxy_domain "<%= fillIn(@dicom_proxy_domain, '') %>"
+    if { $proxy_domain != "" } {
+        authentication.domain.create :domain $proxy_domain :ifexists ignore
+    }
+    
+    <% @dicom_proxy_user_names.each() do |name| %>
+    set name "<%= fillIn(name, '') %>"
+    if { $name != "" } then {
+	authentication.user.create :user $name :domain $proxy_domain \
+	    :ifexists ignore
+    }
+    <% end %> 
 #<% @dicom_ingest_notifications.each() do |addr| %><%= addr + "\n" %><% end %>
-
 }
 
 proc set_property { name value } {

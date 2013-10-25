@@ -10,7 +10,7 @@ node.default['daris']['download_password'] = 'nIg4!871'
 node.default['daris']['dicom_namespace'] = 'dicom'
 node.default['daris']['dicom_store'] = 'dicom'
 node.default['daris']['dicom_proxy_domain'] = 'dicom'
-node.default['daris']['dicom_proxy_user_names'] = ['dicom']
+node.default['daris']['dicom_proxy_user_names'] = ['DICOM-TEST']
 node.default['daris']['dicom_ingest_notifications'] = []
 
 # The standard DaRIS packages.
