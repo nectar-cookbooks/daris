@@ -71,7 +71,8 @@ template "#{mflux_user_home}/initial_daris_conf.tcl" do
     :dicom_store => dicom_store,
     :dicom_proxy_domain => node['daris']['dicom_proxy_domain'],
     :dicom_proxy_user_names => node['daris']['dicom_proxy_user_names'],
-    :dicom_ingest_notifications => node['daris']['dicom_ingest_notifications']
+    :dicom_ingest_notifications => node['daris']['dicom_ingest_notifications'],
+    :ns => node['daris']['ns']
   })
 end
 

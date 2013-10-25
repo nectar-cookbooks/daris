@@ -1,3 +1,4 @@
+node.default['daris']['ns'] = 'nig'
 node.default['daris']['file_system_type'] = 'file-system'
 
 node.default['daris']['dicom_port'] = '6666'

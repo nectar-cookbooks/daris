@@ -1,7 +1,13 @@
 proc init_daris_conf { } {
     if { [ xvalue exists [ package.exists :package "PSSD" ] ] == "false" } {
 	error "Package PSSD has not been installed.  You must install it first"
-    } 
+    }
+
+    set ns "<% fillIn(@ns, '') %>"
+    if { $ns != "" &&
+         [xvalue exists [package.exists :package "${ns}-PSSD"]] == "false" } {
+	error "Package ${ns}-PSSD has not been installed.  You must install it first"
+    }
 
     set name "<%= fillIn(@server_name, 'unknown') %>"
     set org "<%= fillIn(@server_organization, 'Unknown organization') %>"
@@ -42,9 +48,20 @@ proc init_daris_conf { } {
     if { $name != "" } then {
 	authentication.user.create :user $name :domain $proxy_domain \
 	    :ifexists ignore
+        actor.grant :name "${proxy_domain}:${name}" :type user \
+	    :role -type role "pssd.dicom-ingest"
+	if { $ns != "" } {
+	    actor.grant :name "${proxy_domain}:${name}" :type user \
+		:role -type role "${ns}.pssd.dicom-ingest"
+	}
     }
     <% end %> 
-#<% @dicom_ingest_notifications.each() do |addr| %><%= addr + "\n" %><% end %>
+    <% @dicom_ingest_notifications.each() do |addr| %>
+    set addr "<%= fillIn(addr, '') %>"
+    if { $addr != "" } then {
+	
+    }
+    <% end %>
 }
 
 proc set_property { name value } {
