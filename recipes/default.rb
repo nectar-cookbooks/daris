@@ -167,13 +167,6 @@ end
   end
 end
 
-bash "run-server-config" do
-  code ". /etc/mediaflux/servicerc && " +
-         "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
-         "#{mfcommand} source #{mflux_user_home}/initial_daris_conf.tcl && " +
-         "#{mfcommand} logoff"
-end
-
 pkgs.each() do | pkg, file | 
   bash "install-#{pkg}" do
     user "root"
@@ -183,3 +176,10 @@ pkgs.each() do | pkg, file |
          "#{mfcommand} logoff"
   end
 end 
+
+bash "run-server-config" do
+  code ". /etc/mediaflux/servicerc && " +
+         "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
+         "#{mfcommand} source #{mflux_user_home}/initial_daris_conf.tcl && " +
+         "#{mfcommand} logoff"
+end
