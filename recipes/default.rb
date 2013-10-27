@@ -131,51 +131,72 @@ cookbook_file "#{mflux_user_home}/bin/server-config.sh" do
   source "server-config.sh"
 end
 
-template "#{mflux_home}/config/services/network.tcl" do 
-  owner mflux_user
-  source "network-tcl.erb"
-  variables({
-    :http_port => node['mediaflux']['http_port'],
-    :https_port => node['mediaflux']['https_port'],
-    :dicom_port => node['daris']['dicom_port']
-  })
+bootstrap_dicom = true
+
+# The deal here is that when we are bootstrapping DaRIS into a clean
+# Mediaflux system, it won't have the "dicom" listener in network.tcl.
+# We have to: 1) start Mediaflux, 2) create the stores, 3) add the
+# DaRIS packages, 4) update network.tcl and restart Mediaflux.
+if bootstrap_dicom then
+  service "mediaflux-restart" do
+    service_name "mediaflux"
+    action :restart
+  end
+  
+  bash "mediaflux-running" do
+    user mflux_user
+    code ". /etc/mediaflux/mfluxrc ; " +
+      "wget ${MFLUX_TRANSPORT}://${MFLUX_HOST}:${MFLUX_PORT}/ " +
+      "    --retry-connrefused --no-check-certificate -O /dev/null " +
+      "    --waitretry=1 --timeout=2 --tries=10"
+  end 
+  
+  ['pssd', dicom_store ].each() do |store| 
+    bash "create-#{store}-store" do
+      user "root"
+      code ". /etc/mediaflux/servicerc && " +
+        "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
+        "#{mfcommand} asset.store.create :name #{store} :local true " +
+        "    :type #{node['daris']['file_system_type']} " +
+        "    :automount true  && " +
+        "#{mfcommand} logoff"
+      not_if { ::File.exists?( "#{mflux_home}/volatile/stores/#{store}" ) }
+    end
+  end
+  
+  pkgs.each() do | pkg, file | 
+    bash "install-#{pkg}" do
+      user "root"
+      code ". /etc/mediaflux/servicerc && " +
+        "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
+        "#{mfcommand} package.install :in file:#{installers}/#{file} && " +
+        "#{mfcommand} logoff"
+    end
+  end 
+  
+  template "#{mflux_home}/config/services/network.tcl" do 
+    owner mflux_user
+    source "network-tcl.erb"
+    variables({
+                :http_port => node['mediaflux']['http_port'],
+                :https_port => node['mediaflux']['https_port'],
+                :dicom_port => node['daris']['dicom_port']
+              })
+  end
 end
 
-service "mediaflux-restart" do
+service "mediaflux-restart-2" do
   service_name "mediaflux"
   action :restart
 end
 
-bash "mediaflux-running" do
+bash "mediaflux-running-2" do
   user mflux_user
   code ". /etc/mediaflux/mfluxrc ; " +
-       "wget ${MFLUX_TRANSPORT}://${MFLUX_HOST}:${MFLUX_PORT}/ " +
-       "    --retry-connrefused --no-check-certificate -O /dev/null " +
-       "    --waitretry=1 --timeout=2 --tries=10"
-end 
-
-['pssd', dicom_store ].each() do |store| 
-  bash "create-#{store}-store" do
-    user "root"
-    code ". /etc/mediaflux/servicerc && " +
-         "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
-         "#{mfcommand} asset.store.create :name #{store} :local true " +
-         "    :type #{node['daris']['file_system_type']} " +
-         "    :automount true  && " +
-         "#{mfcommand} logoff"
-    not_if { ::File.exists?( "#{mflux_home}/volatile/stores/#{store}" ) }
-  end
+    "wget ${MFLUX_TRANSPORT}://${MFLUX_HOST}:${MFLUX_PORT}/ " +
+    "    --retry-connrefused --no-check-certificate -O /dev/null " +
+    "    --waitretry=1 --timeout=2 --tries=10"
 end
-
-pkgs.each() do | pkg, file | 
-  bash "install-#{pkg}" do
-    user "root"
-    code ". /etc/mediaflux/servicerc && " +
-         "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
-         "#{mfcommand} package.install :in file:#{installers}/#{file} && " +
-         "#{mfcommand} logoff"
-  end
-end 
 
 bash "run-server-config" do
   code ". /etc/mediaflux/servicerc && " +
