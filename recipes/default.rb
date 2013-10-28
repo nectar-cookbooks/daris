@@ -178,8 +178,7 @@ end
 service "mediaflux-restart" do
   action :nothing
   service_name "mediaflux"
-  action :restart
-  subscribes :write, "log[bootstrap]", :immediately
+  subscribes :restart, "log[bootstrap]", :immediately
 end
 
 bash "mediaflux-running" do
@@ -189,7 +188,7 @@ bash "mediaflux-running" do
     "wget ${MFLUX_TRANSPORT}://${MFLUX_HOST}:${MFLUX_PORT}/ " +
     "    --retry-connrefused --no-check-certificate -O /dev/null " +
     "    --waitretry=1 --timeout=2 --tries=10"
-  subscribes :restart, "service[mediaflux-restart]", :immediately
+  subscribes :run, "service[mediaflux-restart]", :immediately
 end 
 
 ['pssd', dicom_store ].each() do |store| 
@@ -228,7 +227,7 @@ template "#{mflux_home}/config/services/network.tcl" do
               :https_port => node['mediaflux']['https_port'],
               :dicom_port => node['daris']['dicom_port']
             })
-  subscribes :run, "bash[mediaflux-running]", :immediately
+  subscribes :create, "bash[mediaflux-running]", :immediately
 end
 
 service "mediaflux-restart-2" do
