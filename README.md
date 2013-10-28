@@ -39,3 +39,8 @@ See `attributes/default.rb` for the default values.
 * `node['daris']['dicom_proxy_domain']` - The domain to be used for the DICOM proxy users.
 * `node['daris']['dicom_proxy_user_names']` - A list of DICOM proxy users to be created.
 * `node['daris']['dicom_ingest_notifications']` - A list of user emails to be notified of DICOM ingestion events.
+
+TO DO List
+==========
+
+* Deal with updating DaRIS with a fresh version.  For example, the simple-minded  scheme for deciding when to bootstrap doesn't take account of DaRIS versions, so it won't even try to upgrade the DaRIS packages.
