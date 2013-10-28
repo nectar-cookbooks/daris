@@ -140,18 +140,22 @@ cookbook_file "#{mflux_user_home}/bin/server-config.sh" do
   source "server-config.sh"
 end
 
-bootstrap_dicom = node['daris']['force_bootstrap']
-if ! bootstrap_dicom then
-  # Sniff the 'network.tcl' for evidence that we created it ...
-  line = `grep Generated #{mflux_home}/config/services/network.tcl`.strip()
-  if /Mediaflux chef recipe/.match(line) then
-    bootstrap = true
-  elsif /DaRIS chef recipe/.match(line) then
-    bootstrap = false
-  else
-    # Badness.  Bail now before we do any more damage.
-    raise "We do not recognize the signature in the network.tcl " +
+ruby_block "bootstrap_test" do
+  block do
+    bootstrap_dicom = node['daris']['force_bootstrap']
+    if ! bootstrap_dicom then
+      # Sniff the 'network.tcl' for evidence that we created it ...
+      line = `grep Generated #{mflux_home}/config/services/network.tcl`.strip()
+      if /Mediaflux chef recipe/.match(line) then
+        resources(:log => "bootstrap").run_action(:write)
+      elsif /DaRIS chef recipe/.match(line) then
+        resources(:log => "no-bootstrap").run_action(:write)
+      else
+        # Badness.  Bail now before we do any more damage.
+        raise "We do not recognize the signature in the network.tcl " +
           " file (#{line})."  
+      end
+    end
   end
 end
 
@@ -159,62 +163,72 @@ end
 # Mediaflux system, it won't have the "dicom" listener in network.tcl.
 # We have to: 1) start Mediaflux, 2) create the stores, 3) add the
 # DaRIS packages, 4) update network.tcl and restart Mediaflux.
-if bootstrap_dicom then
-  log "bootstrap" do
-    message "Bootstrapping the DaRIS stores and plugins."
-    level :info
-  end
+log "bootstrap" do
+  action :nothing
+  message "Bootstrapping the DaRIS stores and plugins."
+  level :info
+end
 
-  service "mediaflux-restart" do
-    service_name "mediaflux"
-    action :restart
+log "no-bootstrap" do
+  action :nothing
+  message "Skipped bootstrapping the DaRIS stores and plugins."
+  level :info
+end
+
+service "mediaflux-restart" do
+  action :nothing
+  service_name "mediaflux"
+  action :restart
+  subscribes :write, "log[bootstrap]", :immediately
+end
+
+bash "mediaflux-running" do
+  action :nothing
+  user mflux_user
+  code ". /etc/mediaflux/mfluxrc ; " +
+    "wget ${MFLUX_TRANSPORT}://${MFLUX_HOST}:${MFLUX_PORT}/ " +
+    "    --retry-connrefused --no-check-certificate -O /dev/null " +
+    "    --waitretry=1 --timeout=2 --tries=10"
+  subscribes :restart, "service[mediaflux-restart]", :immediately
+end 
+
+['pssd', dicom_store ].each() do |store| 
+  bash "create-#{store}-store" do
+    action :nothing
+    user "root"
+    code ". /etc/mediaflux/servicerc && " +
+      "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
+      "#{mfcommand} asset.store.create :name #{store} :local true " +
+      "    :type #{node['daris']['file_system_type']} " +
+      "    :automount true  && " +
+      "#{mfcommand} logoff"
+    not_if { ::File.exists?( "#{mflux_home}/volatile/stores/#{store}" ) }
+    subscribes :run, "bash[mediaflux-running]", :immediately
   end
-  
-  bash "mediaflux-running" do
-    user mflux_user
-    code ". /etc/mediaflux/mfluxrc ; " +
-      "wget ${MFLUX_TRANSPORT}://${MFLUX_HOST}:${MFLUX_PORT}/ " +
-      "    --retry-connrefused --no-check-certificate -O /dev/null " +
-      "    --waitretry=1 --timeout=2 --tries=10"
-  end 
-  
-  ['pssd', dicom_store ].each() do |store| 
-    bash "create-#{store}-store" do
-      user "root"
-      code ". /etc/mediaflux/servicerc && " +
-        "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
-        "#{mfcommand} asset.store.create :name #{store} :local true " +
-        "    :type #{node['daris']['file_system_type']} " +
-        "    :automount true  && " +
-        "#{mfcommand} logoff"
-      not_if { ::File.exists?( "#{mflux_home}/volatile/stores/#{store}" ) }
-    end
+end
+
+pkgs.each() do | pkg, file | 
+  bash "install-#{pkg}" do
+    action :nothing
+    user "root"
+    code ". /etc/mediaflux/servicerc && " +
+      "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
+      "#{mfcommand} package.install :in file:#{installers}/#{file} && " +
+      "#{mfcommand} logoff"
+    subscribes :run, "bash[mediaflux-running]", :immediately
   end
-  
-  pkgs.each() do | pkg, file | 
-    bash "install-#{pkg}" do
-      user "root"
-      code ". /etc/mediaflux/servicerc && " +
-        "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
-        "#{mfcommand} package.install :in file:#{installers}/#{file} && " +
-        "#{mfcommand} logoff"
-    end
-  end 
-  
-  template "#{mflux_home}/config/services/network.tcl" do 
-    owner mflux_user
-    source "network-tcl.erb"
-    variables({
-                :http_port => node['mediaflux']['http_port'],
-                :https_port => node['mediaflux']['https_port'],
-                :dicom_port => node['daris']['dicom_port']
-              })
-  end
-else
-  log "skipped-bootstrap" do
-    message "Skipped bootstrapping the DaRIS stores and plugins.  (See the cookbook's README on how to force bootstrapping.)"
-    level :info
-  end
+end 
+
+template "#{mflux_home}/config/services/network.tcl" do 
+  action :nothing
+  owner mflux_user
+  source "network-tcl.erb"
+  variables({
+              :http_port => node['mediaflux']['http_port'],
+              :https_port => node['mediaflux']['https_port'],
+              :dicom_port => node['daris']['dicom_port']
+            })
+  subscribes :run, "bash[mediaflux-running]", :immediately
 end
 
 service "mediaflux-restart-2" do
