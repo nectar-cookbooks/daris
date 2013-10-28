@@ -142,13 +142,15 @@ end
 
 bootstrap_dicom = node['daris']['force_bootstrap']
 if ! bootstrap_dicom then
+  # Sniff the 'network.tcl' for evidence that we created it ...
   line = `grep Generated #{mflux_home}/config/network.tcl`.strip()
   if /Mediaflux chef recipe/.match(line) then
     bootstrap = true
   elsif /DaRIS chef recipe/.match(line) then
     bootstrap = false
   else
-    raise "Don't recognize the signature in the network.tcl file."  
+    # Badness.  Bail now before we do any more damage.
+    raise "We do not recognize the signature in the network.tcl file."  
   end
 end
 
