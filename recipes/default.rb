@@ -142,7 +142,7 @@ end
 
 bootstrap_dicom = node['daris']['force_bootstrap']
 if ! bootstrap_dicom then
-  line = `grep Generated #{mflux_home}/config/network.tcl`.trim()
+  line = `grep Generated #{mflux_home}/config/network.tcl`.strip()
   if /Mediaflux chef recipe/.match(line) then
     bootstrap = true
   elsif /DaRIS chef recipe/.match(line) then
