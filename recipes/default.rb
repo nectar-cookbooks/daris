@@ -160,6 +160,11 @@ end
 # We have to: 1) start Mediaflux, 2) create the stores, 3) add the
 # DaRIS packages, 4) update network.tcl and restart Mediaflux.
 if bootstrap_dicom then
+  log "bootstrap" do
+    message "Bootstrapping the DaRIS stores and plugins."
+    level :info
+  end
+
   service "mediaflux-restart" do
     service_name "mediaflux"
     action :restart
@@ -204,6 +209,11 @@ if bootstrap_dicom then
                 :https_port => node['mediaflux']['https_port'],
                 :dicom_port => node['daris']['dicom_port']
               })
+  end
+else
+  log "skipped-bootstrap" do
+    message "Skipped bootstrapping the DaRIS stores and plugins.  (See the cookbook's README on how to force bootstrapping.)"
+    level :info
   end
 end
 
