@@ -150,7 +150,8 @@ if ! bootstrap_dicom then
     bootstrap = false
   else
     # Badness.  Bail now before we do any more damage.
-    raise "We do not recognize the signature in the network.tcl file."  
+    raise "We do not recognize the signature in the network.tcl " +
+          " file (#{line})."  
   end
 end
 
