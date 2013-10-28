@@ -59,7 +59,8 @@ proc init_daris_conf { } {
     <% @dicom_ingest_notifications.each() do |addr| %>
     set addr "<%= fillIn(addr, '') %>"
     if { $addr != "" } then {
-	
+	add_email_notification "dicom" "ingest" "error" $addr
+	add_email_notification "dicom" "ingest" "results" $addr
     }
     <% end %>
 }
@@ -72,6 +73,10 @@ proc set_property { name value } {
     }
 }
 
+proc add_email_notification { type name event recipient } {
+    notification.add :recipient $recipient :method "email" \
+	:event $event :object < -type $type $name > 
+}
 
 init_daris_conf
 
