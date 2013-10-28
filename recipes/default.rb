@@ -140,7 +140,7 @@ cookbook_file "#{mflux_user_home}/bin/server-config.sh" do
   source "server-config.sh"
 end
 
-bootstrap_dicom = node['dicom']['force_bootstrap']
+bootstrap_dicom = node['daris']['force_bootstrap']
 if ! bootstrap_dicom then
   line = `grep Generated #{mflux_home}/config/network.tcl`.trim()
   if /Mediaflux chef recipe/.match(line) then
