@@ -167,6 +167,7 @@ log "bootstrap" do
   action :nothing
   message "Bootstrapping the DaRIS stores and plugins."
   level :info
+  notifies :restart, "service[mediaflux-restart]", :immediately
 end
 
 log "no-bootstrap" do
@@ -178,7 +179,7 @@ end
 service "mediaflux-restart" do
   action :nothing
   service_name "mediaflux"
-  subscribes :restart, "log[bootstrap]", :immediately
+  notifies :run, "bash[mediaflux-running]", :immediately
 end
 
 bash "mediaflux-running" do
@@ -188,7 +189,8 @@ bash "mediaflux-running" do
     "wget ${MFLUX_TRANSPORT}://${MFLUX_HOST}:${MFLUX_PORT}/ " +
     "    --retry-connrefused --no-check-certificate -O /dev/null " +
     "    --waitretry=1 --timeout=2 --tries=10"
-  subscribes :run, "service[mediaflux-restart]", :immediately
+  notifies :run, "bash[create-pssd-store]", :immediately
+  notifies :run, "bash[create-#{dicom-store}-store]", :immediately
 end 
 
 ['pssd', dicom_store ].each() do |store| 
@@ -202,7 +204,6 @@ end
       "    :automount true  && " +
       "#{mfcommand} logoff"
     not_if { ::File.exists?( "#{mflux_home}/volatile/stores/#{store}" ) }
-    subscribes :run, "bash[mediaflux-running]", :immediately
   end
 end
 
