@@ -1,6 +1,6 @@
 node.default['daris']['ns'] = 'nig'
 node.default['daris']['file_system_type'] = 'file-system'
-
+node.default['daris']['force_bootstrap'] = false
 node.default['daris']['dicom_port'] = '6666'
 
 node.default['daris']['download_url'] = 

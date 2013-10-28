@@ -25,6 +25,7 @@ See `attributes/default.rb` for the default values.
 * `node['daris']['version']` - This gives the DaRIS version
 * `node['daris']['download_user']` - The account name for downloading from the DaRIS site.
 * `node['daris']['download_password']` - The password for downloading from the DaRIS site.
+* `node['daris']['force_bootstrap']` - If true (actually, "truthy"), the bootstrapping of the Mediaflux stores and DaRIS packages is forced.  If false, we only bootstrap if it looks like we have a fresh Mediaflux installation as created by the "mediaflux" recipe.  (We "sniff" the network.tcl file to figure this out.)
 * `node['mediaflux']['server_name']` - The name of the DaRIS server
 * `node['mediaflux']['server_organization']` - The organization string for the server
 * `node['mediaflux']['mail_smtp_host']` - The mail relay host for sending mail.

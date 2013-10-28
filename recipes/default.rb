@@ -37,6 +37,15 @@ user = node['daris']['download_user']
 password = node['daris']['download_password']
 pkgs = node['daris']['pkgs']
 
+if ! File::directory?("#{mflux_home}") then
+  raise "Cannot find the Mediaflux install directory #{mflux_home}. " +
+    "Have you installed Mediaflux?"
+end
+if ! File::directory?("#{mflux_home}/config") then
+  raise "Cannot find the Mediaflux config directory #{mflux_home}/config. " +
+    "Have you installed Mediaflux?"
+end
+
 installers = node['mediaflux']['installers']
 if ! installers.start_with?('/') then
   installers = mflux_user_home + '/' + installers
@@ -131,7 +140,17 @@ cookbook_file "#{mflux_user_home}/bin/server-config.sh" do
   source "server-config.sh"
 end
 
-bootstrap_dicom = true
+bootstrap_dicom = node['dicom']['force_bootstrap']
+if ! bootstrap_dicom then
+  line = `grep Generated #{mflux_home}/config/network.tcl`.trim()
+  if /Mediaflux chef recipe/.match(line) then
+    bootstrap = true
+  elsif /DaRIS chef recipe/.match(line) then
+    bootstrap = false
+  else
+    raise "Don't recognize the signature in the network.tcl file."  
+  end
+end
 
 # The deal here is that when we are bootstrapping DaRIS into a clean
 # Mediaflux system, it won't have the "dicom" listener in network.tcl.
