@@ -46,6 +46,7 @@ You also need to:
 
 * copy the "mfpkg*.zip" file containing your PSSD localization to the local installers location (e.g. ~mediaflux/installers), and
 * add entry to the "pkgs" map; e.g. in the "node.json" file ...
+
       "daris": {
          "pkgs: {
             "cai_pssd": "mfpkg-cai_pssd-0.02-mf3.8.029.zip"
