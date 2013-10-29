@@ -22,6 +22,7 @@ Attributes
 
 See `attributes/default.rb` for the default values.
 
+* `node['daris']['ns']` - This gives the namespace prefix for this installation's PSSD tailoring.
 * `node['daris']['download_url']` - This gives the base URL for downloading DaRIS software.
 * `node['daris']['version']` - This gives the DaRIS version
 * `node['daris']['download_user']` - The account name for downloading from the DaRIS site.
@@ -41,8 +42,20 @@ See `attributes/default.rb` for the default values.
 * `node['daris']['dicom_proxy_user_names']` - A list of DICOM proxy users to be created.
 * `node['daris']['dicom_ingest_notifications']` - A list of user emails to be notified of DICOM ingestion events.
 
+You also need to:
+
+* copy the "mfpkg*.zip" file containing your PSSD localization to the local installers location (e.g. ~mediaflux/installers), and
+* add entry to the "pkgs" map; e.g. in the "node.json" file ...
+      "daris": {
+         "pkgs: {
+            "cai_pssd": "mfpkg-cai_pssd-0.02-mf3.8.029.zip"
+         },
+         "ns": "cai"
+      }
+
 TO DO List
 ==========
 
 * Deal with updating DaRIS with a fresh version.  For example, the simple-minded  scheme for deciding when to bootstrap doesn't take account of DaRIS versions, so it won't even try to upgrade the DaRIS packages.
 * The implementation of DaRIS bootstrapping is ugly.  (Maybe it would be better to make it a single templatized shell script?)
+* Installing stuff in ~mediaflux/bin is maybe not the best ...
