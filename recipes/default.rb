@@ -147,7 +147,17 @@ ruby_block "bootstrap_test" do
       # Sniff the 'network.tcl' for evidence that we created it ...
       line = `grep Generated #{mflux_home}/config/services/network.tcl`.strip()
       if /Mediaflux chef recipe/.match(line) then
+        # It appears that if you use run_action like this, triggering
+        # doesn't work.  But it is simpler this way anyway
         resources(:log => "bootstrap").run_action(:write)
+        resources(:service => "mediaflux-restart").run_action(:restart)
+        resources(:bash => "create-pssd-store").run_action(:run)
+        resources(:bash => "create-#{dicom_store}-store").run_action(:run)
+        pkgs.each() do | pkg, file | 
+          resources(:bash => "install-#{pkg}").run_action(:run)
+        end
+        resources(:template => "#{mflux_home}/config/services/network.tcl")
+          .run_action(:create)
       elsif /DaRIS chef recipe/.match(line) then
         resources(:log => "no-bootstrap").run_action(:write)
       else
@@ -167,7 +177,6 @@ log "bootstrap" do
   action :nothing
   message "Bootstrapping the DaRIS stores and plugins."
   level :info
-  notifies :restart, "service[mediaflux-restart]", :immediately
 end
 
 log "no-bootstrap" do
@@ -179,7 +188,6 @@ end
 service "mediaflux-restart" do
   action :nothing
   service_name "mediaflux"
-  notifies :run, "bash[mediaflux-running]", :immediately
 end
 
 bash "mediaflux-running" do
@@ -189,8 +197,6 @@ bash "mediaflux-running" do
     "wget ${MFLUX_TRANSPORT}://${MFLUX_HOST}:${MFLUX_PORT}/ " +
     "    --retry-connrefused --no-check-certificate -O /dev/null " +
     "    --waitretry=1 --timeout=2 --tries=10"
-  notifies :run, "bash[create-pssd-store]", :immediately
-  notifies :run, "bash[create-#{dicom_store}-store]", :immediately
 end 
 
 ['pssd', dicom_store ].each() do |store| 
@@ -215,7 +221,6 @@ pkgs.each() do | pkg, file |
       "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
       "#{mfcommand} package.install :in file:#{installers}/#{file} && " +
       "#{mfcommand} logoff"
-    subscribes :run, "bash[mediaflux-running]", :immediately
   end
 end 
 
@@ -228,7 +233,6 @@ template "#{mflux_home}/config/services/network.tcl" do
               :https_port => node['mediaflux']['https_port'],
               :dicom_port => node['daris']['dicom_port']
             })
-  subscribes :create, "bash[mediaflux-running]", :immediately
 end
 
 service "mediaflux-restart-2" do
