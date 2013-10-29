@@ -107,6 +107,11 @@ pkgs.each() do | pkg, file |
   end
 end
 
+directory "#{mflux_home}/plugin/bin" do
+  owner mflux_user
+  recursive true
+end 
+
 template "#{mflux_home}/plugin/bin/pvconv.pl" do
   owner mflux_user
   group mflux_user
