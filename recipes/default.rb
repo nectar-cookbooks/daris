@@ -190,7 +190,7 @@ bash "mediaflux-running" do
     "    --retry-connrefused --no-check-certificate -O /dev/null " +
     "    --waitretry=1 --timeout=2 --tries=10"
   notifies :run, "bash[create-pssd-store]", :immediately
-  notifies :run, "bash[create-#{dicom-store}-store]", :immediately
+  notifies :run, "bash[create-#{dicom_store}-store]", :immediately
 end 
 
 ['pssd', dicom_store ].each() do |store| 
