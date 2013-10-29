@@ -15,6 +15,7 @@ Recipes
 =======
 
 * `daris::default` - installs DaRIS into a MediaFlux installation, along with some useful tools recommended by the DaRIS team.
+* `daris::pvupload` - installs the Bruker upload tool.
 
 Attributes
 ==========
@@ -44,3 +45,4 @@ TO DO List
 ==========
 
 * Deal with updating DaRIS with a fresh version.  For example, the simple-minded  scheme for deciding when to bootstrap doesn't take account of DaRIS versions, so it won't even try to upgrade the DaRIS packages.
+* The implementation of DaRIS bootstrapping is ugly.  (Maybe it would be better to make it a single templatized shell script?)

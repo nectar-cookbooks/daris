@@ -29,12 +29,8 @@
 
 include_recipe "pvconv"
 
-mflux_home = node['mediaflux']['home']
-mflux_user = node['mediaflux']['user']
-mflux_user_home = node['mediaflux']['user_home']
-url = node['daris']['download_url']
-user = node['daris']['download_user']
-password = node['daris']['download_password']
+include_recipe "daris::common"
+
 pkgs = node['daris']['pkgs']
 
 ruby_block "check-preconditions" do
@@ -48,11 +44,6 @@ ruby_block "check-preconditions" do
         "Have you installed Mediaflux?"
     end
   end
-end
-
-installers = node['mediaflux']['installers']
-if ! installers.start_with?('/') then
-  installers = mflux_user_home + '/' + installers
 end
 
 mfcommand = "#{mflux_user_home}/bin/mfcommand"
@@ -89,15 +80,6 @@ template "#{mflux_user_home}/initial_daris_conf.tcl" do
   })
 end
 
-package "wget" do
-  action :install
-  not_if { ::File.exists?("/usr/bin/wget") }
-end
-
-directory installers do
-  owner mflux_user
-end
-
 pkgs.each() do | pkg, file | 
   bash "fetch-#{pkg}" do
     user mflux_user
@@ -130,11 +112,6 @@ bash "fetch-server-config" do
   not_if { ::File.exists?("#{installers}/#{file}") }
 end
 
-package "unzip" do
-  action :install
-  not_if { ::File.exists?('/usr/bin/unzip') }
-end
-
 bash "extract-server-config" do
   cwd "#{mflux_user_home}/bin"
   user mflux_user
@@ -164,7 +141,7 @@ ruby_block "bootstrap_test" do
         resources(:bash => "create-pssd-store").run_action(:run)
         resources(:bash => "create-#{dicom_store}-store").run_action(:run)
         pkgs.each() do | pkg, file | 
-          resources(:bash => "install-#{pkg}").run_action(:run)
+          resources(:bash => "install<-#{pkg}").run_action(:run)
         end
         resources(:template => "#{mflux_home}/config/services/network.tcl")
           .run_action(:create)
