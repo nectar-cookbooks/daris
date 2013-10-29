@@ -60,5 +60,5 @@ cookbook_file "#{mflux_user_home}/bin/mfpvupload.sh" do
   owner mflux_user
   group mflux_user
   mode 0750
-  source "mvpvload.sh"
+  source "mfpvload.sh"
 end
