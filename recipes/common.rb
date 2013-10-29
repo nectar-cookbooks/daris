@@ -27,17 +27,12 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+mflux_user_home = node['mediaflux']['user_home']
+
 installers = node['mediaflux']['installers']
 if ! installers.start_with?('/') then
   installers = mflux_user_home + '/' + installers
 end
-
-mflux_home = node['mediaflux']['home']
-mflux_user = node['mediaflux']['user']
-mflux_user_home = node['mediaflux']['user_home']
-url = node['daris']['download_url']
-user = node['daris']['download_user']
-password = node['daris']['download_password']
 
 package "wget" do
   action :install

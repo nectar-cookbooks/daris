@@ -31,7 +31,19 @@ include_recipe "pvconv"
 
 include_recipe "daris::common"
 
+mflux_home = node['mediaflux']['home']
+mflux_user = node['mediaflux']['user']
+mflux_user_home = node['mediaflux']['user_home']
+url = node['daris']['download_url']
+user = node['daris']['download_user']
+password = node['daris']['download_password']
+
 pkgs = node['daris']['pkgs']
+
+installers = node['mediaflux']['installers']
+if ! installers.start_with?('/') then
+  installers = mflux_user_home + '/' + installers
+end
 
 ruby_block "check-preconditions" do
   block do

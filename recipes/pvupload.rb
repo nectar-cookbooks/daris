@@ -29,6 +29,18 @@
 
 include_recipe "daris::common"
 
+mflux_home = node['mediaflux']['home']
+mflux_user = node['mediaflux']['user']
+mflux_user_home = node['mediaflux']['user_home']
+url = node['daris']['download_url']
+user = node['daris']['download_user']
+password = node['daris']['download_password']
+
+installers = node['mediaflux']['installers']
+if ! installers.start_with?('/') then
+  installers = mflux_user_home + '/' + installers
+end
+
 file = node.default['daris']['pvupload']
 bash "fetch-pvupload" do
   user mflux_user
