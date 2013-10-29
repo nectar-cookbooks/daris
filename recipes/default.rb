@@ -151,6 +151,7 @@ ruby_block "bootstrap_test" do
         # doesn't work.  But it is simpler this way anyway
         resources(:log => "bootstrap").run_action(:write)
         resources(:service => "mediaflux-restart").run_action(:restart)
+        resources(:bash => "mediaflux-running").run_action(:run)
         resources(:bash => "create-pssd-store").run_action(:run)
         resources(:bash => "create-#{dicom_store}-store").run_action(:run)
         pkgs.each() do | pkg, file | 
