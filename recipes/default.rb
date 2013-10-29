@@ -37,7 +37,7 @@ user = node['daris']['download_user']
 password = node['daris']['download_password']
 pkgs = node['daris']['pkgs']
 
-ruby_block do
+ruby_block "check-preconditions" do
   block do
     if ! File::directory?("#{mflux_home}") then
       raise "Can't find the Mediaflux install directory #{mflux_home}. " +
