@@ -37,13 +37,17 @@ user = node['daris']['download_user']
 password = node['daris']['download_password']
 pkgs = node['daris']['pkgs']
 
-if ! File::directory?("#{mflux_home}") then
-  raise "Cannot find the Mediaflux install directory #{mflux_home}. " +
-    "Have you installed Mediaflux?"
-end
-if ! File::directory?("#{mflux_home}/config") then
-  raise "Cannot find the Mediaflux config directory #{mflux_home}/config. " +
-    "Have you installed Mediaflux?"
+ruby_block do
+  block do
+    if ! File::directory?("#{mflux_home}") then
+      raise "Can't find the Mediaflux install directory #{mflux_home}. " +
+        "Have you installed Mediaflux?"
+    end
+    if ! File::directory?("#{mflux_home}/config") then
+      raise "Can't find the Mediaflux config directory #{mflux_home}/config. " +
+        "Have you installed Mediaflux?"
+    end
+  end
 end
 
 installers = node['mediaflux']['installers']
