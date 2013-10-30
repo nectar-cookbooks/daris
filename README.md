@@ -35,7 +35,7 @@ See `attributes/default.rb` for the default values.
 * `node['mediaflux']['mail_smtp_port']` - The corresponding port.
 * `node['mediaflux']['mail_from']` - The "from:" address for regular mail sent by the server.
 * `node['mediaflux']['notification_from']` - The "from:" address for notifications.
-* `node['mediaflux']['authentication_domain']` - A Mediaflux authentication domain name for users.  Set this if you want to create a custom local domain for user accounts.
+* `node['mediaflux']['authentication_domain']` - A Mediaflux authentication domain name for users.  This defaults to the namespace prefix.  If it is different, then you will most likely need to "tweak" some of the ${ns}_pssd package TCL code. 
 * `node['mediaflux']['jvm_memory_max']` - The server's heap size (in Mbytes)
 * `node['mediaflux']['jvm_memory_perm_max']` - The server's permgen size (in Mbytes)
 * `node['daris']['dicom_namespace']` - The namespace used for DICOM.
