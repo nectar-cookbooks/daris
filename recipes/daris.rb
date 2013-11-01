@@ -86,7 +86,7 @@ template "#{mflux_user_home}/initial_daris_conf.tcl" do
                :mail_smtp_port => node['mediaflux']['mail_smtp_port'],
                :mail_from => node['mediaflux']['mail_from'],
                :notification_from => node['mediaflux']['notification_from'],
-               :authentication_domain => domain
+               :authentication_domain => domain,
                :dicom_namespace => node['daris']['dicom_namespace'],
                :dicom_store => dicom_store,
                :dicom_proxy_domain => node['daris']['dicom_proxy_domain'],
