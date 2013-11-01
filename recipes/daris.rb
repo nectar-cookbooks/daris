@@ -69,6 +69,7 @@ end
 domain = node['mediaflux']['authentication_domain']
 if ! domain || domain == '' then
   domain = node['daris']['ns'] 
+end
 
 template "#{mflux_user_home}/initial_daris_conf.tcl" do 
   source "initial_daris_conf_tcl.erb"
@@ -92,8 +93,8 @@ template "#{mflux_user_home}/initial_daris_conf.tcl" do
                :dicom_proxy_domain => node['daris']['dicom_proxy_domain'],
                :dicom_proxy_user_names => node['daris']['dicom_proxy_user_names'],
                :dicom_ingest_notifications => node['daris']['dicom_ingest_notifications'],
-    :ns => node['daris']['ns']
-  })
+               :ns => node['daris']['ns']
+             })
 end
 
 pkgs.each() do | pkg, file | 
@@ -226,7 +227,7 @@ pkgs.each() do | pkg, file |
       "#{mfcommand} logoff"
   end
 end 
-
+  
 template "#{mflux_home}/config/services/network.tcl" do 
   action :nothing
   owner mflux_user
