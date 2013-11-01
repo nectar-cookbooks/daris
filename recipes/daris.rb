@@ -259,12 +259,3 @@ bash "run-server-config" do
          "#{mfcommand} logoff"
 end
 
-template "#{mflux_user_home}/bin/change-mf-password.sh" do
-  source "change-mf-password.erb"
-  owner 'root'
-  group mflux_user
-  mode 0755
-  variables ({
-               :mflux_user_home => mflux_user_home
-             })
-end
