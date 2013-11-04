@@ -226,10 +226,10 @@ pkgs.each() do | pkg, file |
   bash "install-#{pkg}" do
     action :nothing
     user "root"
-    code ". /etc/mediaflux/servicerc && " +
-      "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
-      "#{mfcommand} package.install :in file:#{installers}/#{file} && " +
-      "#{mfcommand} logoff"
+    code ". /etc/mediaflux/servicerc >> /tmp/logg 2>&1 && " +
+      "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD >> /tmp/logg 2>&1 && " +
+      "#{mfcommand} package.install :in file:#{installers}/#{file} >> /tmp/logg 2>&1 && " +
+      "#{mfcommand} logoff >> /tmp/logg 2>&1 "
   end
 end 
   
