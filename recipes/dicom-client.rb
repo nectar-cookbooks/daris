@@ -30,13 +30,14 @@
 include_recipe "daris::common"
 
 mflux_home = node['mediaflux']['home']
+mflux_bin = node['mediaflux']['bin'] || "#{mflux_home}/bin"
 mflux_user = node['mediaflux']['user']
-mflux_user_home = node['mediaflux']['user_home']
+mflux_user_home = node['mediaflux']['user_home'] || mflux_home
 url = node['daris']['download_url']
 user = node['daris']['download_user']
 password = node['daris']['download_password']
 
-installers = node['mediaflux']['installers']
+installers = node['mediaflux']['installers'] || 'installers'
 if ! installers.start_with?('/') then
   installers = mflux_user_home + '/' + installers
 end
@@ -50,13 +51,13 @@ bash "fetch-dicom-client" do
 end
 
 bash "extract-dicom-client" do
-  cwd "#{mflux_user_home}/bin"
+  cwd "#{mflux_bin}"
   user mflux_user
   group mflux_user
   code "unzip -o #{installers}/#{file} dicom-client.jar"
 end
 
-cookbook_file "#{mflux_user_home}/bin/dicom-mf.sh" do
+cookbook_file "#{mflux_bin}/dicom-mf.sh" do
   owner mflux_user
   group mflux_user
   mode 0750

@@ -32,15 +32,15 @@ include_recipe "pvconv"
 include_recipe "daris::common"
 
 mflux_home = node['mediaflux']['home']
+mflux_bin = node['mediaflux']['bin'] || "#{mflux_home}/bin"
 mflux_user = node['mediaflux']['user']
-mflux_user_home = node['mediaflux']['user_home']
+mflux_user_home = node['mediaflux']['user_home'] || mflux_home
 url = node['daris']['download_url']
 user = node['daris']['download_user']
 password = node['daris']['download_password']
 
 pkgs = node['daris']['pkgs']
-
-installers = node['mediaflux']['installers']
+installers = node['mediaflux']['installers'] || 'installers'
 if ! installers.start_with?('/') then
   installers = mflux_user_home + '/' + installers
 end
@@ -58,7 +58,7 @@ ruby_block "check-preconditions" do
   end
 end
 
-mfcommand = "#{mflux_user_home}/bin/mfcommand"
+mfcommand = "#{mflux_bin}/mfcommand"
 pvconv = node['pvconv']['command']
 
 dicom_store = node['daris']['dicom_store']
@@ -71,7 +71,7 @@ if ! domain || domain == '' then
   domain = node['daris']['ns'] 
 end
 
-template "#{mflux_user_home}/initial_daris_conf.tcl" do 
+template "#{mflux_home}/config/initial_daris_conf.tcl" do 
   source "initial_daris_conf_tcl.erb"
   owner mflux_user
   group mflux_user
@@ -260,7 +260,7 @@ end
 bash "run-server-config" do
   code ". /etc/mediaflux/servicerc && " +
          "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
-         "#{mfcommand} source #{mflux_user_home}/initial_daris_conf.tcl && " +
+         "#{mfcommand} source #{mflux_home}/config/initial_daris_conf.tcl && " +
          "#{mfcommand} logoff"
 end
 

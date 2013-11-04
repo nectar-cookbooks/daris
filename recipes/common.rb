@@ -27,10 +27,11 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+mflux_home = node['mediaflux']['user_home']
 mflux_user = node['mediaflux']['user']
-mflux_user_home = node['mediaflux']['user_home']
+mflux_user_home = node['mediaflux']['user_home'] || mflux_home
 
-installers = node['mediaflux']['installers']
+installers = node['mediaflux']['installers'] || 'installers'
 if ! installers.start_with?('/') then
   installers = mflux_user_home + '/' + installers
 end
