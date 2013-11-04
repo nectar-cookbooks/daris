@@ -27,7 +27,7 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-mflux_home = node['mediaflux']['user_home']
+mflux_home = node['mediaflux']['home']
 mflux_user = node['mediaflux']['user']
 mflux_user_home = node['mediaflux']['user_home'] || mflux_home
 
