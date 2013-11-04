@@ -1,5 +1,8 @@
 node.default['daris']['ns'] = 'nig'
 node.default['daris']['file_system_type'] = 'file-system'
+
+# If you set force-bootstrap, the DaRIS packages are loaded, even if
+# this doesn't look like a fresh install.
 node.default['daris']['force_bootstrap'] = false
 node.default['daris']['dicom_port'] = '6666'
 
@@ -29,9 +32,9 @@ node.default['daris']['pkgs']['daris_portal'] =
 node.default['daris']['server_config'] =
   'server-config-1.0-stable.zip'
 
-# Additional tools that are installed by other recipes:
+# Additional tools (optional)
 node.default['daris']['pvupload'] = 'pvupload-0.33-stable.zip'
-node.default['daris']['dicomclient'] = 'dicom-client-1.0-stable.zip'
+node.default['daris']['dicom-client'] = 'dicom-client-1.0-stable.zip'
 node.default['daris']['dcmtools'] = 'dcmtools-0.29-stable.zip'
 
 node.override['mediaflux']['defer_start'] = true

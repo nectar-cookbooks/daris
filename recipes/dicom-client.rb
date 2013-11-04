@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: daris
-# Recipe:: pvupload
+# Recipe:: dicom-client
 #
 # Copyright (c) 2013, The University of Queensland
 # All rights reserved.
@@ -27,7 +27,6 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-include_recipe "mediaflux::common"
 include_recipe "daris::common"
 
 mflux_home = node['mediaflux']['home']
@@ -42,24 +41,24 @@ if ! installers.start_with?('/') then
   installers = mflux_user_home + '/' + installers
 end
 
-file = node.default['daris']['pvupload']
-bash "fetch-pvupload" do
+file = node.default['daris']['dicom-client']
+bash "fetch-dicom-client" do
   user mflux_user
   code "wget --user=#{user} --password=#{password} --no-check-certificate " +
        "-O #{installers}/#{file} #{url}/#{file}"
   not_if { ::File.exists?("#{installers}/#{file}") }
 end
 
-bash "extract-pvupload" do
+bash "extract-dicom-client" do
   cwd "#{mflux_user_home}/bin"
   user mflux_user
   group mflux_user
-  code "unzip -o #{installers}/#{file} pvupload.jar"
+  code "unzip -o #{installers}/#{file} dicom-client.jar"
 end
 
-cookbook_file "#{mflux_user_home}/bin/mfpvupload.sh" do
+cookbook_file "#{mflux_user_home}/bin/dicom-mf.sh" do
   owner mflux_user
   group mflux_user
   mode 0750
-  source "mfpvload.sh"
+  source "dicom-mf.sh"
 end

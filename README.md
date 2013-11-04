@@ -17,6 +17,7 @@ Recipes
 * `daris::default` - installs DaRIS into a MediaFlux installation, along with some useful tools provided by the DaRIS team.
 * `daris::daris` - installs just DaRIS into a MediaFlux installation.
 * `daris::pvupload` - installs the Bruker upload tool.
+* `daris::dicom-client` - installs the "dicom-mf" upload tool.
 
 Attributes
 ==========

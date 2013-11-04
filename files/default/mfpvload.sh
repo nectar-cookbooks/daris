@@ -19,10 +19,10 @@ if [ -r $HOME/.mfluxrc ] ; then
     . $HOME/.mfluxrc
 fi
 
-JAVA=`which java`
-if [ -z "${JAVA}" ]; then
-        echo "Error: could not find java." >&2
-        exit 1
+if [ -z "$MFLUX_JAVA" ] ; then
+    JAVA=`which java`
+else
+    JAVA="$MFLUX_JAVA"
 fi
 
 JAR=`dirname $0`/pvupload.jar
@@ -50,7 +50,7 @@ NIG_META=-nig-subject-meta-add
 $JAVA -Dmf.host=$MFLUX_HOST -Dmf.port=$MFLUX_PORT \
     -Dmf.transport=$MFLUX_TRANSPORT -Dmf.domain=$MFLUX_DOMAIN \
     -Dmf.user=$MFLUX_USER -Dmf.password=$MFLUX_PASSWORD \
-    -jar $JAR -wait $MF_WAIT $MF_VERBOSE $NIG_META $AUTO_SUBJECT_CREATE $@
+    -jar $JAR -wait $MF_WAIT $MF_VERBOSE $NIG_META $AUTO_SUBJECT_CREATE "$@"
 
 RETVAL=$?
 exit $RETVAL
