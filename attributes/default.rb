@@ -17,7 +17,7 @@ node.default['daris']['dicom_proxy_domain'] = 'dicom'
 node.default['daris']['dicom_proxy_user_names'] = ['DICOM-TEST']
 node.default['daris']['dicom_ingest_notifications'] = []
 
-# The standard DaRIS packages.
+# The standard DaRIS packages.  These are downloaded if not found locally
 node.default['daris']['pkgs']['nig_essentials'] = 
   'mfpkg-nig_essentials-0.19-mf3.8.029-stable.zip'
 node.default['daris']['pkgs']['nig_transcoder'] = 
@@ -26,6 +26,9 @@ node.default['daris']['pkgs']['pssd'] =
   'mfpkg-pssd-2.04-mf3.8.029-stable.zip'
 node.default['daris']['pkgs']['daris_portal'] = 
   'mfpkg-daris-0.29-mf3.8.029-stable.zip'
+
+# Local packages.  These WON'T be downloaded.
+node.default['daris']['local_pkgs'] = {}
 
 # We install the "server-config.sh" tool by default, though 
 # we don't actually use it in the setup procedure anymore.

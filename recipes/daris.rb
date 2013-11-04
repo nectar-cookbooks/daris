@@ -40,6 +40,8 @@ user = node['daris']['download_user']
 password = node['daris']['download_password']
 
 pkgs = node['daris']['pkgs']
+local_pkgs = node['daris']['local_pkgs']
+all_pkgs = pkgs.merge(local_pkgs)
 installers = node['mediaflux']['installers'] || 'installers'
 if ! installers.start_with?('/') then
   installers = mflux_user_home + '/' + installers
@@ -106,6 +108,13 @@ pkgs.each() do | pkg, file |
   end
 end
 
+local_pkgs.each() do | pkg, file | 
+  if ! ::File.exists?("#{installers}/#{file}")
+    raise "There is no installer for local package #{pkg}: " +
+      "(expected #{installers}/#{file})" 
+  end
+end
+
 directory "#{mflux_home}/plugin/bin" do
   owner mflux_user
   recursive true
@@ -167,7 +176,7 @@ ruby_block "bootstrap_test" do
       resources(:bash => "mediaflux-running").run_action(:run)
       resources(:bash => "create-pssd-store").run_action(:run)
       resources(:bash => "create-#{dicom_store}-store").run_action(:run)
-      pkgs.each() do | pkg, file | 
+      (all_pkgs.each() do | pkg, file | 
         resources(:bash => "install-#{pkg}").run_action(:run)
       end
       resources(:template => "#{mflux_home}/config/services/network.tcl")
@@ -222,7 +231,7 @@ end
   end
 end
 
-pkgs.each() do | pkg, file | 
+all_pkgs.each() do | pkg, file | 
   bash "install-#{pkg}" do
     action :nothing
     user "root"
