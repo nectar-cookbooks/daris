@@ -168,7 +168,7 @@ ruby_block "bootstrap_test" do
       resources(:bash => "create-pssd-store").run_action(:run)
       resources(:bash => "create-#{dicom_store}-store").run_action(:run)
       pkgs.each() do | pkg, file | 
-        resources(:bash => "install<-#{pkg}").run_action(:run)
+        resources(:bash => "install-#{pkg}").run_action(:run)
       end
       resources(:template => "#{mflux_home}/config/services/network.tcl")
         .run_action(:create)
