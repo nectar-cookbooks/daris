@@ -145,30 +145,35 @@ end
 
 ruby_block "bootstrap_test" do
   block do
-    bootstrap_dicom = node['daris']['force_bootstrap']
-    if ! bootstrap_dicom then
+    bootstrap = node['daris']['force_bootstrap']
+    if ! bootstrap then
       # Sniff the 'network.tcl' for evidence that we created it ...
       line = `grep Generated #{mflux_home}/config/services/network.tcl`.strip()
       if /Mediaflux chef recipe/.match(line) then
-        # It appears that if you use run_action like this, triggering
-        # doesn't work.  But it is simpler this way anyway
-        resources(:log => "bootstrap").run_action(:write)
-        resources(:service => "mediaflux-restart").run_action(:restart)
-        resources(:bash => "mediaflux-running").run_action(:run)
-        resources(:bash => "create-pssd-store").run_action(:run)
-        resources(:bash => "create-#{dicom_store}-store").run_action(:run)
-        pkgs.each() do | pkg, file | 
-          resources(:bash => "install<-#{pkg}").run_action(:run)
-        end
-        resources(:template => "#{mflux_home}/config/services/network.tcl")
-          .run_action(:create)
+        bootstrap = true
       elsif /DaRIS chef recipe/.match(line) then
-        resources(:log => "no-bootstrap").run_action(:write)
+        bootstrap = false
       else
         # Badness.  Bail now before we do any more damage.
         raise "We do not recognize the signature in the network.tcl " +
           " file (#{line})."  
       end
+    end
+    if bootstrap then
+      # It appears that if you use run_action like this, triggering
+      # doesn't work.  But it is simpler this way anyway
+      resources(:log => "bootstrap").run_action(:write)
+      resources(:service => "mediaflux-restart").run_action(:restart)
+      resources(:bash => "mediaflux-running").run_action(:run)
+      resources(:bash => "create-pssd-store").run_action(:run)
+      resources(:bash => "create-#{dicom_store}-store").run_action(:run)
+      pkgs.each() do | pkg, file | 
+        resources(:bash => "install<-#{pkg}").run_action(:run)
+      end
+      resources(:template => "#{mflux_home}/config/services/network.tcl")
+        .run_action(:create)
+    else
+      resources(:log => "no-bootstrap").run_action(:write)
     end
   end
 end
