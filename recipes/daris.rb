@@ -155,8 +155,8 @@ ruby_block "bootstrap_test" do
         bootstrap = false
       else
         # Badness.  Bail now before we do any more damage.
-        raise "We do not recognize the signature in the network.tcl " +
-          " file (#{line})."  
+        raise "Unrecognized signature in the network.tcl file (#{line}). " +
+          "Bailing out to avoid clobbering hand-made Mediaflux configs."
       end
     end
     if bootstrap then
