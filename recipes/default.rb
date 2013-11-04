@@ -30,3 +30,5 @@
 include_recipe "daris::daris"
 
 include_recipe "daris::pvupload"
+
+include_recipe "daris::dicom-client"
