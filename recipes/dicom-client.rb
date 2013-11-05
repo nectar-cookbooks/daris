@@ -57,6 +57,6 @@ end
 
 cookbook_file "#{mflux_bin}/dicom-mf.sh" do
   owner 'root'
-  mode 0750
+  mode 0755
   source "dicom-mf.sh"
 end
