@@ -15,6 +15,9 @@
 if [ -r /etc/mediaflux/mfluxrc ] ; then
     . /etc/mediaflux/mfluxrc
 fi
+if [ -r /etc/mediaflux/mfuploadrc ] ; then
+    . /etc/mediaflux/mfuploadrc
+fi
 if [ -r $HOME/.mfluxrc ] ; then
     . $HOME/.mfluxrc
 fi
@@ -27,8 +30,16 @@ fi
 
 JAR=`dirname $0`/pvupload.jar
 if [ ! -f "${JAR}" ]; then
-        echo "Error: could not find file pvupload.jar." >&2
-        exit 1
+    echo "Error: could not find file pvupload.jar." >&2
+    exit 1
+fi
+
+if [ -z "$MFLUX_HOST" -o -z "$MFLUX_PORT" -o -z "$MFLUX_TRANSPORT" -o \
+     -z "$MFLUX_DOMAIN" -o -z "$MFLUX_USER" -o -z "$MFLUX_PASSWORD" ] ; then
+    echo "Error: the following environment variables must be set; e.g. in an 'rc' file"
+    echo "    MFLUX_HOST, MFLUX_PORT, MFLUX_TRANSPORT,"
+    echo "    MFLUX_DOMAIN, MFLUX_USER, MFLUX_PASSWORD"
+    exit 1
 fi
 
 # The amount of time to wait to see if a corresponding DICOM series
