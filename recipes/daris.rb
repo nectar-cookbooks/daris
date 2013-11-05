@@ -138,18 +138,16 @@ bash "fetch-server-config" do
   not_if { ::File.exists?("#{installers}/#{file}") }
 end
 
-bash "extract-server-config" do
-  cwd "#{mflux_user_home}/bin"
-  user mflux_user
-  group mflux_user
+bash 'extract-server-config' do
+  cwd mflux_bin
+  user 'root'
   code "unzip -o #{installers}/#{file} server-config.jar"
 end
 
-cookbook_file "#{mflux_user_home}/bin/server-config.sh" do
-  owner mflux_user
-  group mflux_user
+cookbook_file "#{mflux_bin}/server-config.sh" do
+  owner 'root'
   mode 0750
-  source "server-config.sh"
+  source 'server-config.sh'
 end
 
 ruby_block "bootstrap_test" do
