@@ -34,12 +34,17 @@ if [ ! -f "${JAR}" ]; then
     exit 1
 fi
 
-if [ -z "$MFLUX_HOST" -o -z "$MFLUX_PORT" -o -z "$MFLUX_TRANSPORT" -o \
+if [ -z "$MFLUX_HOST" -o -z "$MFLUX_PORT" -o \
      -z "$MFLUX_DOMAIN" -o -z "$MFLUX_USER" -o -z "$MFLUX_PASSWORD" ] ; then
     echo "Error: the following environment variables must be set; e.g. in an 'rc' file"
-    echo "    MFLUX_HOST, MFLUX_PORT, MFLUX_TRANSPORT,"
-    echo "    MFLUX_DOMAIN, MFLUX_USER, MFLUX_PASSWORD"
+    echo "    MFLUX_HOST, MFLUX_PORT, MFLUX_DOMAIN, MFLUX_USER, MFLUX_PASSWORD"
     exit 1
+fi
+
+if [ ! -z "$MFLUX_TRANSPORT" ] ; then
+    TRANSPORT="-Dmf.transport=$MFLUX_TRANSPORT"
+else
+    TRANSPORT=""
 fi
 
 # The amount of time to wait to see if a corresponding DICOM series
@@ -58,9 +63,9 @@ AUTO_SUBJECT_CREATE=-auto-subject-create
 NIG_META=-nig-subject-meta-add
 
 # Do the upload
-$JAVA -Dmf.host=$MFLUX_HOST -Dmf.port=$MFLUX_PORT \
-    -Dmf.transport=$MFLUX_TRANSPORT -Dmf.domain=$MFLUX_DOMAIN \
-    -Dmf.user=$MFLUX_USER -Dmf.password=$MFLUX_PASSWORD \
+$JAVA -Dmf.host=$MFLUX_HOST -Dmf.port=$MFLUX_PORT $TRANSPORT \
+    -Dmf.domain=$MFLUX_DOMAIN -Dmf.user=$MFLUX_USER \
+    -Dmf.password=$MFLUX_PASSWORD \
     -jar $JAR -wait $MF_WAIT $MF_VERBOSE $NIG_META $AUTO_SUBJECT_CREATE "$@"
 
 RETVAL=$?
