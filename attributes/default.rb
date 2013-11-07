@@ -28,7 +28,7 @@ node.default['daris']['nig_transcode'] = nil
 node.default['daris']['pssd'] = nil
 node.default['daris']['daris_portal'] = nil
 node.default['daris']['pvupload'] = nil
-node.default['daris']['dicom-client'] = nil
+node.default['daris']['dicom_client'] = nil
 node.default['daris']['dcmtools'] = nil
 
 # Local packages.  These WON'T be downloaded.

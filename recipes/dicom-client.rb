@@ -29,10 +29,11 @@
 
 include_recipe "daris::common"
 
+::Chef::Recipe.send(:include, DarisUrls)
+
 mflux_home = node['mediaflux']['home']
 mflux_bin = node['mediaflux']['bin'] || "#{mflux_home}/bin"
 mflux_user_home = node['mediaflux']['user_home'] || mflux_home
-url = node['daris']['download_url']
 user = node['daris']['download_user']
 password = node['daris']['download_password']
 
@@ -41,18 +42,19 @@ if ! installers.start_with?('/') then
   installers = mflux_user_home + '/' + installers
 end
 
-file = node.default['daris']['dicom-client']
+dc_url = getUrl(node, 'dicom_client')
+dc_file = urlToFile(dc_url)
 bash "fetch-dicom-client" do
   user 'root'
   code "wget --user=#{user} --password=#{password} --no-check-certificate " +
-       "-O #{installers}/#{file} #{url}/#{file}"
-  not_if { ::File.exists?("#{installers}/#{file}") }
+       "-O #{installers}/#{dc_file} #{dc_url}"
+  not_if { ::File.exists?("#{installers}/#{dc_file}") }
 end
 
 bash "extract-dicom-client" do
   cwd mflux_bin
   user 'root'
-  code "unzip -o #{installers}/#{file} dicom-client.jar"
+  code "unzip -o #{installers}/#{dc_file} dicom-client.jar"
 end
 
 cookbook_file "#{mflux_bin}/dicom-mf.sh" do
