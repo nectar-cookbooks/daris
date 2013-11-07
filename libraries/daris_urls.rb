@@ -24,7 +24,7 @@ module DarisUrls
     }
   }
   
-  templates = {
+  patterns = {
     'nig_commons' => 'nig-commons-%{type}.jar',
     'nig_essentials' => 'mfpkg-nig_essentials-%{ver}-mf%{mver}-%{type}.zip',
     'nig_transcoder' => 'mfpkg-nig_transcoder-%{ver}-mf%{mver}-%{type}.zip',
@@ -52,9 +52,9 @@ module DarisUrls
     if specified then
       return assemble(node, specified)
     end
-    template = templates[item]
-    if ! template then
-      raise "There is no filename template for '#{item}'"
+    pat = patterns[item]
+    if ! pat then
+      raise "There is no filename pattern for '#{item}'"
     end 
     release_name = node['daris']['release']
     if ! release_name then
@@ -70,7 +70,7 @@ module DarisUrls
       'ver' => versions[0],
       'mver' => versions[1] || ''
     }
-    file = template % hash
+    file = pat % hash
     return assemble(node, file)
   end
 
