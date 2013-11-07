@@ -43,7 +43,7 @@ if ! installers.start_with?('/') then
   installers = mflux_user_home + '/' + installers
 end
 
-pv_url = getUrl(node, 'upload')
+pv_url = getUrl(node, 'pvupload')
 pv_file = urlToFile(pv_url)
 bash "fetch-pvupload" do
   code "wget --user=#{user} --password=#{password} --no-check-certificate " +
