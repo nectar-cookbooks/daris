@@ -31,9 +31,7 @@ include_recipe "pvconv"
 
 include_recipe "daris::common"
 
-class Chef::Recipe::namespace 
-  include "DarisUrls"
-end
+::Chef::Recipe.send(:include, DarisUrls)
 
 mflux_home = node['mediaflux']['home']
 mflux_bin = node['mediaflux']['bin'] || "#{mflux_home}/bin"
