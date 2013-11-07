@@ -141,11 +141,6 @@ end
 
 sc_url = getUrl(node, 'server_config')
 sc_file = urlToFile(sc_url)
-exists = ::File.exists?("#{installers}/#{sc_file}")
-log "url is #{sc_url}, file is #{sc_file}, exists = #{exists}" do
-  level :error
-end
-
 
 bash "fetch-server-config" do
   user mflux_user
