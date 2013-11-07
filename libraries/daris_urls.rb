@@ -66,9 +66,9 @@ module DarisUrls
     end
     versions = release[item] || ['1.0']
     hash = {
-      'type' => release['type'] || 'stable',
-      'ver' => versions[0],
-      'mver' => versions[1] || ''
+      :type => release['type'] || 'stable',
+      :ver => versions[0] || '',
+      :mver => versions[1] || ''
     }
     file = pat % hash
     return assemble(node, file)
