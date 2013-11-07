@@ -75,7 +75,7 @@ module DarisUrls
   end
 
   def assemble(node, file)
-      if /^[a-zA-Z]+:.+$/ ~= file then
+      if /^[a-zA-Z]+:.+$/.match(file) then
         return file
       else
         base = node['daris']['download_url']
