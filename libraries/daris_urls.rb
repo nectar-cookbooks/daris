@@ -50,7 +50,7 @@ module DarisUrls
   def getUrl(node, item)
     specified = node['daris'][item]
     if specified then
-      return assemble(node, specified)
+      return assemble(node, specified, node['daris']['download_dir'])
     end
     pat = DARIS_PATTERNS[item]
     if ! pat then
@@ -65,21 +65,21 @@ module DarisUrls
       raise "There is no 'releases' entry for release '#{release_name}'"
     end
     versions = release[item] || ['1.0']
+    type = release['type'] || 'stable'
     hash = {
-      :type => release['type'] || 'stable',
+      :type => type, 
       :ver => versions[0] || '',
       :mver => versions[1] || ''
     }
     file = pat % hash
-    return assemble(node, file)
+    return assemble(node, file, type)
   end
 
-  def assemble(node, file)
+  def assemble(node, file, dir)
       if /^[a-zA-Z]+:.+$/.match(file) then
         return file
       else
         base = node['daris']['download_url']
-        dir = node['daris']['download_dir']
         if ! file.start_with?('/') && dir then
           if ! base.end_with?('/') && ! dir.start_with?('/') then
             base += '/'
