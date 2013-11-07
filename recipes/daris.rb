@@ -43,7 +43,7 @@ password = node['daris']['download_password']
 
 pkgs = {
   'nig_essentials' => getUrl(node, 'nig_essentials'),  
-  'nig_transcoder' => getUrl(node, 'nig_transcoder'),  
+  'nig_transcode' => getUrl(node, 'nig_transcode'),  
   'pssd' => getUrl(node, 'pssd'),
   'daris_portal' => getUrl(node, 'daris_portal')
 }

@@ -3,7 +3,7 @@ module DarisUrls
     'stable-2-18' => {
       'type' => 'stable',
       'nig_essentials' => ['0.19', '3.8.029'],
-      'nig_transcoder' => ['0.33', '3.8.029'],
+      'nig_transcode' => ['0.33', '3.8.029'],
       'pssd' => ['2.04', '3.8.029'],
       'daris_portal' => ['0.29', '3.8.029'],
       'server_config' => ['1.0'],
@@ -14,7 +14,7 @@ module DarisUrls
     'latest' => {
       'type' => 'latest',
       'nig_essentials' => ['0.20', '3.8.029'],
-      'nig_transcoder' => ['0.33', '3.8.029'],
+      'nig_transcode' => ['0.33', '3.8.029'],
       'pssd' => ['2.06', '3.8.040'],
       'daris_portal' => ['0.32', '3.8.040'],
       'server_config' => ['1.0'],
@@ -27,7 +27,7 @@ module DarisUrls
   DARIS_PATTERNS = {
     'nig_commons' => 'nig-commons-%{type}.jar',
     'nig_essentials' => 'mfpkg-nig_essentials-%{ver}-mf%{mver}-%{type}.zip',
-    'nig_transcoder' => 'mfpkg-nig_transcoder-%{ver}-mf%{mver}-%{type}.zip',
+    'nig_transcode' => 'mfpkg-nig_transcode-%{ver}-mf%{mver}-%{type}.zip',
     'pssd' => 'mfpkg-pssd-%{ver}-mf%{mver}-%{type}.zip',
     'daris_portal' => 'mfpkg-daris-%{ver}-mf%{mver}-%{type}.zip',
     'server_config' => 'server-config-%{ver}-%{type}.zip',
