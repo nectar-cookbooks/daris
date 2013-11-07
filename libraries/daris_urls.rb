@@ -1,5 +1,5 @@
 module DarisUrls
-  releases = {
+  DARIS_RELEASES = {
     'stable-2-18' => {
       'type' => 'stable',
       'nig_essentials' => ['0.19', '3.8.029'],
@@ -24,7 +24,7 @@ module DarisUrls
     }
   }
   
-  patterns = {
+  DARIS_PATTERNS = {
     'nig_commons' => 'nig-commons-%{type}.jar',
     'nig_essentials' => 'mfpkg-nig_essentials-%{ver}-mf%{mver}-%{type}.zip',
     'nig_transcoder' => 'mfpkg-nig_transcoder-%{ver}-mf%{mver}-%{type}.zip',
@@ -52,7 +52,7 @@ module DarisUrls
     if specified then
       return assemble(node, specified)
     end
-    pat = DarisUrls::patterns[item]
+    pat = DARIS_PATTERNS[item]
     if ! pat then
       raise "There is no filename pattern for '#{item}'"
     end 
@@ -60,7 +60,7 @@ module DarisUrls
     if ! release_name then
       raise "No DaRIS release has been specified"
     end 
-    release = releases[release_name]
+    release = DARIS_RELEASES[release_name]
     if ! release then
       raise "There is no 'releases' entry for release '#{release_name}'"
     end
