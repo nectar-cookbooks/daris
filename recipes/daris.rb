@@ -32,7 +32,7 @@ include_recipe "pvconv"
 include_recipe "daris::common"
 
 class Chef::Recipe::namespace 
-  include DarisUrls
+  include "DarisUrls"
 end
 
 mflux_home = node['mediaflux']['home']
