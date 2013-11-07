@@ -30,10 +30,11 @@
 include_recipe "mediaflux::common"
 include_recipe "daris::common"
 
+::Chef::Recipe.send(:include, DarisUrls)
+
 mflux_home = node['mediaflux']['home']
 mflux_bin = node['mediaflux']['bin'] || "#{mflux_home}/bin"
 mflux_user_home = node['mediaflux']['user_home'] || mflux_home
-url = node['daris']['download_url']
 user = node['daris']['download_user']
 password = node['daris']['download_password']
 
@@ -42,17 +43,18 @@ if ! installers.start_with?('/') then
   installers = mflux_user_home + '/' + installers
 end
 
-file = node.default['daris']['pvupload']
+pv_url = getUrl(node, 'upload')
+pv_file = urlToFile(pv_url)
 bash "fetch-pvupload" do
   code "wget --user=#{user} --password=#{password} --no-check-certificate " +
-       "-O #{installers}/#{file} #{url}/#{file}"
-  not_if { ::File.exists?("#{installers}/#{file}") }
+       "-O #{installers}/#{pv_file} #{pv_url}"
+  not_if { ::File.exists?("#{installers}/#{pv_file}") }
 end
 
 bash "extract-pvupload" do
   cwd mflux_bin
   user 'root'
-  code "unzip -o #{installers}/#{file} pvupload.jar"
+  code "unzip -o #{installers}/#{pv_file} pvupload.jar"
 end
 
 cookbook_file "#{mflux_bin}/mfpvupload.sh" do
