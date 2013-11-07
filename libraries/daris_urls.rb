@@ -37,7 +37,7 @@ module DarisUrls
   }
   
   # Get the filename part of a URL string
-  def file(url_string)
+  def getFile(url_string)
     return Pathname(URI(url_string).path).basename
   end
 

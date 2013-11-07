@@ -26,11 +26,14 @@
 # CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-require "daris_urls"
 
 include_recipe "pvconv"
 
 include_recipe "daris::common"
+
+class Chef::Recipe::namespace 
+  include DarisUrls
+end
 
 mflux_home = node['mediaflux']['home']
 mflux_bin = node['mediaflux']['bin'] || "#{mflux_home}/bin"
@@ -41,10 +44,10 @@ user = node['daris']['download_user']
 password = node['daris']['download_password']
 
 pkgs = {
-  'nig-essentials' => DarisUrls::getUrl(node, 'nig-essentials'),  
-  'nig-transcoder' => DarisUrls::getUrl(node, 'nig-transcoder'),  
-  'pssd' => DarisUrls::getUrl(node, 'pssd'),
-  'daris_portal' => DarisUrls::getUrl(node, 'daris_portal')
+  'nig-essentials' => getUrl(node, 'nig-essentials'),  
+  'nig-transcoder' => getUrl(node, 'nig-transcoder'),  
+  'pssd' => getUrl(node, 'pssd'),
+  'daris_portal' => getUrl(node, 'daris_portal')
 }
 
 local_pkgs = node['daris']['local_pkgs'] || {}
@@ -107,7 +110,7 @@ template "#{mflux_home}/config/initial_daris_conf.tcl" do
 end
 
 pkgs.each() do | pkg, url | 
-  file = DarisUrls::file(url)
+  file = getFile(url)
   bash "fetch-#{pkg}" do
     user mflux_user
     code "wget --user=#{user} --password=#{password} --no-check-certificate " +
@@ -138,8 +141,8 @@ template "#{mflux_home}/plugin/bin/pvconv.pl" do
   })
 end
 
-url = DarisUrls::getUrl(node, 'server_config')
-file = DarisUrls::file(url)
+url = getUrl(node, 'server_config')
+file = getFile(url)
 bash "fetch-server-config" do
   user mflux_user
   code "wget --user=#{user} --password=#{password} --no-check-certificate " +
