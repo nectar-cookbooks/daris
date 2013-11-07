@@ -37,7 +37,7 @@ module DarisUrls
   }
   
   # Get the filename part of a URL string
-  def getFile(url_string)
+  def urlToFile(url_string)
     return Pathname(URI(url_string).path).basename
   end
 
@@ -73,6 +73,10 @@ module DarisUrls
     }
     file = pat % hash
     return assemble(node, file, type)
+  end
+
+  def getFile(node, item) 
+    return urlToFile(getUrl(node, item))
   end
 
   def assemble(node, file, dir)

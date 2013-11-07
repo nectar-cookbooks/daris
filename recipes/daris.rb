@@ -108,7 +108,7 @@ template "#{mflux_home}/config/initial_daris_conf.tcl" do
 end
 
 pkgs.each() do | pkg, url | 
-  file = getFile(url)
+  file = urlToFile(url)
   bash "fetch-#{pkg}" do
     user mflux_user
     code "wget --user=#{user} --password=#{password} --no-check-certificate " +
@@ -140,7 +140,7 @@ template "#{mflux_home}/plugin/bin/pvconv.pl" do
 end
 
 url = getUrl(node, 'server_config')
-file = getFile(url)
+file = urlToFile(url)
 bash "fetch-server-config" do
   user mflux_user
   code "wget --user=#{user} --password=#{password} --no-check-certificate " +
@@ -239,7 +239,8 @@ end
   end
 end
 
-all_pkgs.each() do | pkg, file | 
+all_pkgs.each() do | pkg, url |
+  file = urlToFile(url) 
   bash "install-#{pkg}" do
     action :nothing
     user "root"
