@@ -52,7 +52,7 @@ module DarisUrls
     if specified then
       return assemble(node, specified)
     end
-    pat = patterns[item]
+    pat = DarisUrls::patterns[item]
     if ! pat then
       raise "There is no filename pattern for '#{item}'"
     end 
