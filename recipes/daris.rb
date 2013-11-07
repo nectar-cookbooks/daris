@@ -39,7 +39,13 @@ url = node['daris']['download_url']
 user = node['daris']['download_user']
 password = node['daris']['download_password']
 
-pkgs = node['daris']['pkgs']
+pkgs = {
+  'nig-essentials' => DarisUrls.getUrl(node, 'nig-essentials'),  
+  'nig-transcoder' => DarisUrls.getUrl(node, 'nig-transcoder'),  
+  'pssd' => DarisUrls.getUrl(node, 'pssd'),
+  'daris_portal' => DarisUrls.getUrl(node, 'daris_portal')
+}
+
 local_pkgs = node['daris']['local_pkgs'] || {}
 all_pkgs = pkgs.merge(local_pkgs)
 installers = node['mediaflux']['installers'] || 'installers'
@@ -99,11 +105,12 @@ template "#{mflux_home}/config/initial_daris_conf.tcl" do
              })
 end
 
-pkgs.each() do | pkg, file | 
+pkgs.each() do | pkg, url | 
+  file = DarisUrls::file(url)
   bash "fetch-#{pkg}" do
     user mflux_user
     code "wget --user=#{user} --password=#{password} --no-check-certificate " +
-         "-O #{installers}/#{file} #{url}/#{file}"
+         "-O #{installers}/#{file} #{url}"
     not_if { ::File.exists?("#{installers}/#{file}") }
   end
 end
@@ -130,11 +137,12 @@ template "#{mflux_home}/plugin/bin/pvconv.pl" do
   })
 end
 
-file = node.default['daris']['server_config']
+url = DarisUrls::getUrl(node, 'server_config')
+file = DarisUrls::file(url)
 bash "fetch-server-config" do
   user mflux_user
   code "wget --user=#{user} --password=#{password} --no-check-certificate " +
-       "-O #{installers}/#{file} #{url}/#{file}"
+         "-O #{installers}/#{file} #{url}"
   not_if { ::File.exists?("#{installers}/#{file}") }
 end
 
