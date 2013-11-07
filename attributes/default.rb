@@ -34,14 +34,4 @@ node.default['daris']['dcmtools'] = nil
 # Local packages.  These WON'T be downloaded.
 node.default['daris']['local_pkgs'] = {}
 
-# We install the "server-config.sh" tool by default, though 
-# we don't actually use it in the setup procedure anymore.
-node.default['daris']['server_config'] =
-  'server-config-1.0-stable.zip'
-
-# Additional tools (optional)
-node.default['daris']['pvupload'] = 'pvupload-0.33-stable.zip'
-node.default['daris']['dicom-client'] = 'dicom-client-1.0-stable.zip'
-node.default['daris']['dcmtools'] = 'dcmtools-0.29-stable.zip'
-
 node.override['mediaflux']['defer_start'] = true
