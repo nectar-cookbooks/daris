@@ -141,9 +141,12 @@ end
 
 url = getUrl(node, 'server_config')
 file = urlToFile(url)
-log "url is #{url}, file is #{file}" do
+exists = ::File.exists?("#{installers}/#{file}")
+log "url is #{url}, file is #{file}, exists = #{exists}" do
   level :error
 end
+
+
 bash "fetch-server-config" do
   user mflux_user
   code "wget --user=#{user} --password=#{password} --no-check-certificate " +
