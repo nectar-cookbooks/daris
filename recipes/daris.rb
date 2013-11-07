@@ -40,10 +40,10 @@ user = node['daris']['download_user']
 password = node['daris']['download_password']
 
 pkgs = {
-  'nig-essentials' => DarisUrls.getUrl(node, 'nig-essentials'),  
-  'nig-transcoder' => DarisUrls.getUrl(node, 'nig-transcoder'),  
-  'pssd' => DarisUrls.getUrl(node, 'pssd'),
-  'daris_portal' => DarisUrls.getUrl(node, 'daris_portal')
+  'nig-essentials' => DarisUrls::getUrl(node, 'nig-essentials'),  
+  'nig-transcoder' => DarisUrls::getUrl(node, 'nig-transcoder'),  
+  'pssd' => DarisUrls::getUrl(node, 'pssd'),
+  'daris_portal' => DarisUrls::getUrl(node, 'daris_portal')
 }
 
 local_pkgs = node['daris']['local_pkgs'] || {}
