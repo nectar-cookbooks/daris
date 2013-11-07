@@ -139,10 +139,10 @@ template "#{mflux_home}/plugin/bin/pvconv.pl" do
   })
 end
 
-url = getUrl(node, 'server_config')
-file = urlToFile(url)
-exists = ::File.exists?("#{installers}/#{file}")
-log "url is #{url}, file is #{file}, exists = #{exists}" do
+sc_url = getUrl(node, 'server_config')
+sc_file = urlToFile(sc_url)
+exists = ::File.exists?("#{installers}/#{sc_file}")
+log "url is #{sc_url}, file is #{sc_file}, exists = #{exists}" do
   level :error
 end
 
@@ -150,8 +150,8 @@ end
 bash "fetch-server-config" do
   user mflux_user
   code "wget --user=#{user} --password=#{password} --no-check-certificate " +
-         "-O #{installers}/#{file} #{url}"
-  not_if { ::File.exists?("#{installers}/#{file}") }
+         "-O #{installers}/#{sc_file} #{sc_url}"
+  not_if { ::File.exists?("#{installers}/#{sc_file}") }
 end
 
 bash 'extract-server-config' do
