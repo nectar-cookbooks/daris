@@ -8,7 +8,7 @@ module DarisUrls
       'daris_portal' => ['0.29', '3.8.029'],
       'server_config' => ['1.0'],
       'pvupload' => ['0.33'],
-      'dicom-client' => ['1.0'],
+      'dicom_client' => ['1.0'],
       'dcmtools' => ['0.29'],
     },
     'latest' => {
@@ -19,7 +19,7 @@ module DarisUrls
       'daris_portal' => ['0.32', '3.8.040'],
       'server_config' => ['1.0'],
       'pvupload' => ['0.33'],
-      'dicom-client' => ['1.0'],
+      'dicom_client' => ['1.0'],
       'dcmtools' => ['0.29']
     }
   }
@@ -32,7 +32,7 @@ module DarisUrls
     'daris_portal' => 'mfpkg-daris-%{ver}-mf%{mver}-%{type}.zip',
     'server_config' => 'server-config-%{ver}-%{type}.zip',
     'pvupload' => 'pvupload-%{ver}-%{type}.zip',
-    'dicom-client' => 'dicom-client-%{ver}-%{type}.zip',
+    'dicom_client' => 'dicom-client-%{ver}-%{type}.zip',
     'dcmtools' => 'dcmtools-%{ver}-%{type}.zip'
   }
   
