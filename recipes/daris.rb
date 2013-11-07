@@ -157,7 +157,7 @@ end
 bash 'extract-server-config' do
   cwd mflux_bin
   user 'root'
-  code "unzip -o #{installers}/#{file} server-config.jar"
+  code "unzip -o #{installers}/#{sc_file} server-config.jar"
 end
 
 cookbook_file "#{mflux_bin}/server-config.sh" do
