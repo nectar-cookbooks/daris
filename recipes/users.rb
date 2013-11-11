@@ -27,20 +27,20 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-user_group = node['daris']['user_group']
-users = data_bag['daris_users']
+daris_user_group = node['daris']['user_group']
+daris_users = data_bag('daris_users')
 
 domain = node['mediaflux']['authentication_domain']
 if ! domain || domain == '' then
   domain = node['daris']['ns'] 
 end
 
-if user_group && users then
+if daris_user_group && daris_users then
   template "create-#{user-group}-users" do
     source "create_users.erb"
     variables ({
-                 :user_group => user_group,
-                 :users => users,
+                 :user_group => daris_user_group,
+                 :users => daris_users,
                  :domain => domain
     }) 
   end
