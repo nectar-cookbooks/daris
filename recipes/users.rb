@@ -27,6 +27,9 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+include_recipe "daris::common"
+
+mflux_home = node['mediaflux']['home']
 daris_user_group = node['daris']['user_group']
 daris_users = data_bag('daris_users')
 
