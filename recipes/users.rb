@@ -31,7 +31,8 @@ include_recipe "daris::common"
 
 mflux_home = node['mediaflux']['home']
 daris_user_group = node['daris']['user_group']
-daris_users = data_bag('daris_users')
+items = data_bag('daris_users')
+daris_users = items.map { |id| data_bag_item('daris_users', id) }
 
 domain = node['mediaflux']['authentication_domain']
 if ! domain || domain == '' then
