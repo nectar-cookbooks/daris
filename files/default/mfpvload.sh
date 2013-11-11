@@ -56,11 +56,11 @@ MF_WAIT=60
 
 # Auto create subjects from CID
 # Comment out to disable
-AUTO_SUBJECT_CREATE=-auto-subject-create
+#AUTO_SUBJECT_CREATE=-auto-subject-create
 
 # Parse NIG-specific meta-data and locate on Subject
 # Comment out to disable
-NIG_META=-nig-subject-meta-add
+#NIG_META=-nig-subject-meta-add
 
 # Do the upload
 $JAVA -Dmf.host=$MFLUX_HOST -Dmf.port=$MFLUX_PORT $TRANSPORT \
