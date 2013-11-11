@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: daris
-# Recipe:: default
+# Recipe:: daris
 #
 # Copyright (c) 2013, The University of Queensland
 # All rights reserved.
@@ -282,4 +282,3 @@ bash "run-server-config" do
          "#{mfcommand} source #{mflux_home}/config/initial_daris_conf.tcl && " +
          "#{mfcommand} logoff"
 end
-
