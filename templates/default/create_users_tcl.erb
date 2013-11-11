@@ -2,7 +2,7 @@
 <% 
   @users.each do |user| 
     if user['groups'].member?(@user_group) then
-      role_args = user['roles'].map { |r| ":role #{r}" }.join(" ")
+      role_args = (user['roles'] || []).map { |r| ":role #{r}" }.join(" ")
       names = user['names'] || []
       name_args = [0..names.length-1].map { |i|
 	  type = (case i 
