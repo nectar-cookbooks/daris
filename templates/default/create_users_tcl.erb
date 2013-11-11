@@ -2,6 +2,7 @@
 <% 
   @users.each do |user| 
     if user['groups'].member?(@user_group) then
+      id = user['user'] || user['id']
       role_args = (user['roles'] || []).map { |r| ":role #{r}" }.join(" ")
       names = user['names'] || []
       name_args = (0 .. names.length - 1).map { |i|
@@ -15,14 +16,16 @@
                   end)
 	  ":name -type #{type} #{names[i]}" }.join(" ")
 %>
-      om.pssd.user.create :user <%= user['user'] || user['id'] %> \
-          :authority local \
-          :domain <%= @domain %> \
+   if [ catch {
+      om.pssd.user.create :user <%= id %> \
+          :authority local :domain <%= @domain %> \
 	  :email <%= user['email'] || "nobody@nowhere" %> \
 	  :password <%= user['password'] || "secret" %> \
 	  :project-creator <%= user['project_creator'] || false %> \
 	  <%= name_args %> \
           <%= role_args %> \
+      } message ] {
+      puts stdout Did not create user <%= id %> : $message
 <%
     end
   end

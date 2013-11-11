@@ -40,12 +40,20 @@ if ! domain || domain == '' then
 end
 
 if daris_user_group && daris_users then
-  template "#{mflux_home}/config/create-#{daris_user_group}-users.tcl" do
+  create_users = "#{mflux_home}/config/create-#{daris_user_group}-users.tcl"
+  template create_users do
     source "create_users_tcl.erb"
     variables ({
                  :user_group => daris_user_group,
                  :users => daris_users,
                  :domain => domain
-    }) 
+               }) 
+  end
+
+  bash "run-create-users" do
+    code ". /etc/mediaflux/servicerc && " +
+      "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
+      "#{mfcommand} source #{create_users) && " +
+      "#{mfcommand} logoff"
   end
 end
