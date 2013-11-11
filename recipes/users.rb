@@ -39,7 +39,7 @@ if ! domain || domain == '' then
 end
 
 if daris_user_group && daris_users then
-  template "#{mflux_home}/config/create-#{user-group}-users.tcl" do
+  template "#{mflux_home}/config/create-#{daris_user_group}-users.tcl" do
     source "create_users_tcl.erb"
     variables ({
                  :user_group => daris_user_group,
