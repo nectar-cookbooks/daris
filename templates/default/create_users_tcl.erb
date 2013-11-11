@@ -17,8 +17,7 @@
 	  ":name -type #{type} #{names[i]}" }.join(" ")
 %>
    if [ catch {
-      om.pssd.user.create :user <%= id %> \
-          :authority local :domain <%= @domain %> \
+      om.pssd.user.create :user <%= id %> :domain <%= @domain %> \
 	  :email <%= user['email'] || "nobody@nowhere" %> \
 	  :password <%= user['password'] || "secret" %> \
 	  :project-creator <%= user['project_creator'] || false %> \
