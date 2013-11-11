@@ -30,6 +30,9 @@
 include_recipe "daris::common"
 
 mflux_home = node['mediaflux']['home']
+mflux_bin = node['mediaflux']['bin'] || "#{mflux_home}/bin"
+mfcommand = "#{mflux_bin}/mfcommand"
+
 daris_user_group = node['daris']['user_group']
 items = data_bag('daris_users')
 daris_users = items.map { |id| data_bag_item('daris_users', id) }
@@ -53,7 +56,7 @@ if daris_user_group && daris_users then
   bash "run-create-users" do
     code ". /etc/mediaflux/servicerc && " +
       "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
-      "#{mfcommand} source #{create_users) && " +
+      "#{mfcommand} source #{create_users} && " +
       "#{mfcommand} logoff"
   end
 end
