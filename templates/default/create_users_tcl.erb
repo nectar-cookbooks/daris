@@ -6,13 +6,14 @@
       role_args = user['roles'].map { |r| ":role #{r}" }.join(" ")
       names = user['names'] || []
       name_args = [0..names.length-1].map { |i|
-	  type = (switch i 
+	  type = (case i 
                   when 0
                     'first' 
                   when (names.length - 1) 
                     'last' 
                   else 
-                    'middle')
+                    'middle'
+                  end)
 	  ":name -type #{type} #{names[i]}" }.join(" ")
 %>
       om.pssd.user.create :user <%= user['user'] || user['id'] %> \
