@@ -12,16 +12,16 @@ if { $namespace_exists == "false" } then {
 }
 
 # DICOM
-set store "<%= @dicom_store %>"
-set store_exists [xvalue exists [asset.store.exists :name $store]]
-if { $store_exists == "false" } then {
-    asset.store.create :name $store :local true \
+set dstore "<%= @dicom_store %>"
+set dstore_exists [xvalue exists [asset.store.exists :name $dstore]]
+if { $dstore_exists == "false" } then {
+    asset.store.create :name $dstore :local true \
 	:type "<%= fillIn(@fs_type, 'file-system') %>" :automount true
 }
-set namespace "<%= fillIn(@dicom_namespace, 'dicom') %>"
-set namespace_exists [xvalue exists [asset.namespace.exists \
-					 :namespace $namespace]]
-if { $namespace_exists == "false" } then {
-    asset.namespace.create :namespace $namespace \
-	:store $store :description "DICOM namespace"
+set dnamespace "<%= fillIn(@dicom_namespace, 'dicom') %>"
+set dnamespace_exists [xvalue exists [asset.namespace.exists \
+					 :namespace $dnamespace]]
+if { $dnamespace_exists == "false" } then {
+    asset.namespace.create :namespace $dnamespace \
+	:store $dstore :description "DICOM namespace"
 }
