@@ -48,8 +48,7 @@ pkgs = {
   'daris_portal' => getUrl(node, 'daris_portal')
 }
 
-# local_pkgs = node['daris']['local_pkgs'] || {}
-local_pkgs = {}
+local_pkgs = node['daris']['local_pkgs'] || {}
 all_pkgs = pkgs.merge(local_pkgs)
 installers = node['mediaflux']['installers'] || 'installers'
 if ! installers.start_with?('/') then
@@ -271,7 +270,7 @@ end
 
 bash "mediaflux-running-2" do
   user mflux_user
-  code "exit 1 ; . /etc/mediaflux/mfluxrc ; " +
+  code ". /etc/mediaflux/mfluxrc ; " +
     "wget ${MFLUX_TRANSPORT}://${MFLUX_HOST}:${MFLUX_PORT}/ " +
     "    --retry-connrefused --no-check-certificate -O /dev/null " +
     "    --waitretry=1 --timeout=2 --tries=10"
