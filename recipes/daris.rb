@@ -243,7 +243,8 @@ bash "create-stores" do
     "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
     "#{mfcommand} source #{mflux_home}/config/create_stores.tcl && " +
     "#{mfcommand} logoff"
-  not_if { ::File.exists?( "#{mflux_home}/volatile/stores/#{store}" ) }
+  not_if { ::File.exists?("#{mflux_home}/volatile/stores/pssd") &&
+           ::File.exists?("#{mflux_home}/volatile/stores/#{dicom_store}") }
 end
 
 all_pkgs.each() do | pkg, url |
