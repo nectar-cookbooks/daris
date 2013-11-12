@@ -233,7 +233,7 @@ bash "mediaflux-running" do
   code ". /etc/mediaflux/mfluxrc ; " +
     "wget ${MFLUX_TRANSPORT}://${MFLUX_HOST}:${MFLUX_PORT}/ " +
     "    --retry-connrefused --no-check-certificate -O /dev/null " +
-    "    --waitretry=1 --timeout=2 --tries=20"
+    "    --waitretry=1 --timeout=2 --tries=30"
 end 
 
 bash "create-stores" do
