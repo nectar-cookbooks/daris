@@ -1,13 +1,13 @@
 # PSSD
-set store_exists [xvalue exists [asset.store.exists :name 'pssd']]
+set store_exists [xvalue exists [asset.store.exists :name pssd]]
 if { $store_exists == "false" } then {
-    asset.store.create :name 'pssd' :local true \
+    asset.store.create :name pssd :local true \
 	:type "<%= fillIn(@fs_type, 'file-system') %>" :automount true
 }
 set namespace_exists [xvalue exists [asset.namespace.exists \
-					 :namespace 'pssd']]
+					 :namespace pssd]]
 if { $namespace_exists == "false" } then {
-    asset.namespace.create :namespace 'pssd' \
+    asset.namespace.create :namespace pssd \
 	:store 'pssd' :description "PSSD namespace"
 }
 
