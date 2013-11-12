@@ -1,0 +1,27 @@
+# PSSD
+set store_exists [xvalue exists [asset.store.exists :name 'pssd']]
+if { $store_exists == "false" } then {
+    asset.store.create :name 'pssd' :local true \
+	:type "<%= fillIn(@fs_type, 'file-system') %>" :automount true
+}
+set namespace_exists [xvalue exists [asset.namespace.exists \
+					 :namespace 'pssd']]
+if { $namespace_exists == "false" } then {
+    asset.namespace.create :namespace 'pssd' \
+	:store 'pssd' :description "PSSD namespace"
+}
+
+# DICOM
+set store "<%= @dicom_store %>"
+set store_exists [xvalue exists [asset.store.exists :name $store]]
+if { $store_exists == "false" } then {
+    asset.store.create :name $store :local true \
+	:type "<%= fillIn(@fs_type, 'file-system') %>" :automount true
+}
+set namespace "<%= fillIn(@dicom_namespace, 'dicom') %>"
+set namespace_exists [xvalue exists [asset.namespace.exists \
+					 :namespace $namespace]]
+if { $namespace_exists == "false" } then {
+    asset.namespace.create :namespace $namespace \
+	:store $store :description "DICOM namespace"
+}

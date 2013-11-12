@@ -98,12 +98,23 @@ template "#{mflux_home}/config/initial_daris_conf.tcl" do
                :mail_from => node['mediaflux']['mail_from'],
                :notification_from => node['mediaflux']['notification_from'],
                :authentication_domain => domain,
-               :dicom_namespace => node['daris']['dicom_namespace'],
-               :dicom_store => dicom_store,
                :dicom_proxy_domain => node['daris']['dicom_proxy_domain'],
                :dicom_proxy_user_names => node['daris']['dicom_proxy_user_names'],
                :dicom_ingest_notifications => node['daris']['dicom_ingest_notifications'],
                :ns => node['daris']['ns']
+             })
+end
+
+template "#{mflux_home}/config/create_stores.tcl" do 
+  source "create_stores_tcl.erb"
+  owner mflux_user
+  group mflux_user
+  mode 0400
+  helpers (DarisHelpers)
+  variables ({
+               :dicom_namespace => node['daris']['dicom_namespace'],
+               :dicom_store => dicom_store,
+               :fs_type => node['daris']['file_system_type']
              })
 end
 
@@ -183,8 +194,7 @@ ruby_block "bootstrap_test" do
       resources(:log => "bootstrap").run_action(:write)
       resources(:service => "mediaflux-restart").run_action(:restart)
       resources(:bash => "mediaflux-running").run_action(:run)
-      resources(:bash => "create-pssd-store").run_action(:run)
-      resources(:bash => "create-#{dicom_store}-store").run_action(:run)
+      resources(:bash => "create-stores").run_action(:run)
       all_pkgs.each() do | pkg, file | 
         resources(:bash => "install-#{pkg}").run_action(:run)
       end
@@ -226,18 +236,14 @@ bash "mediaflux-running" do
     "    --waitretry=1 --timeout=2 --tries=20"
 end 
 
-['pssd', dicom_store ].each() do |store| 
-  bash "create-#{store}-store" do
-    action :nothing
-    user "root"
-    code ". /etc/mediaflux/servicerc && " +
-      "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
-      "#{mfcommand} asset.store.create :name #{store} :local true " +
-      "    :type #{node['daris']['file_system_type']} " +
-      "    :automount true  && " +
-      "#{mfcommand} logoff"
-    not_if { ::File.exists?( "#{mflux_home}/volatile/stores/#{store}" ) }
-  end
+bash "create-stores" do
+  action :nothing
+  user "root"
+  code ". /etc/mediaflux/servicerc && " +
+    "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
+    "#{mfcommand} source #{mflux_home}/config/create_stores.tcl && " +
+    "#{mfcommand} logoff"
+  not_if { ::File.exists?( "#{mflux_home}/volatile/stores/#{store}" ) }
 end
 
 all_pkgs.each() do | pkg, url |
