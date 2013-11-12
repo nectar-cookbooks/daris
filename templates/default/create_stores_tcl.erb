@@ -8,7 +8,7 @@ set namespace_exists [xvalue exists [asset.namespace.exists \
 					 :namespace pssd]]
 if { $namespace_exists == "false" } then {
     asset.namespace.create :namespace pssd \
-	:store 'pssd' :description "PSSD namespace"
+	:store pssd :description "PSSD namespace"
 }
 
 # DICOM
