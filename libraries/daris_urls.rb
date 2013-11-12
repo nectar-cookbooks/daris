@@ -18,7 +18,7 @@ module DarisUrls
       'pssd' => ['2.06', '3.8.040'],
       'daris_portal' => ['0.32', '3.8.040'],
       'server_config' => ['1.0'],
-      'pvupload' => ['0.33'],
+      'pvupload' => ['0.34'],
       'dicom_client' => ['1.0'],
       'dcmtools' => ['0.29']
     }
