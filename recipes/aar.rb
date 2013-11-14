@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: daris
-# Recipe:: default
+# Recipe:: aar
 #
 # Copyright (c) 2013, The University of Queensland
 # All rights reserved.
@@ -27,10 +27,22 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-include_recipe "daris::daris"
+include_recipe "daris::common"
 
-include_recipe "daris::pvupload"
+mflux_home = node['mediaflux']['home']
+mflux_bin = node['mediaflux']['bin'] || "#{mflux_home}/bin"
 
-include_recipe "daris::dicom-client"
+# Fetch the aar.jar file from the Mediaflux server ... if we don't have it.
+bash "fetch-aar-jar" do
+  user 'root'
+  code ". /etc/mediaflux/mfluxrc && " +
+    "URL=${MFLUX_TRANSPORT}://${MFLUX_HOST}:${MFLUX_PORT} && " +
+    "wget --no-check-certificate -O #{mflux_bin}/aar.jar $URL/mflux/aar.jar"
+  not_if { ::File.exists?("#{mflux_bin}/aar.jar") }
+end
 
-include_recipe "daris::aar"
+cookbook_file "#{mflux_bin}/aar" do
+  owner 'root'
+  mode 0755
+  source "aar.sh"
+end
