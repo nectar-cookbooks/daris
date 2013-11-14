@@ -76,11 +76,6 @@ if ! dicom_store || dicom_store == '' then
   dicom_store = 'dicom'
 end
 
-domain = node['mediaflux']['authentication_domain']
-if ! domain || domain == '' then
-  domain = node['daris']['ns'] 
-end
-
 template "#{mflux_home}/config/initial_daris_conf.tcl" do 
   source "initial_daris_conf_tcl.erb"
   owner mflux_user
