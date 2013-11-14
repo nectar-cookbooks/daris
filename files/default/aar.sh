@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Run the Arcitecta 'aar' tool
+# Run the Arcitecta 'aar' tool.
 #
 
 if [ -r /etc/mediaflux/mfluxrc ] ; then
@@ -22,5 +22,9 @@ if [ ! -f "${JAR}" ]; then
     exit 1
 fi
 
-$JAVA -jar $JAR "$@"
+if [ $# -eq 0 ] ; then 
+    $JAVA -jar $JAR -help
+else 
+    $JAVA -jar $JAR "$@"
+fi
 
