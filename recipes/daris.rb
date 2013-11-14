@@ -86,18 +86,8 @@ template "#{mflux_home}/config/initial_daris_conf.tcl" do
   owner mflux_user
   group mflux_user
   mode 0400
-  helpers (DarisHelpers)
+  helpers (MfluxHelpers)
   variables ({
-               :password => node['mediaflux']['admin_password'],
-               :server_name => node['mediaflux']['server_name'],
-               :server_organization => node['mediaflux']['server_organization'],
-               :jvm_memory_max => node['mediaflux']['jvm_memory_max'],
-               :jvm_memory_perm_max => node['mediaflux']['jvm_memory_max'],
-               :mail_smtp_host => node['mediaflux']['mail_smtp_host'],
-               :mail_smtp_port => node['mediaflux']['mail_smtp_port'],
-               :mail_from => node['mediaflux']['mail_from'],
-               :notification_from => node['mediaflux']['notification_from'],
-               :authentication_domain => domain,
                :dicom_proxy_domain => node['daris']['dicom_proxy_domain'],
                :dicom_proxy_user_names => node['daris']['dicom_proxy_user_names'],
                :dicom_ingest_notifications => node['daris']['dicom_ingest_notifications'],
@@ -110,7 +100,7 @@ template "#{mflux_home}/config/create_stores.tcl" do
   owner mflux_user
   group mflux_user
   mode 0400
-  helpers (DarisHelpers)
+  helpers (MfluxHelpers)
   variables ({
                :dicom_namespace => node['daris']['dicom_namespace'],
                :dicom_store => dicom_store,
@@ -160,6 +150,7 @@ bash "fetch-server-config" do
   not_if { ::File.exists?("#{installers}/#{sc_file}") }
 end
 
+# We don't use this tool for configuration.  But someone might want to ...
 bash 'extract-server-config' do
   cwd mflux_bin
   user 'root'
@@ -192,7 +183,6 @@ ruby_block "bootstrap_test" do
       # It appears that if you use run_action like this, triggering
       # doesn't work.  But it is simpler this way anyway
       resources(:log => "bootstrap").run_action(:write)
-      resources(:service => "mediaflux-restart").run_action(:restart)
       resources(:bash => "mediaflux-running").run_action(:run)
       resources(:bash => "create-stores").run_action(:run)
       all_pkgs.each() do | pkg, file | 
@@ -200,6 +190,7 @@ ruby_block "bootstrap_test" do
       end
       resources(:template => "#{mflux_home}/config/services/network.tcl")
         .run_action(:create)
+      resources(:service => "mediaflux-restart").run_action(:restart)
     else
       resources(:log => "no-bootstrap").run_action(:write)
     end
@@ -270,11 +261,6 @@ template "#{mflux_home}/config/services/network.tcl" do
               })
   end
 
-service "mediaflux-restart-2" do
-  service_name "mediaflux"
-  action :restart
-end
-
 bash "mediaflux-running-2" do
   user mflux_user
   code ". /etc/mediaflux/mfluxrc ; " +
@@ -283,7 +269,7 @@ bash "mediaflux-running-2" do
     "    --waitretry=1 --timeout=2 --tries=20"
 end
 
-bash "run-server-config" do
+bash "run-initial-daris-config" do
   code ". /etc/mediaflux/servicerc && " +
          "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
          "#{mfcommand} source #{mflux_home}/config/initial_daris_conf.tcl && " +
