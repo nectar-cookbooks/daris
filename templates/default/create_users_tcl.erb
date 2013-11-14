@@ -1,7 +1,7 @@
-# Create PSSD users for the "<%= @user_group %>" group
+# Create PSSD users
 <% 
   @users.each do |user| 
-    if user['groups'].member?(@user_group) then
+    if @user_groups.any { |group| user['groups'].member?(group) } then
       id = user['user'] || user['id']
       role_args = (user['roles'] || []).map { |r| ":role #{r}" }.join(" ")
       names = user['names'] || []

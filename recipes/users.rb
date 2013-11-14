@@ -33,21 +33,18 @@ mflux_home = node['mediaflux']['home']
 mflux_bin = node['mediaflux']['bin'] || "#{mflux_home}/bin"
 mfcommand = "#{mflux_bin}/mfcommand"
 
-daris_user_group = node['daris']['user_group']
+daris_user_groups = node['daris']['user_groups']
 items = data_bag('daris_users')
 daris_users = items.map { |id| data_bag_item('daris_users', id) }
 
-domain = node['mediaflux']['authentication_domain']
-if ! domain || domain == '' then
-  domain = node['daris']['ns'] 
-end
+domain = node['mediaflux']['authentication_domain'] || 'users'
 
-if daris_user_group && daris_users then
-  create_users = "#{mflux_home}/config/create-#{daris_user_group}-users.tcl"
+if daris_user_groups && daris_users then
+  create_users = "#{mflux_home}/config/create-users.tcl"
   template create_users do
     source "create_users_tcl.erb"
     variables ({
-                 :user_group => daris_user_group,
+                 :user_groups => daris_user_groups,
                  :users => daris_users,
                  :domain => domain
                }) 
