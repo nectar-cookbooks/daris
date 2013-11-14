@@ -15,11 +15,12 @@
                     'middle'
                   end)
 	  ":name -type #{type} #{names[i]}" }.join(" ")
+      domain = user['domain'] || @domain
 %>
    if [ catch {
-      om.pssd.user.create :user <%= id %> :domain <%= @domain %> \
+      om.pssd.user.create :user <%= id %> :domain <%= domain %> \
 	  :email <%= user['email'] || "nobody@nowhere" %> \
-	  :password <%= user['password'] || "secret" %> \
+	  :password <%= user['password'] || @password %> \
 	  :project-creator <%= user['project_creator'] || false %> \
 	  <%= name_args %> \
           <%= role_args %> \

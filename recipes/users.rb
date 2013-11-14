@@ -36,6 +36,7 @@ mfcommand = "#{mflux_bin}/mfcommand"
 daris_user_groups = node['daris']['user_groups']
 items = data_bag('daris_users')
 daris_users = items.map { |id| data_bag_item('daris_users', id) }
+password = node['daris']['default_password'] || 'secret'
 
 domain = node['mediaflux']['authentication_domain'] || 'users'
 
@@ -46,7 +47,8 @@ if daris_user_groups && daris_users then
     variables ({
                  :user_groups => daris_user_groups,
                  :users => daris_users,
-                 :domain => domain
+                 :domain => domain,
+                 :password => password
                }) 
   end
 
