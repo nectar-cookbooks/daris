@@ -18,7 +18,7 @@ Recipes
 * `daris::daris` - installs just DaRIS into a MediaFlux installation.
 * `daris::pvupload` - installs the Bruker upload tool.
 * `daris::dicom-client` - installs the "dicom-mf" upload tool.
-* `darus::users` - creates users from the "daris_users" databag.
+* `daris::users` - creates users from the "daris_users" databag.
 
 Attributes
 ==========
