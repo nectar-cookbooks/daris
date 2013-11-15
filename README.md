@@ -35,8 +35,8 @@ See `attributes/default.rb` for the default values.
 * `node['daris']['dicom_proxy_domain']` - The domain to be used for the DICOM proxy users.
 * `node['daris']['dicom_proxy_user_names']` - A list of DICOM proxy users to be created.
 * `node['daris']['dicom_ingest_notifications']` - A list of user emails to be notified of DICOM ingestion events.
-* `node['daris']['user_groups'] - The list of the "groups" of users to be created by the "users" recipe.
-* `node['daris']['default_password'] - The default initial password for users.
+* `node['daris']['user_groups']` - The list of the "groups" of users to be created by the "users" recipe.
+* `node['daris']['default_password']` - The default initial password for users.
 
 You also need to:
 
@@ -49,6 +49,45 @@ You also need to:
          },
          "ns": "cai"
       }
+
+Creating users
+==============
+
+The "users" recipe will create initial DaRIS users based on the contents of the 
+"daris_users" data bag.  To make use of this facility, you need to do the following:
+
+1.  For each user, add a JSON descriptor file to the "data-bags/daris_users" directory.  A typical file would look like this:
+        
+        file:  humphrey.json
+        ----------------
+        {
+            "id": "humphrey",
+            "user": "hb",
+            "domain": "users",
+            "groups": [ "test-users" ],
+            "names": [ "Humphrey", "B", "Bear" ],
+            "email": "hbb@nws9.com.au",
+            "project_creator": true,
+            "password": "secret"
+        }
+        
+    The attributes are as follows:
+    * `'id'` - mandatory. This must match the filename.
+    * `'name'` - optional. This gives the Mediaflux user name.  If it is omitted, `id` is used instead.
+    * `'domain'` - optional.  This gives the Mediaflux domain for the user.  It defaults to `node['mediaflux']['authentication_domain']` which in turn defaults to `'users'`.
+    * `'groups'` - mandatory.  A list of "group names".  The meaning of this is explained below.
+    * `'names'`  - optional.  A list of names for the user in order "first" name, "middle" names, "last" name.  (If only one name is given, it is treated as a "first" name.)
+    * `'email'` - mandatory.  The user's (external) email address.
+    * `'project_creator'` - optional.  If true, the user has DaRIS project creation rights.
+    * `'roles'` - optional. A list of additional Mediaflux "roles" to be granted to the user.  For example, you would typically grant one or more roles defined by the PSSD localization package.
+    * `'password'` - optional.  The user's initial password.  If omitted, the initial password is given by the `node['daris']['default_password']` attribute.
+
+1. In the node JSON file:
+
+    * Add a 'daris' / 'user_groups' whose value is an array of "group names".
+    * Add `"recipe[daris::users]"` to the node's runlist (after 
+
+When the recipe is run, it selects all users which have a "group name" that is in the "user groups" list that you configured.  For each selected user, it attempts to create the DaRIS account (using `om.pssd.user.create`).  If the user account already exists in DaRIS, it is not updated.
 
 TO DO List
 ==========
