@@ -42,7 +42,7 @@ You also need to:
 
 * copy the "mfpkg*.zip" file containing your PSSD localization to the local installers location (e.g. ~mediaflux/installers), and
 * add entry to the "pkgs" map; e.g. in the "node.json" file ...
-
+      
       "daris": {
          "pkgs: {
             "cai_pssd": "mfpkg-cai_pssd-0.02-mf3.8.029.zip"
@@ -107,11 +107,11 @@ There are a couple of other things that you can do to work around these problems
 * If you have old copies of the required "installables", you can manually copy them into the "installers" cache directory.
 
 * If you want to use a specific version of an installable rather the one that the "mappings" say, you can specify this using node attributes.  For example:
-
+      
       "daris": {
           "pssd": "stable/mfpkg-pssd-2.03-mf3.8.029-stable.zip"
       },
-
+      
   tells the recipe to use PSSD 2.03, irrespective of what the other component versions are.  (A download would likely fail, but that's a different issue.)
 
 TO DO List
