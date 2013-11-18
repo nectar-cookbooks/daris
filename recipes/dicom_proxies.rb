@@ -34,7 +34,7 @@ mflux_bin = node['mediaflux']['bin'] || "#{mflux_home}/bin"
 mfcommand = "#{mflux_bin}/mfcommand"
 
 items = data_bag('dicom_hosts')
-hosts = items.map { |id| data_bag_item('daris_users', id) }
+hosts = items.map { |id| data_bag_item('dicom_hosts', id) }
 
 domain = node['daris']['dicom_proxy_domain'] || 'dicom'
 ns = node['daris']['ns'] || 'nig'
