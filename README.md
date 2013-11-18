@@ -19,6 +19,7 @@ Recipes
 * `daris::pvupload` - installs the Bruker upload tool.
 * `daris::dicom-client` - installs the "dicom-mf" upload tool.
 * `daris::users` - creates users from the "daris_users" databag.
+* `daris::dicom-hosts` - creates DICOM proxy users from the "dicom_hosts" databag.
 
 Attributes
 ==========
@@ -53,7 +54,7 @@ You also need to:
 Creating users
 ==============
 
-The "users" recipe will create initial DaRIS users based on the contents of the 
+The "daris::users" recipe will create initial DaRIS users based on the contents of the 
 "daris_users" data bag.  To make use of this facility, you need to do the following:
 
 1.  For each user, add a JSON descriptor file to the "data-bags/daris_users" directory.  A typical file would look like this:
@@ -88,6 +89,36 @@ The "users" recipe will create initial DaRIS users based on the contents of the
     * Add `"recipe[daris::users]"` to the node's runlist (after 
 
 When the recipe is run, it selects all users which have a "group name" that is in the "user groups" list that you configured.  For each selected user, it attempts to create the DaRIS account (using `om.pssd.user.create`).  If the user account already exists in DaRIS, it is not updated.
+
+DICOM Hosts
+===========
+
+The "daris::dicom-hosts" recipe uses the information in the "dicom_hosts" data bag to do two things:
+
+* It creates a "proxy user" accounts in the DICOM authentication domain with roles that allow upload of data by dicom clients.
+
+* If `node['daris']['manage_firewall']` is true, it will create local firewall rules to allow the DICOM hosts to connect using the DICOM port.
+
+A typical "dicom-hosts" databag entry looks like this:
+
+        file: imager.json
+        ----------------
+        {
+            "id": "imager",
+            "name": "imager",
+            "hostname": "imager.example.com",
+            "port": "6666"
+        }
+        
+    The attributes are as follows:
+    * `'id'` - mandatory. This must match the filename.
+    * `'name'` - optional. This gives the proxy user name.  If it is omitted, `id` is used instead.
+    * `'hostname'` - optional.  This gives hostname for the firewall entry.
+    * `'port'` - optional.  This gives the port number for the firewall entry; defaults to `node['daris']['dicom_port']` which in turn defaults to "6666".
+
+Note that firewall management is not yet implemented because the standard recipies for firewall management are currently Debian / Ubuntu specific.
+
+Meanwhile, if you are using a NeCTAR virtual, we recommend that you manage the firewall externally; i.e. via the Dashboard.
 
 DaRIS versions
 ==============

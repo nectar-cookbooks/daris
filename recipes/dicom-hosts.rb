@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: daris
-# Recipe:: dicom_proxies
+# Recipe:: dicom-hosts
 #
 # Copyright (c) 2013, The University of Queensland
 # All rights reserved.
@@ -56,4 +56,8 @@ if hosts && ! hosts.empty? then
       "#{mfcommand} source #{create_users} && " +
       "#{mfcommand} logoff"
   end
+end
+
+if node['daris']['manage_firewall'] then
+  raise "Firewall management is not supported yet.  Sorry!"
 end
