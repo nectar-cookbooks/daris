@@ -17,6 +17,7 @@ node.default['daris']['dicom_store'] = 'dicom'
 node.default['daris']['dicom_proxy_domain'] = 'dicom'
 node.default['daris']['dicom_proxy_user_names'] = ['DICOM-TEST']
 node.default['daris']['dicom_ingest_notifications'] = []
+node.default['daris']['manage_firewall'] = false
 
 # These attributes give specific versions of the downloadables.  If
 # they are not set (e.g. in the Node, Role or Recipe) then they

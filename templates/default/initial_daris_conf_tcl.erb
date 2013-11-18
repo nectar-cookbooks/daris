@@ -30,20 +30,6 @@ proc init_daris_conf { } {
     if { $proxy_domain != "" } {
         authentication.domain.create :domain $proxy_domain :ifexists ignore
     }
-    
-    <% @dicom_proxy_user_names.each() do |name| %>
-    set name "<%= fillIn(name, '') %>"
-    if { $name != "" } then {
-	authentication.user.create :user $name :domain $proxy_domain \
-	    :ifexists ignore
-        actor.grant :name "${proxy_domain}:${name}" :type user \
-	    :role -type role "pssd.dicom-ingest"
-	if { $ns != "" } {
-	    actor.grant :name "${proxy_domain}:${name}" :type user \
-		:role -type role "${ns}.pssd.dicom-ingest"
-	}
-    }
-    <% end %> 
     <% @dicom_ingest_notifications.each() do |addr| %>
     set addr "<%= fillIn(addr, '') %>"
     if { $addr != "" } then {

@@ -1,0 +1,22 @@
+# Create DICOM proxy users
+set proxy_domain "<%= @domain %>"
+set ns "<%= @ns %>"
+authentication.domain.create :domain $proxy_domain :ifexists ignore
+<% 
+@hosts.each do |host| 
+  id = host['user'] || user['id']
+%>
+set id "<%= id %>"
+if [ catch {
+    authentication.user.create :user $id :domain $proxy_domain \
+	:ifexists ignore
+    actor.grant :name "${proxy_domain}:$id" :type user \
+	:role -type role "pssd.dicom-ingest"
+    actor.grant :name "${proxy_domain}:${id}" :type user \
+	:role -type role "${ns}.pssd.dicom-ingest"
+} message ] {
+    puts stdout "Did not create user <%= id %> : $message"
+}
+<%
+end
+%>
