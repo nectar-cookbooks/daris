@@ -4,7 +4,7 @@ set ns "<%= @ns %>"
 authentication.domain.create :domain $proxy_domain :ifexists ignore
 <% 
 @hosts.each do |host| 
-  id = host['user'] || user['id']
+  id = host['user'] || host['id']
 %>
 set id "<%= id %>"
 if [ catch {
