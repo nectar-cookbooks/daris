@@ -110,8 +110,7 @@ pkgs.each() do | pkg, url |
   bash "fetch-#{pkg}" do
     user mflux_user
     code "wget --user=#{user} --password=#{password} --no-check-certificate " +
-         "-O #{installers}/#{file} #{url}"
-    not_if { ::File.exists?("#{installers}/#{file}") }
+         "-N -O #{installers}/#{file} #{url}"
   end
 end
 
@@ -153,8 +152,7 @@ sc_file = urlToFile(sc_url)
 bash "fetch-server-config" do
   user mflux_user
   code "wget --user=#{user} --password=#{password} --no-check-certificate " +
-         "-O #{installers}/#{sc_file} #{sc_url}"
-  not_if { ::File.exists?("#{installers}/#{sc_file}") }
+         "-N -O #{installers}/#{sc_file} #{sc_url}"
 end
 
 # We don't use this tool for configuration.  But someone might want to ...
