@@ -41,6 +41,7 @@ mflux_user_home = node['mediaflux']['user_home'] || mflux_home
 url = node['daris']['download_url']
 user = node['daris']['download_user']
 password = node['daris']['download_password']
+refresh = node['daris']['force_refresh'] || false
 
 pkgs = {
   'nig_essentials' => getUrl(node, 'nig_essentials'),  
@@ -107,10 +108,21 @@ end
 
 pkgs.each() do | pkg, url | 
   file = urlToFile(url)
-  bash "fetch-#{pkg}" do
-    user mflux_user
-    code "wget --user=#{user} --password=#{password} --no-check-certificate " +
-         "-N -O #{installers}/#{file} #{url}"
+  if refresh then
+    bash "fetch-#{pkg}" do
+      user mflux_user
+      code "wget --user=#{user} --password=#{password} " +
+        "--no-check-certificate " +
+        "-N -O #{installers}/#{file} #{url}"
+    end
+  else
+    bash "fetch-#{pkg}" do
+      user mflux_user
+      code "wget --user=#{user} --password=#{password} " +
+        "--no-check-certificate " +
+        "-O #{installers}/#{file} #{url}"
+      not_if { File.exists?("#{installers}/#{file}") }
+    end
   end
 end
 
@@ -149,10 +161,19 @@ end
 sc_url = getUrl(node, 'server_config')
 sc_file = urlToFile(sc_url)
 
-bash "fetch-server-config" do
-  user mflux_user
-  code "wget --user=#{user} --password=#{password} --no-check-certificate " +
-         "-N -O #{installers}/#{sc_file} #{sc_url}"
+if refresh then
+  bash "fetch-server-config" do
+    user mflux_user
+    code "wget --user=#{user} --password=#{password} --no-check-certificate " +
+      "-N -O #{installers}/#{sc_file} #{sc_url}"
+  end
+else
+  bash "fetch-server-config" do
+    user mflux_user
+    code "wget --user=#{user} --password=#{password} --no-check-certificate " +
+      "-O #{installers}/#{sc_file} #{sc_url}"
+    not_if { File.exists?("#{installers}/#{sc_file}") }
+  end
 end
 
 # We don't use this tool for configuration.  But someone might want to ...

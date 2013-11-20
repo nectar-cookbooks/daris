@@ -12,6 +12,13 @@ node.default['daris']['download_dir'] = 'stable'
 node.default['daris']['download_user'] = 'guest@www-public'
 node.default['daris']['download_password'] = 'nIg4!871'
 
+# Normally, the recipes only download installers that we don't have 
+# local copies of (based on the filenames).  Setting 'force_refresh'
+# will cause the recipe to download if the timestamp has changed.
+# (For the "latest" downloadables, the timestamps will change
+# on each daily build.)
+node.default['daris']['download_password'] = 'nIg4!871'
+
 node.default['daris']['dicom_namespace'] = 'dicom'
 node.default['daris']['dicom_store'] = 'dicom'
 node.default['daris']['dicom_proxy_domain'] = 'dicom'
