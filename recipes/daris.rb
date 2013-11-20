@@ -28,6 +28,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 include_recipe "pvconv"
+include_recipe "minc-toolkit"
 
 include_recipe "daris::common"
 
@@ -70,6 +71,7 @@ end
 
 mfcommand = "#{mflux_bin}/mfcommand"
 pvconv = node['pvconv']['command']
+dcm2mnc = (node['minc-toolkit']['prefix'] || '/usr/local') + '/bin/dcm2mnc'
 
 dicom_store = node['daris']['dicom_store']
 if ! dicom_store || dicom_store == '' then
@@ -132,6 +134,16 @@ template "#{mflux_home}/plugin/bin/pvconv.pl" do
   source 'pvconv.erb'
   variables ({
     :pvconv_command => pvconv
+  })
+end
+
+template "#{mflux_home}/plugin/bin/dcm2mnc" do
+  owner mflux_user
+  group mflux_user
+  mode 0555
+  source 'dcm2mnc.erb'
+  variables ({
+    :dcm2mnc_command => dcm2mnc
   })
 end
 
