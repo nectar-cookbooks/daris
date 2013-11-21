@@ -28,8 +28,12 @@ if [ -z "$MFLUX_HOST" -o -z "$MFLUX_PORT" -o -z "$MFLUX_TRANSPORT" ] ; then
     exit 1
 fi
 
+JVM_OPTS=$MFLUX_JAVA_OPTS
+JVM_OPTS="$JVM_OPTS -Dmf.host=$MFLUX_HOST -Dmf.port=$MFLUX_PORT"
+JVM_OPTS="$JVM_OPTS -Dmf.transport=$MFLUX_TRANSPORT"
+
 # Do it
-$JAVA -Dmf.host=$MFLUX_HOST -Dmf.port=$MFLUX_PORT -Dmf.transport=$MFLUX_TRANSPORT  -cp $JAR  nig.mf.pssd.client.dicom.DicomMF "$@"
+$JAVA $JVM_OPTS -cp $JAR  nig.mf.pssd.client.dicom.DicomMF "$@"
 
 RETVAL=$?
 exit $RETVAL

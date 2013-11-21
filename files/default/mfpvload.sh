@@ -47,6 +47,11 @@ else
     TRANSPORT=""
 fi
 
+JAVA_OPTS=$MFLUX_JAVA_OPTS
+JAVA_OPTS="$JAVA_OPTS -Dmf.host=$MFLUX_HOST -Dmf.port=$MFLUX_PORT $TRANSPORT"
+JAVA_OPTS="$JAVA_OPTS -Dmf.domain=$MFLUX_DOMAIN -Dmf.user=$MFLUX_USER"
+JAVA_OPTS="$JAVA_OPTS -Dmf.password=$MFLUX_PASSWORD"
+
 # The amount of time to wait to see if a corresponding DICOM series
 # appears in the server. Specified in seconds.
 MF_WAIT=60
@@ -63,10 +68,7 @@ MF_WAIT=60
 #NIG_META=-nig-subject-meta-add
 
 # Do the upload
-$JAVA -Dmf.host=$MFLUX_HOST -Dmf.port=$MFLUX_PORT $TRANSPORT \
-    -Dmf.domain=$MFLUX_DOMAIN -Dmf.user=$MFLUX_USER \
-    -Dmf.password=$MFLUX_PASSWORD \
-    -jar $JAR -wait $MF_WAIT $MF_VERBOSE $NIG_META $AUTO_SUBJECT_CREATE "$@"
+$JAVA $JAVA_OPTS -jar $JAR -wait $MF_WAIT $MF_VERBOSE $NIG_META $AUTO_SUBJECT_CREATE "$@"
 
 RETVAL=$?
 exit $RETVAL
