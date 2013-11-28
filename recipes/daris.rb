@@ -36,6 +36,7 @@ include_recipe "daris::common"
 
 mflux_home = node['mediaflux']['home']
 mflux_bin = node['mediaflux']['bin'] || "#{mflux_home}/bin"
+mflux_config = "#{mflux_home}/config"
 mflux_user = node['mediaflux']['user']
 mflux_user_home = node['mediaflux']['user_home'] || mflux_home
 url = node['daris']['download_url']
@@ -63,8 +64,8 @@ ruby_block "check-preconditions" do
       raise "Can't find the Mediaflux install directory #{mflux_home}. " +
         "Have you installed Mediaflux?"
     end
-    if ! File::directory?("#{mflux_home}/config") then
-      raise "Can't find the Mediaflux config directory #{mflux_home}/config. " +
+    if ! File::directory?("#{mflux_config}") then
+      raise "Can't find the Mediaflux config directory #{mflux_config}. " +
         "Have you installed Mediaflux?"
     end
   end
@@ -79,7 +80,7 @@ if ! dicom_store || dicom_store == '' then
   dicom_store = 'dicom'
 end
 
-template "#{mflux_home}/config/initial_daris_conf.tcl" do 
+template "#{mflux_config}/initial_daris_conf.tcl" do 
   source "initial_daris_conf_tcl.erb"
   owner mflux_user
   group mflux_user
@@ -93,7 +94,7 @@ template "#{mflux_home}/config/initial_daris_conf.tcl" do
              })
 end
 
-template "#{mflux_home}/config/create_stores.tcl" do 
+template "#{mflux_config}/create_stores.tcl" do 
   source "create_stores_tcl.erb"
   owner mflux_user
   group mflux_user
@@ -194,7 +195,7 @@ ruby_block "bootstrap_test" do
     bootstrap = node['daris']['force_bootstrap']
     if ! bootstrap then
       # Sniff the 'network.tcl' for evidence that we created it ...
-      line = `grep Generated #{mflux_home}/config/services/network.tcl`.strip()
+      line = `grep Generated #{mflux_config}/services/network.tcl`.strip()
       if /Mediaflux chef recipe/.match(line) then
         bootstrap = true
       elsif /DaRIS chef recipe/.match(line) then
@@ -214,7 +215,7 @@ ruby_block "bootstrap_test" do
       all_pkgs.each() do | pkg, file | 
         resources(:bash => "install-#{pkg}").run_action(:run)
       end
-      resources(:template => "#{mflux_home}/config/services/network.tcl")
+      resources(:template => "#{mflux_config}/services/network.tcl")
         .run_action(:create)
       resources(:service => "mediaflux-restart").run_action(:restart)
     else
@@ -258,7 +259,7 @@ bash "create-stores" do
   user "root"
   code ". /etc/mediaflux/servicerc && " +
     "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
-    "#{mfcommand} source #{mflux_home}/config/create_stores.tcl && " +
+    "#{mfcommand} source #{mflux_config}/create_stores.tcl && " +
     "#{mfcommand} logoff"
   not_if { ::File.exists?("#{mflux_home}/volatile/stores/pssd") &&
            ::File.exists?("#{mflux_home}/volatile/stores/#{dicom_store}") }
@@ -276,7 +277,7 @@ all_pkgs.each() do | pkg, url |
   end
 end 
   
-template "#{mflux_home}/config/services/network.tcl" do 
+template "#{mflux_config}/services/network.tcl" do 
   action :nothing
   owner mflux_user
   source "network-tcl.erb"
@@ -298,6 +299,18 @@ end
 bash "run-initial-daris-config" do
   code ". /etc/mediaflux/servicerc && " +
          "#{mfcommand} logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD && " +
-         "#{mfcommand} source #{mflux_home}/config/initial_daris_conf.tcl && " +
+         "#{mfcommand} source #{mflux_config}/initial_daris_conf.tcl && " +
          "#{mfcommand} logoff"
+end
+
+cookbook_file "#{mflux_home}/bin/backup.sh" do
+  source 'backup.sh'
+  owner mflux_user
+  mode 0700
+end
+
+cookbook_file "#{mflux_config}/daris_backup.tcl" do
+  source 'daris_backup.tcl'
+  owner mflux_user
+  mode 0600
 end
