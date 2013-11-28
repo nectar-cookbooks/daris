@@ -10,6 +10,7 @@ fi
 DIR=/tmp/backup
 
 mkdir -p $DIR
+chown $MFLUX_USER:$MFLUX_USER $DIR
 
 MF_COMMAND="$MFLUX_BIN/mfcommand"
 $MF_COMMAND logon $MFLUX_DOMAIN $MFLUX_USER "$MFLUX_PASSWORD"
