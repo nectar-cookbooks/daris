@@ -302,15 +302,3 @@ bash "run-initial-daris-config" do
          "#{mfcommand} source #{mflux_config}/initial_daris_conf.tcl && " +
          "#{mfcommand} logoff"
 end
-
-cookbook_file "#{mflux_home}/bin/backup.sh" do
-  source 'backup.sh'
-  owner mflux_user
-  mode 0700
-end
-
-cookbook_file "#{mflux_config}/daris_backup.tcl" do
-  source 'daris_backup.tcl'
-  owner mflux_user
-  mode 0600
-end
