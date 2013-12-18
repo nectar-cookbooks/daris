@@ -107,21 +107,19 @@ template "#{mflux_config}/create_stores.tcl" do
              })
 end
 
+wget_opts="--user=#{user} --password=#{password} --no-check-certificate --secure-protocol=SSLv3"
+
 pkgs.each() do | pkg, url | 
   file = urlToFile(url)
   if refresh then
     bash "fetch-#{pkg}" do
       user mflux_user
-      code "wget --user=#{user} --password=#{password} " +
-        "--no-check-certificate " +
-        "-N -O #{installers}/#{file} #{url}"
+      code "wget #{wget_opts} -N -O #{installers}/#{file} #{url}"
     end
   else
     bash "fetch-#{pkg}" do
       user mflux_user
-      code "wget --user=#{user} --password=#{password} " +
-        "--no-check-certificate " +
-        "-O #{installers}/#{file} #{url}"
+      code "wget #{wget_opts} -O #{installers}/#{file} #{url}"
       not_if { File.exists?("#{installers}/#{file}") }
     end
   end
@@ -165,14 +163,12 @@ sc_file = urlToFile(sc_url)
 if refresh then
   bash "fetch-server-config" do
     user mflux_user
-    code "wget --user=#{user} --password=#{password} --no-check-certificate " +
-      "-N -O #{installers}/#{sc_file} #{sc_url}"
+    code "wget #{wget_opts} -N -O #{installers}/#{sc_file} #{sc_url}"
   end
 else
   bash "fetch-server-config" do
     user mflux_user
-    code "wget --user=#{user} --password=#{password} --no-check-certificate " +
-      "-O #{installers}/#{sc_file} #{sc_url}"
+    code "wget #{wget_opts} -O #{installers}/#{sc_file} #{sc_url}"
     not_if { File.exists?("#{installers}/#{sc_file}") }
   end
 end
