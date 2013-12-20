@@ -7,7 +7,7 @@ node.default['daris']['force_bootstrap'] = false
 node.default['daris']['dicom_port'] = '6666'
 
 node.default['daris']['download_url'] = 
-  'https://daris-1.rvm.nectar.org.au:8443/daris-downloads'
+  'https://daris-1.melbourne.nectar.org.au:8443/daris-downloads'
 node.default['daris']['download_dir'] = 'stable' 
 node.default['daris']['download_user'] = 'guest@www-public'
 node.default['daris']['download_password'] = 'nIg4!871'
