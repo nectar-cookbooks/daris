@@ -2,7 +2,7 @@
 # Cookbook Name:: daris
 # Recipe:: pvupload
 #
-# Copyright (c) 2013, The University of Queensland
+# Copyright (c) 2013, 2014, The University of Queensland
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -38,25 +38,28 @@ mflux_user_home = node['mediaflux']['user_home'] || mflux_home
 user = node['daris']['download_user']
 password = node['daris']['download_password']
 refresh = node['daris']['force_refresh'] || false
+bootstrap = node['daris']['force_bootstrap'] || false
+
+if unstableRelease?(node) && bootstrap then
+  refresh = true
+end
+
+wget_opts = "--user=#{user} --password=#{password} --no-check-certificate --secure-protocol=SSLv3"
+if refresh then
+  wget_opts += " -N"
+end
 
 installers = node['mediaflux']['installers'] || 'installers'
 if ! installers.start_with?('/') then
   installers = mflux_user_home + '/' + installers
 end
 
-pv_url = getUrl(node, 'pvupload')
-pv_file = urlToFile(pv_url)
-if refresh then
-  bash "fetch-pvupload" do
-    code "wget --user=#{user} --password=#{password} --no-check-certificate " +
-      "-N -O #{installers}/#{pv_file} #{pv_url}"
-  end
-else 
-  bash "fetch-pvupload" do
-    code "wget --user=#{user} --password=#{password} --no-check-certificate " +
-      "-O #{installers}/#{pv_file} #{pv_url}"
-    not_if { ::File.exists?("#{installers}/#{pv_file}") }
-  end
+pv_url = buildDarisUrl(node, 'pvupload')
+pv_file = darisUrlToFile(pv_url)
+
+bash "fetch-pvupload" do
+  code "wget #{wget_opts} -O #{installers}/#{pv_file} #{pv_url}"
+  not_if { !refresh && ::File.exists?("#{installers}/#{pv_file}") }
 end
 
 bash "extract-pvupload" do

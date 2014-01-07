@@ -49,6 +49,11 @@ if unstableRelease?(node) && bootstrap then
   refresh = true
 end
 
+wget_opts = "--user=#{user} --password=#{password} --no-check-certificate --secure-protocol=SSLv3"
+if refresh then
+  wget_opts += " -N"
+end
+
 pkgs = {
   'nig_essentials' => buildDarisUrl(node, 'nig_essentials'),  
   'nig_transcode' => buildDarisUrl(node, 'nig_transcode'),  
@@ -110,11 +115,6 @@ template "#{mflux_config}/create_stores.tcl" do
                :dicom_store => dicom_store,
                :fs_type => node['daris']['file_system_type']
              })
-end
-
-wget_opts = "--user=#{user} --password=#{password} --no-check-certificate --secure-protocol=SSLv3"
-if refresh then
-  wget_opts += " -N"
 end
 
 pkgs.each() do | pkg, url | 
