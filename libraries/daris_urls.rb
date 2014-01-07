@@ -25,9 +25,9 @@ module DarisUrls
     'latest' => {
       'type' => 'latest',
       'nig_essentials' => ['0.20', '3.8.050'],
-      'nig_transcode' => ['0.34', '3.8.050'],
+      'nig_transcode' => ['0.35', '3.8.050'],
       'pssd' => ['2.06', '3.8.050'],
-      'daris_portal' => ['0.33', '3.8.050'],
+      'daris_portal' => ['0.34', '3.8.050'],
       'server_config' => ['1.0'],
       'pvupload' => ['0.34'],
       'dicom_client' => ['1.0'],
