@@ -2,7 +2,7 @@
 # Cookbook Name:: daris
 # Recipe:: daris
 #
-# Copyright (c) 2013, The University of Queensland
+# Copyright (c) 2013, 2014, The University of Queensland
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -43,12 +43,17 @@ url = node['daris']['download_url']
 user = node['daris']['download_user']
 password = node['daris']['download_password']
 refresh = node['daris']['force_refresh'] || false
+bootstrap = node['daris']['force_bootstrap'] || false
+
+if !stableRelease?(node) && bootstrap then
+  refresh = true
+end
 
 pkgs = {
-  'nig_essentials' => getUrl(node, 'nig_essentials'),  
-  'nig_transcode' => getUrl(node, 'nig_transcode'),  
-  'pssd' => getUrl(node, 'pssd'),
-  'daris_portal' => getUrl(node, 'daris_portal')
+  'nig_essentials' => buildDarisUrl(node, 'nig_essentials'),  
+  'nig_transcode' => buildDarisUrl(node, 'nig_transcode'),  
+  'pssd' => buildDarisUrl(node, 'pssd'),
+  'daris_portal' => buildDarisUrl(node, 'daris_portal')
 }
 
 local_pkgs = node['daris']['local_pkgs'] || {}
@@ -107,21 +112,17 @@ template "#{mflux_config}/create_stores.tcl" do
              })
 end
 
-wget_opts="--user=#{user} --password=#{password} --no-check-certificate --secure-protocol=SSLv3"
+wget_opts = "--user=#{user} --password=#{password} --no-check-certificate --secure-protocol=SSLv3"
+if refresh then
+  wget_opts += " -N"
+end
 
 pkgs.each() do | pkg, url | 
-  file = urlToFile(url)
-  if refresh then
-    bash "fetch-#{pkg}" do
-      user mflux_user
-      code "wget #{wget_opts} -N -O #{installers}/#{file} #{url}"
-    end
-  else
-    bash "fetch-#{pkg}" do
-      user mflux_user
-      code "wget #{wget_opts} -O #{installers}/#{file} #{url}"
-      not_if { File.exists?("#{installers}/#{file}") }
-    end
+  file = darisUrlToFile(url)
+  bash "fetch-#{pkg}" do
+    user mflux_user
+    code "wget #{wget_opts} -O #{installers}/#{file} #{url}"
+    not_if { !refresh && File.exists?("#{installers}/#{file}") }
   end
 end
 
@@ -157,20 +158,13 @@ template "#{mflux_home}/plugin/bin/dcm2mnc" do
   })
 end
 
-sc_url = getUrl(node, 'server_config')
-sc_file = urlToFile(sc_url)
+sc_url = buildDarisUrl(node, 'server_config')
+sc_file = darisUrlToFile(sc_url)
 
-if refresh then
-  bash "fetch-server-config" do
-    user mflux_user
-    code "wget #{wget_opts} -N -O #{installers}/#{sc_file} #{sc_url}"
-  end
-else
-  bash "fetch-server-config" do
-    user mflux_user
-    code "wget #{wget_opts} -O #{installers}/#{sc_file} #{sc_url}"
-    not_if { File.exists?("#{installers}/#{sc_file}") }
-  end
+bash "fetch-server-config" do
+  user mflux_user
+  code "wget #{wget_opts} -O #{installers}/#{sc_file} #{sc_url}"
+  not_if { !refresh && File.exists?("#{installers}/#{sc_file}") }
 end
 
 # We don't use this tool for configuration.  But someone might want to ...
@@ -188,7 +182,6 @@ end
 
 ruby_block "bootstrap_test" do
   block do
-    bootstrap = node['daris']['force_bootstrap']
     if ! bootstrap then
       # Sniff the 'network.tcl' for evidence that we created it ...
       line = `grep Generated #{mflux_config}/services/network.tcl`.strip()
@@ -262,7 +255,7 @@ bash "create-stores" do
 end
 
 all_pkgs.each() do | pkg, url |
-  file = urlToFile(url) 
+  file = darisUrlToFile(url) 
   bash "install-#{pkg}" do
     action :nothing
     user "root"

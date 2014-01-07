@@ -48,7 +48,7 @@ module DarisUrls
   }
   
   # Get the filename part of a URL string
-  def urlToFile(url_string)
+  def darisUrlToFile(url_string)
     return Pathname(URI(url_string).path).basename
   end
 
@@ -58,7 +58,7 @@ module DarisUrls
   # we lookup the version information for the item in the selected
   # DaRIS release, interpolate the versions into a filename, and 
   # then turn that into a URL.
-  def getUrl(node, item)
+  def buildDarisUrl(node, item)
     specified = node['daris'][item]
     if specified then
       return assemble(node, specified, node['daris']['download_dir'])
@@ -67,14 +67,7 @@ module DarisUrls
     if ! pat then
       raise "There is no filename pattern for '#{item}'"
     end 
-    release_name = node['daris']['release']
-    if ! release_name then
-      raise "No DaRIS release has been specified"
-    end 
-    release = DARIS_RELEASES[release_name]
-    if ! release then
-      raise "There is no 'releases' entry for release '#{release_name}'"
-    end
+    release = getRelease(node)
     versions = release[item] || ['1.0']
     type = release['type'] || 'stable'
     hash = {
@@ -86,8 +79,22 @@ module DarisUrls
     return assemble(node, file, type)
   end
 
-  def getFile(node, item) 
-    return urlToFile(getUrl(node, item))
+  def getRelease(node)
+    release_name = node['daris']['release']
+    if ! release_name then
+      raise "No DaRIS release has been specified"
+    end 
+    release = DARIS_RELEASES[release_name]
+    if ! release then
+      raise "There is no 'releases' entry for release '#{release_name}'"
+    end
+    return release
+  end
+
+  # If a release is not stable, we cannot assume that a cached local copy
+  # is current just based on the name.
+  def unstableRelease?(node)
+    return getRelease(node)['type'] != 'stable'
   end
 
   def assemble(node, file, dir)
