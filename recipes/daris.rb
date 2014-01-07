@@ -45,7 +45,7 @@ password = node['daris']['download_password']
 refresh = node['daris']['force_refresh'] || false
 bootstrap = node['daris']['force_bootstrap'] || false
 
-if !stableRelease?(node) && bootstrap then
+if unstableRelease?(node) && bootstrap then
   refresh = true
 end
 
