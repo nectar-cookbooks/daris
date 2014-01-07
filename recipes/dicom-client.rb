@@ -2,7 +2,7 @@
 # Cookbook Name:: daris
 # Recipe:: dicom-client
 #
-# Copyright (c) 2013, The University of Queensland
+# Copyright (c) 2013, 2014, The University of Queensland
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -37,27 +37,30 @@ mflux_user_home = node['mediaflux']['user_home'] || mflux_home
 user = node['daris']['download_user']
 password = node['daris']['download_password']
 refresh = node['daris']['force_refresh'] || false
+bootstrap = node['daris']['force_bootstrap'] || false
+
+if unstableRelease?(node) && bootstrap then
+  refresh = true
+end
+
+wget_opts = "--user=#{user} --password=#{password} --no-check-certificate --secure-protocol=SSLv3"
+if refresh then
+  wget_opts += " -N"
+end
+
 
 installers = node['mediaflux']['installers'] || 'installers'
 if ! installers.start_with?('/') then
   installers = mflux_user_home + '/' + installers
 end
 
-dc_url = getUrl(node, 'dicom_client')
-dc_file = urlToFile(dc_url)
-if refresh then
-  bash "fetch-dicom-client" do
-    user 'root'
-    code "wget --user=#{user} --password=#{password} --no-check-certificate " +
-      "-N -O #{installers}/#{dc_file} #{dc_url}"
-  end
-else 
-  bash "fetch-dicom-client" do
-    user 'root'
-    code "wget --user=#{user} --password=#{password} --no-check-certificate " +
-      "-O #{installers}/#{dc_file} #{dc_url}"
-    not_if { ::File.exists?("#{installers}/#{dc_file}") }
-  end
+dc_url = buildDarisUrl(node, 'dicom_client')
+dc_file = darisUrlToFile(dc_url)
+
+bash "fetch-dicom-client" do
+  user 'root'
+  code "wget #{wget_opts} -O #{installers}/#{dc_file} #{dc_url}"
+  not_if { !refresh && ::File.exists?("#{installers}/#{dc_file}") }
 end
 
 bash "extract-dicom-client" do
