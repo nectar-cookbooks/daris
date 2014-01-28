@@ -127,9 +127,13 @@ pkgs.each() do | pkg, url |
 end
 
 local_pkgs.each() do | pkg, file | 
-  if ! ::File.exists?("#{installers}/#{file}") then
-    raise "There is no installer for local package #{pkg}: " +
-      "(expected #{installers}/#{file})" 
+  ruby_block "check #{pkg} installer" do
+    block do
+      if ! ::File.exists?("#{installers}/#{file}") then
+        raise "There is no installer for local package #{pkg}: " +
+          "(expected #{installers}/#{file})" 
+      end
+    end
   end
 end
 
