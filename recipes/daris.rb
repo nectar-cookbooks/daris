@@ -40,8 +40,6 @@ mflux_config = "#{mflux_home}/config"
 mflux_user = node['mediaflux']['user']
 mflux_user_home = node['mediaflux']['user_home'] || mflux_home
 url = node['daris']['download_url']
-user = node['daris']['download_user']
-password = node['daris']['download_password']
 refresh = node['daris']['force_refresh'] || false
 bootstrap = node['daris']['force_bootstrap'] || false
 
@@ -49,10 +47,7 @@ if unstableRelease?(node) && bootstrap then
   refresh = true
 end
 
-wget_opts = "--user=#{user} --password=#{password} --no-check-certificate --secure-protocol=SSLv3"
-if refresh then
-  wget_opts += " -N"
-end
+wget_opts = wgetOpts(node, refresh)
 
 pkgs = {
   'nig_essentials' => buildDarisUrl(node, 'nig_essentials'),  

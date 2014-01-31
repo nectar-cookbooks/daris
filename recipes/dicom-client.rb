@@ -34,8 +34,6 @@ include_recipe "daris::common"
 mflux_home = node['mediaflux']['home']
 mflux_bin = node['mediaflux']['bin'] || "#{mflux_home}/bin"
 mflux_user_home = node['mediaflux']['user_home'] || mflux_home
-user = node['daris']['download_user']
-password = node['daris']['download_password']
 refresh = node['daris']['force_refresh'] || false
 bootstrap = node['daris']['force_bootstrap'] || false
 
@@ -43,11 +41,7 @@ if unstableRelease?(node) && bootstrap then
   refresh = true
 end
 
-wget_opts = "--user=#{user} --password=#{password} --no-check-certificate --secure-protocol=SSLv3"
-if refresh then
-  wget_opts += " -N"
-end
-
+wget_opts = wgetOpts(node, refresh)
 
 installers = node['mediaflux']['installers'] || 'installers'
 if ! installers.start_with?('/') then
