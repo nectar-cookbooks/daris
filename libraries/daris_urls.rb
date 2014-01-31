@@ -54,7 +54,7 @@ module DarisUrls
   def wgetOpts(node, refresh)
     u = node['daris']['download_user']
     p = node['daris']['download_password']
-    opts "--user=#{u} --password=#{p} " +
+    opts = "--user=#{u} --password=#{p} " +
       "--no-check-certificate --secure-protocol=SSLv3"
     if refresh then
       opts += " -N"
