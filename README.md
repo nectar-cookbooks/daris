@@ -6,10 +6,12 @@ This cookbook is for installing DaRIS in a MediaFlux instance.
 Dependencies
 ============
 
-DaRIS is a set of plugins for MediaFlux.  Hence a Mediaflux installation and license are dependencies.
+DaRIS is a set of plugins for MediaFlux.  Hence a Mediaflux installation 
+and license are dependencies.
 
-This cookbook should in theory be platform independent ... across unix-like 
-OSes.
+The recipes in this cookbook should work on x86 and x86-64 systems running
+recent Ubuntu, RHEL compatible and Fedora distros (at least).  Windows is
+is not supported.
 
 Recipes
 =======
