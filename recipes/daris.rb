@@ -40,8 +40,6 @@ mflux_config = "#{mflux_home}/config"
 mflux_user = node['mediaflux']['user']
 mflux_user_home = node['mediaflux']['user_home'] || mflux_home
 url = node['daris']['download_url']
-user = node['daris']['download_user']
-password = node['daris']['download_password']
 refresh = node['daris']['force_refresh'] || false
 bootstrap = node['daris']['force_bootstrap'] || false
 
@@ -49,10 +47,7 @@ if unstableRelease?(node) && bootstrap then
   refresh = true
 end
 
-wget_opts = "--user=#{user} --password=#{password} --no-check-certificate --secure-protocol=SSLv3"
-if refresh then
-  wget_opts += " -N"
-end
+wget_opts = wgetOpts(node, refresh)
 
 pkgs = {
   'nig_essentials' => buildDarisUrl(node, 'nig_essentials'),  
@@ -256,6 +251,16 @@ bash "create-stores" do
     "#{mfcommand} logoff"
   not_if { ::File.exists?("#{mflux_home}/volatile/stores/pssd") &&
            ::File.exists?("#{mflux_home}/volatile/stores/#{dicom_store}") }
+end
+
+# Add the pssd and dicom stores to the set of stores to be backed up
+backup_tcl = resources("template[backup.tcl]")
+all_stores = backup_tcl.variables['stores']
+if !all_stores.include?('pssd') then
+   all_stores << 'pssd'
+end
+if !all_stores.include?(dicom_store) then
+   all_stores << dicom_store
 end
 
 all_pkgs.each() do | pkg, url |

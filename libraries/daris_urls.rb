@@ -10,6 +10,7 @@ module DarisUrls
       'pvupload' => ['0.33'],
       'dicom_client' => ['1.0'],
       'dcmtools' => ['0.29'],
+      'nig-commons' => ['0.40']
     },
     'stable-2-19' => {
       'type' => 'stable',
@@ -21,6 +22,7 @@ module DarisUrls
       'pvupload' => ['0.34'],
       'dicom_client' => ['1.0'],
       'dcmtools' => ['0.29'],
+      'nig-commons' => ['0.40']
     },
     'latest' => {
       'type' => 'latest',
@@ -32,6 +34,7 @@ module DarisUrls
       'pvupload' => ['0.34'],
       'dicom_client' => ['1.0'],
       'dcmtools' => ['0.29'],
+      'nig-commons' => ['0.41']
     }
   }
   
@@ -46,7 +49,19 @@ module DarisUrls
     'dicom_client' => 'dicom-client-%{ver}-%{type}.zip',
     'dcmtools' => 'dcmtools-%{ver}-%{type}.zip'
   }
-  
+
+  # Options for 'wget'ing DaRIS downloadables.
+  def wgetOpts(node, refresh)
+    u = node['daris']['download_user']
+    p = node['daris']['download_password']
+    opts = "--user=#{u} --password=#{p} " +
+      "--no-check-certificate --secure-protocol=SSLv3"
+    if refresh then
+      opts += " -N"
+    end
+    return opts
+  end
+
   # Get the filename part of a URL string
   def darisUrlToFile(url_string)
     return Pathname(URI(url_string).path).basename
@@ -96,23 +111,22 @@ module DarisUrls
   def unstableRelease?(node)
     return getRelease(node)['type'] != 'stable'
   end
-
+  
   def assemble(node, file, dir)
-      if /^[a-zA-Z]+:.+$/.match(file) then
-        return file
-      else
-        base = node['daris']['download_url']
-        if ! file.start_with?('/') && dir then
-          if ! base.end_with?('/') && ! dir.start_with?('/') then
-            base += '/'
-          end
-          base += dir
-        end
-        if ! base.end_with?('/') && ! file.start_with?('/') then
+    if /^[a-zA-Z]+:.+$/.match(file) then
+      return file
+    else
+      base = node['daris']['download_url']
+      if ! file.start_with?('/') && dir then
+        if ! base.end_with?('/') && ! dir.start_with?('/') then
           base += '/'
         end
-        return base + file
+        base += dir
       end
-  end  
-
+      if ! base.end_with?('/') && ! file.start_with?('/') then
+        base += '/'
+      end
+      return base + file
+    end
+  end 
 end 
