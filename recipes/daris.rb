@@ -256,10 +256,10 @@ end
 # Add the pssd and dicom stores to the set of stores to be backed up
 backup_tcl = resources("template[backup.tcl]")
 all_stores = backup_tcl.variables['stores']
-if !all_stores.contains?('pssd') then
+if !all_stores.include?('pssd') then
    all_stores << 'pssd'
 end
-if !all_stores.contains?(dicom_store) then
+if !all_stores.include?(dicom_store) then
    all_stores << dicom_store
 end
 
