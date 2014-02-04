@@ -41,5 +41,3 @@ node.default['daris']['dcmtools'] = nil
 
 # Local packages.  These WON'T be downloaded.
 node.default['daris']['local_pkgs'] = {}
-
-#node.override['mediaflux']['defer_start'] = true

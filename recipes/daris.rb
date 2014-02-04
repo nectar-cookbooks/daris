@@ -258,6 +258,16 @@ bash "create-stores" do
            ::File.exists?("#{mflux_home}/volatile/stores/#{dicom_store}") }
 end
 
+# Add the pssd and dicom stores to the set of stores to be backed up
+backup_tcl = resources("template[backup.tcl]")
+all_stores = backup_tcl.variables['stores']
+if !all_stores.contains?('pssd') then
+   all_stores << 'pssd'
+end
+if !all_stores.contains?(dicom_store) then
+   all_stores << dicom_store
+end
+
 all_pkgs.each() do | pkg, url |
   file = darisUrlToFile(url) 
   bash "install-#{pkg}" do
