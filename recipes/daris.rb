@@ -116,7 +116,7 @@ pkgs.each() do | pkg, url |
   file = darisUrlToFile(url)
   bash "fetch-#{pkg}" do
     user mflux_user
-    code "wget #{wget_opts} -O #{installers}/#{file} #{url}"
+    code "wget #{wget_opts} -P #{installers} #{url}"
     not_if { !refresh && File.exists?("#{installers}/#{file}") }
   end
 end
@@ -162,7 +162,7 @@ sc_file = darisUrlToFile(sc_url)
 
 bash "fetch-server-config" do
   user mflux_user
-  code "wget #{wget_opts} -O #{installers}/#{sc_file} #{sc_url}"
+  code "wget #{wget_opts} -P #{installers} #{sc_url}"
   not_if { !refresh && File.exists?("#{installers}/#{sc_file}") }
 end
 

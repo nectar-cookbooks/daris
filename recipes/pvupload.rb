@@ -53,7 +53,7 @@ pv_url = buildDarisUrl(node, 'pvupload')
 pv_file = darisUrlToFile(pv_url)
 
 bash "fetch-pvupload" do
-  code "wget #{wget_opts} -O #{installers}/#{pv_file} #{pv_url}"
+  code "wget #{wget_opts} -P #{installers} #{pv_url}"
   not_if { !refresh && ::File.exists?("#{installers}/#{pv_file}") }
 end
 

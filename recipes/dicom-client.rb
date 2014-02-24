@@ -53,7 +53,7 @@ dc_file = darisUrlToFile(dc_url)
 
 bash "fetch-dicom-client" do
   user 'root'
-  code "wget #{wget_opts} -O #{installers}/#{dc_file} #{dc_url}"
+  code "wget #{wget_opts} -P #{installers} #{dc_url}"
   not_if { !refresh && ::File.exists?("#{installers}/#{dc_file}") }
 end
 
