@@ -24,12 +24,24 @@ module DarisUrls
       'dcmtools' => ['0.29'],
       'nig-commons' => ['0.40']
     },
+    'stable-2-20' => {
+      'type' => 'stable',
+      'nig_essentials' => ['0.22', '3.8.057'],
+      'nig_transcode' => ['0.35', '3.8.057'],
+      'pssd' => ['2.07', '3.8.057'],
+      'daris_portal' => ['0.38', '3.8.050'],
+      'server_config' => ['1.0'],
+      'pvupload' => ['0.34'],
+      'dicom_client' => ['1.0'],
+      'dcmtools' => ['0.29'],
+      'nig-commons' => ['0.41']
+    },
     'latest' => {
       'type' => 'latest',
-      'nig_essentials' => ['0.21', '3.8.050'],
-      'nig_transcode' => ['0.35', '3.8.050'],
-      'pssd' => ['2.07', '3.8.050'],
-      'daris_portal' => ['0.36', '3.8.050'],
+      'nig_essentials' => ['0.22', '3.8.057'],
+      'nig_transcode' => ['0.35', '3.8.057'],
+      'pssd' => ['2.07', '3.8.057'],
+      'daris_portal' => ['0.38', '3.8.057'],
       'server_config' => ['1.0'],
       'pvupload' => ['0.34'],
       'dicom_client' => ['1.0'],
