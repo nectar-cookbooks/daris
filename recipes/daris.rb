@@ -53,7 +53,8 @@ pkgs = {
   'nig_essentials' => buildDarisUrl(node, 'nig_essentials'),  
   'nig_transcode' => buildDarisUrl(node, 'nig_transcode'),  
   'pssd' => buildDarisUrl(node, 'pssd'),
-  'daris_portal' => buildDarisUrl(node, 'daris_portal')
+  'daris_portal' => buildDarisUrl(node, 'daris_portal'),
+  'sinks' => buildDarisUrl(node, 'sinks'),
 }
 
 local_pkgs = node['daris']['local_pkgs'] || {}

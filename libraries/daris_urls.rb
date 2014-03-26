@@ -34,7 +34,8 @@ module DarisUrls
       'pvupload' => ['0.34'],
       'dicom_client' => ['1.0'],
       'dcmtools' => ['0.29'],
-      'nig-commons' => ['0.41']
+      'nig-commons' => ['0.41'],
+      'sinks' => ['0.03', '3.9.002']
     },
     'latest' => {
       'type' => 'latest',
@@ -46,7 +47,8 @@ module DarisUrls
       'pvupload' => ['0.34'],
       'dicom_client' => ['1.0'],
       'dcmtools' => ['0.29'],
-      'nig-commons' => ['0.41']
+      'nig-commons' => ['0.41'],
+      'sinks' => ['0.03', '3.9.002']
     }
   }
   
@@ -59,7 +61,8 @@ module DarisUrls
     'server_config' => 'server-config-%{ver}-%{type}.zip',
     'pvupload' => 'pvupload-%{ver}-%{type}.zip',
     'dicom_client' => 'dicom-client-%{ver}-%{type}.zip',
-    'dcmtools' => 'dcmtools-%{ver}-%{type}.zip'
+    'dcmtools' => 'dcmtools-%{ver}-%{type}.zip',
+    'sinks' => 'mfpkg-nig_sinks-%{ver}-mf%{mver}.zip'
   }
 
   # Options for 'wget'ing DaRIS downloadables.
