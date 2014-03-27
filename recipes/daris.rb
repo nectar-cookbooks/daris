@@ -160,7 +160,7 @@ template "#{mflux_home}/plugin/bin/dcm2mnc" do
   })
 end
 
-sc_url, sc_file = DarisUrlAndFile(node, 'server_config')
+sc_url, sc_file = darisUrlAndFile(node, 'server_config')
 
 if sc_url then
   bash "fetch-server-config" do
