@@ -49,8 +49,7 @@ if ! installers.start_with?('/') then
   installers = mflux_user_home + '/' + installers
 end
 
-pv_url = buildDarisUrl(node, 'pvupload')
-pv_file = darisUrlToFile(pv_url)
+pv_url, pv_file = darisUrlAndFile(node, 'pvupload')
 
 bash "fetch-pvupload" do
   code "wget #{wget_opts} -P #{installers} #{pv_url}"

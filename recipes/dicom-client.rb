@@ -48,8 +48,7 @@ if ! installers.start_with?('/') then
   installers = mflux_user_home + '/' + installers
 end
 
-dc_url = buildDarisUrl(node, 'dicom_client')
-dc_file = darisUrlToFile(dc_url)
+dc_url, dc_file = darisUrlAndFile(node, 'dicom_client')
 
 bash "fetch-dicom-client" do
   user 'root'
