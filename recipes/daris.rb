@@ -50,11 +50,11 @@ end
 wget_opts = wgetOpts(node, refresh)
 
 pkgs = {
-  'nig_essentials' => buildDarisUrl(node, 'nig_essentials'),  
-  'nig_transcode' => buildDarisUrl(node, 'nig_transcode'),  
-  'pssd' => buildDarisUrl(node, 'pssd'),
-  'daris_portal' => buildDarisUrl(node, 'daris_portal'),
-  'sinks' => buildDarisUrl(node, 'sinks'),
+  'nig_essentials' => darisUrlAndFile(node, 'nig_essentials'),  
+  'nig_transcode' => darisUrlAndFile(node, 'nig_transcode'),  
+  'pssd' => darisUrlAndFile(node, 'pssd'),
+  'daris_portal' => darisUrlAndFile(node, 'daris_portal'),
+  'sinks' => darisUrlAndFile(node, 'sinks'),
 }
 
 local_pkgs = node['daris']['local_pkgs'] || {}
@@ -113,12 +113,14 @@ template "#{mflux_config}/create_stores.tcl" do
              })
 end
 
-pkgs.each() do | pkg, url | 
-  file = darisUrlToFile(url)
-  bash "fetch-#{pkg}" do
-    user mflux_user
-    code "wget #{wget_opts} -P #{installers} #{url}"
-    not_if { !refresh && File.exists?("#{installers}/#{file}") }
+pkgs.each() do | pkg, url_and_file | 
+  url, file = url_and_file
+  if url then
+    bash "fetch-#{pkg}" do
+      user mflux_user
+      code "wget #{wget_opts} -P #{installers} #{url}"
+      not_if { !refresh && File.exists?("#{installers}/#{file}") }
+    end
   end
 end
 
@@ -158,13 +160,14 @@ template "#{mflux_home}/plugin/bin/dcm2mnc" do
   })
 end
 
-sc_url = buildDarisUrl(node, 'server_config')
-sc_file = darisUrlToFile(sc_url)
+sc_url, sc_file = DarisUrlAndFile(node, 'server_config')
 
-bash "fetch-server-config" do
-  user mflux_user
-  code "wget #{wget_opts} -P #{installers} #{sc_url}"
-  not_if { !refresh && File.exists?("#{installers}/#{sc_file}") }
+if sc_url then
+  bash "fetch-server-config" do
+    user mflux_user
+    code "wget #{wget_opts} -P #{installers} #{sc_url}"
+    not_if { !refresh && File.exists?("#{installers}/#{sc_file}") }
+  end
 end
 
 # We don't use this tool for configuration.  But someone might want to ...
@@ -264,8 +267,8 @@ if !all_stores.include?(dicom_store) then
    all_stores << dicom_store
 end
 
-all_pkgs.each() do | pkg, url |
-  file = darisUrlToFile(url) 
+all_pkgs.each() do | pkg, url_and_file |
+  file = url_and_file[1]
   bash "install-#{pkg}" do
     action :nothing
     user "root"

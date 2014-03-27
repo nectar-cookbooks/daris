@@ -1,4 +1,10 @@
 module DarisUrls
+
+  # The 1st level keys represent official releases, apart from 'latest'.  
+  # The 2nd level keys mostly represent the available components (of interest).
+  # The value arrays consist of the component version, the minimum mediaflux 
+  #   version the component notionally depends on, and a flag to say if the
+  #   pre-built component is downloadable in this version.
   DARIS_RELEASES = {
     'stable-2-18' => {
       'type' => 'stable',
@@ -34,8 +40,7 @@ module DarisUrls
       'pvupload' => ['0.34'],
       'dicom_client' => ['1.0'],
       'dcmtools' => ['0.29'],
-      'nig-commons' => ['0.41'],
-      'sinks' => ['0.03', '3.9.002']
+      'nig-commons' => ['0.41']
     },
     'latest' => {
       'type' => 'latest',
@@ -48,21 +53,22 @@ module DarisUrls
       'dicom_client' => ['1.0'],
       'dcmtools' => ['0.29'],
       'nig-commons' => ['0.41'],
-      'sinks' => ['0.03', '3.9.002']
+      'sinks' => ['0.03', '3.9.002', false],
+      'transform' => ['1.3.03', '3.8.059', false]
     }
   }
   
   DARIS_PATTERNS = {
-    'nig_commons' => 'nig-commons-%{type}.jar',
-    'nig_essentials' => 'mfpkg-nig_essentials-%{ver}-mf%{mver}-%{type}.zip',
-    'nig_transcode' => 'mfpkg-nig_transcode-%{ver}-mf%{mver}-%{type}.zip',
-    'pssd' => 'mfpkg-pssd-%{ver}-mf%{mver}-%{type}.zip',
-    'daris_portal' => 'mfpkg-daris-%{ver}-mf%{mver}-%{type}.zip',
-    'server_config' => 'server-config-%{ver}-%{type}.zip',
-    'pvupload' => 'pvupload-%{ver}-%{type}.zip',
-    'dicom_client' => 'dicom-client-%{ver}-%{type}.zip',
-    'dcmtools' => 'dcmtools-%{ver}-%{type}.zip',
-    'sinks' => 'mfpkg-nig_sinks-%{ver}-mf%{mver}.zip'
+    'nig_commons' => 'nig-commons%{type}.jar',
+    'nig_essentials' => 'mfpkg-nig_essentials-%{ver}-mf%{mver}%{type}.zip',
+    'nig_transcode' => 'mfpkg-nig_transcode-%{ver}-mf%{mver}%{type}.zip',
+    'pssd' => 'mfpkg-pssd-%{ver}-mf%{mver}%{type}.zip',
+    'daris_portal' => 'mfpkg-daris-%{ver}-mf%{mver}%{type}.zip',
+    'server_config' => 'server-config-%{ver}%{type}.zip',
+    'pvupload' => 'pvupload-%{ver}%{type}.zip',
+    'dicom_client' => 'dicom-client-%{ver}%{type}.zip',
+    'dcmtools' => 'dcmtools-%{ver}%{type}.zip',
+    'sinks' => 'mfpkg-nig_sinks-%{ver}-mf%{mver}%{type}.zip'
   }
 
   # Options for 'wget'ing DaRIS downloadables.
@@ -77,36 +83,57 @@ module DarisUrls
     return opts
   end
 
-  # Get the filename part of a URL string
-  def darisUrlToFile(url_string)
-    return Pathname(URI(url_string).path).basename
+  # Test if we should try to download a component if we don't have
+  # suitable local copy.  
+  def _tryDownload?(node, item) 
+    if node['daris']['use_local_daris_builds'] then
+      return false
+    elsif node['daris'][item] then
+      return true
+    else 
+      version_info = getRelease(node)[item] || ['1.0', '1.0', false]
+      return version_info.length < 3 || version_info[2]
+    end
   end
 
-  # Lookup / figure out the URL for a DaRIS downloadable based on 
+  # Lookup / figure out the URL for a DaRIS component based on 
   # the settings in the Node object.  If the node has specified a
   # file (or url), that is turned into a URL and returned.  Otherwise
   # we lookup the version information for the item in the selected
-  # DaRIS release, interpolate the versions into a filename, and 
-  # then turn that into a URL.
-  def buildDarisUrl(node, item)
+  # DaRIS release, interpolate the version into a filename, and 
+  # then turn that into a URL.  
+  def darisUrlAndFile(node, item)
     specified = node['daris'][item]
     if specified then
-      return assemble(node, specified, node['daris']['download_dir'])
+      url = assemble(node, specified, node['daris']['download_dir'])
+      file = Pathname(URI(url).path).basename
+    else 
+      file, type = _buildDarisFileAndType(node, item)
+      url = _assemble(node, file, type)
     end
+    if _tryDownload?(node, item) then 
+      return url, file
+    else
+      return nil, file
+    end
+  end
+
+  def _buildDarisFileAndType(node, item)
+    local = node['daris']['use_local_daris_builds']
     pat = DARIS_PATTERNS[item]
     if ! pat then
       raise "There is no filename pattern for '#{item}'"
     end 
     release = getRelease(node)
-    versions = release[item] || ['1.0']
+    version_info = release[item] || ['1.0', '1.0', false]
     type = release['type'] || 'stable'
+    type_suffix = local ? "" : "-#{type}"
     hash = {
-      :type => type, 
-      :ver => versions[0] || '',
-      :mver => versions[1] || ''
+      :type => type_suffix, 
+      :ver => version_info[0] || '',
+      :mver => version_info[1] || ''
     }
-    file = pat % hash
-    return assemble(node, file, type)
+    return pat % hash, type
   end
 
   def getRelease(node)
@@ -127,7 +154,7 @@ module DarisUrls
     return getRelease(node)['type'] != 'stable'
   end
   
-  def assemble(node, file, dir)
+  def _assemble(node, file, dir)
     if /^[a-zA-Z]+:.+$/.match(file) then
       return file
     else
