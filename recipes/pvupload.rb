@@ -51,9 +51,11 @@ end
 
 pv_url, pv_file = darisUrlAndFile(node, 'pvupload')
 
-bash "fetch-pvupload" do
-  code "wget #{wget_opts} -P #{installers} #{pv_url}"
-  not_if { !refresh && ::File.exists?("#{installers}/#{pv_file}") }
+if pv_url then
+  bash "fetch-pvupload" do
+    code "wget #{wget_opts} -P #{installers} #{pv_url}"
+    not_if { !refresh && ::File.exists?("#{installers}/#{pv_file}") }
+  end
 end
 
 bash "extract-pvupload" do

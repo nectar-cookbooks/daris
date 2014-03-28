@@ -50,10 +50,12 @@ end
 
 dc_url, dc_file = darisUrlAndFile(node, 'dicom_client')
 
-bash "fetch-dicom-client" do
-  user 'root'
-  code "wget #{wget_opts} -P #{installers} #{dc_url}"
-  not_if { !refresh && ::File.exists?("#{installers}/#{dc_file}") }
+if dc_url then
+  bash "fetch-dicom-client" do
+    user 'root'
+    code "wget #{wget_opts} -P #{installers} #{dc_url}"
+    not_if { !refresh && ::File.exists?("#{installers}/#{dc_file}") }
+  end
 end
 
 bash "extract-dicom-client" do
