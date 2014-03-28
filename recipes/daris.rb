@@ -57,7 +57,12 @@ pkgs = {
   'sinks' => darisUrlAndFile(node, 'sinks'),
 }
 
-local_pkgs = node['daris']['local_pkgs'] || {}
+local_pkg_names = node['daris']['local_pkgs'] || {}
+local_pkgs = {}
+local_pkg_names.each_pair do |key, value|
+  local_pkgs[key] = [nil, value]
+end
+
 all_pkgs = pkgs.merge(local_pkgs)
 installers = node['mediaflux']['installers'] || 'installers'
 if ! installers.start_with?('/') then
