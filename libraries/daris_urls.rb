@@ -47,7 +47,7 @@ module DarisUrls
       'nig_essentials' => ['0.22', '3.8.057'],
       'nig_transcode' => ['0.35', '3.8.057'],
       'pssd' => ['2.09', '3.9.002'],
-      'daris_portal' => ['0.38', '3.8.057'],
+      'daris_portal' => ['0.40', '3.8.057'],
       'server_config' => ['1.0'],
       'pvupload' => ['0.34'],
       'dicom_client' => ['1.0'],
