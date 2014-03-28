@@ -46,7 +46,7 @@ module DarisUrls
       'type' => 'latest',
       'nig_essentials' => ['0.22', '3.8.057'],
       'nig_transcode' => ['0.35', '3.8.057'],
-      'pssd' => ['2.09', '3.8.057'],
+      'pssd' => ['2.09', '3.9.002'],
       'daris_portal' => ['0.38', '3.8.057'],
       'server_config' => ['1.0'],
       'pvupload' => ['0.34'],
@@ -54,7 +54,7 @@ module DarisUrls
       'dcmtools' => ['0.29'],
       'nig-commons' => ['0.41'],
       'sinks' => ['0.03', '3.9.002', false],
-      'transform' => ['1.3.03', '3.9.002', false]
+      'transform' => ['1.3.03', '3.8.059', false]
     }
   }
   
