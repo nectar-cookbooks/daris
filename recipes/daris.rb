@@ -129,7 +129,8 @@ pkgs.each() do | pkg, url_and_file |
   end
 end
 
-local_pkgs.each() do | pkg, file | 
+local_pkgs.each() do | pkg, url_and_file |
+  url, file = url_and_file 
   ruby_block "check #{pkg} installer" do
     block do
       if ! ::File.exists?("#{installers}/#{file}") then
