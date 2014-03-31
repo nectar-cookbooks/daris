@@ -22,6 +22,9 @@ Recipes
 * `daris::dicom-client` - installs the "dicom-mf" upload tool.
 * `daris::users` - creates users from the "daris_users" databag.
 * `daris::dicom-hosts` - creates DICOM proxy users from the "dicom_hosts" databag.
+* `daris::build_daris` - checks out and does a local build of the DaRIS portal component.
+* `daris::build_nigtk` - checks out and does a local build of the NIGTK components.
+* `daris::build_transform` - checks out and does a local build of the Transform component.
 
 Attributes
 ==========
@@ -40,6 +43,8 @@ See `attributes/default.rb` for the default values.
 * `node['daris']['dicom_ingest_notifications']` - A list of user emails to be notified of DICOM ingestion events.
 * `node['daris']['user_groups']` - The list of the "groups" of users to be created by the "users" recipe.
 * `node['daris']['default_password']` - The default initial password for users.
+
+There are other "advanced" attributes that relate to local builds and using the resulting components; see "Using the build recipes" below.
 
 You also need to:
 
@@ -147,3 +152,33 @@ There are a couple of other things that you can do to work around these problems
         
   tells the recipe to use PSSD 2.03, irrespective of what the other component versions are.  (A download would likely fail, but that's a different issue.)
 
+Using the build recipes
+=======================
+
+The "daris::build_*" recipes are designed for situations where you need to
+make a local build of the DaRIS components instead of downloading them.  
+To use them, you will need to ask the DaRIS project administrators to 
+provide you with the repository URLs.  They are currently private, but 
+read access is typically granted on request.  (Open access is on the agenda,
+but certain things need to be sorted out first.)
+
+The build recipes checkout from the relevant DaRIS project Git repositories,
+run the respective builds, and then copy the built components into the local
+installer cache directory.  However, there is a slight snag.  The build 
+scripts create the components with different names to the ones used on the
+download site.  (This is arguably a good thing ...).  So, if you want to
+use the downloadables, you need to set these attrubutes:
+
+* `node['daris']['release']` - This must be set to "latest".
+* `node['daris']['use_local_daris_builds']` - This must be "true".
+
+In addition, you need to set the following:
+
+* `node['daris']['nigtk_repo']` - The url of the NIGTK git repository.
+* `node['daris']['nigtk_branch']` -The NIGTK branch to use; defaults to "master".
+* `node['daris']['transform_repo']` - The url of the Transform git repository.
+* `node['daris']['transform_branch']` - The Transform branch to use; defaults to "master".
+* `node['daris']['daris_repo']` - The url of the DaRIS git repository.
+* `node['daris']['daris_branch']` - The DaRIS branch to use; defaults to "master".
+ 
+Finally, you need to ensure that the 'daris::build_*' recipes are run before the 'daris::daris' recipe.
