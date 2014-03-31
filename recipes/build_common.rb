@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: daris
-# Recipe:: build_transform
+# Recipe:: build_daris
 #
 # Copyright (c) 2014, The University of Queensland
 # All rights reserved.
@@ -26,33 +26,21 @@
 # CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#
 
-include_recipe 'daris::build_common'
-
-::Chef::Recipe.send(:include, DarisUrls)
+include_recipe 'java'
 
 build_tree = File.absolute_path(node['daris']['build_tree'])
-dir = "#{build_tree}/git/transform"
 
-mflux_home = node['mediaflux']['home']
-mflux_user_home = node['mediaflux']['user_home'] || mflux_home
-installers = node['mediaflux']['installers'] || 'installers'
-if ! installers.start_with?('/') then
-  installers = mflux_user_home + '/' + installers
-end
+package "ant"
 
-git dir do
-  repository node['daris']['transform_repo']
-  revision node['daris']['transform_branch']
-  ssh_wrapper "#{build_tree}/ssh_wrapper.sh" if private_key_file
-end
+directory "#{build_tree}/dist"
+directory "#{build_tree}/git"
 
-link "#{dir}/lib/aplugin.jar" do
-  to "#{mflux_home}/dev/plugin/lib/aplugin.jar"
-end
-
-bash "build transform" do
-  code "ant clean mf-package && cp #{build_tree}/dist/transform/* #{installers}"
-  cwd dir
+private_key_file = node['daris']['private_key_file']
+if private_key_file then
+  template "#{build_tree}/ssh_wrapper.sh" do
+    source "ssh_wrapper.sh.erb"
+    variables ({"private_key_file" => private_key_file})
+    mode 0755
+  end 
 end

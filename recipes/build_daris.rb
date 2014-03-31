@@ -27,29 +27,16 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-include_recipe 'java'
+include_recipe 'daris::build_common'
 
 build_tree = File.absolute_path(node['daris']['build_tree'])
 dir = "#{build_tree}/git/nigtk"
 
 mflux_home = node['mediaflux']['home']
-mflux_user = node['mediaflux']['user']
+mflux_user_home = node['mediaflux']['user'] || mflux_home
 installers = node['mediaflux']['installers'] || 'installers'
 if ! installers.start_with?('/') then
   installers = mflux_user_home + '/' + installers
-end
-refresh = node['daris']['force_refresh'] || false
-
-package "ant" do
-end
-
-private_key_file = node['daris']['private_key_file']
-if private_key_file then
-  template "#{build_tree}/ssh_wrapper.sh" do
-    source "ssh_wrapper.sh.erb"
-    variables ({"private_key_file" => private_key_file})
-    mode 0755
-  end 
 end
 
 git dir do
