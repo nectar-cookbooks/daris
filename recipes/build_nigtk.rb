@@ -55,8 +55,8 @@ if private_key_file then
 end
 
 git dir do
-  repository node['daris']['nigtk-repo']
-  revision node['daris']['nigtk-branch']
+  repository node['daris']['nigtk_repo']
+  revision node['daris']['nigtk_branch']
   ssh_wrapper "#{build_tree}/ssh_wrapper.sh" if private_key_file
 end
 
