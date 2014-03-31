@@ -29,7 +29,7 @@ node.default['daris']['manage_firewall'] = false
 # These attributes give specific versions of the downloadables.  If
 # they are not set (e.g. in the Node, Role or Recipe) then they
 # are generated using templates and the 'releases' map.
-node.default['daris']['release'] = 'stable-2-18'
+node.default['daris']['release'] = nil
 node.default['daris']['download_dir'] = nil 
 node.default['daris']['nig_essentials'] = nil
 node.default['daris']['nig_transcode'] = nil
@@ -38,6 +38,20 @@ node.default['daris']['daris_portal'] = nil
 node.default['daris']['pvupload'] = nil
 node.default['daris']['dicom_client'] = nil
 node.default['daris']['dcmtools'] = nil
+
+# This is where we put the git checkouts and where we build.
+node.default['daris']['build_tree'] = '.'  # e.g. the chef-solo current dir.
+
+# If an SSH private key is used to checkout the daris code ...
+node.default['daris']['private_key_file'] = nil
+
+# Repo URLs and branches.  The URLs must be specified.
+node.default['daris']['nigtk_repo'] = nil
+node.default['daris']['nigtk_branch'] = 'master'
+node.default['daris']['transform_repo'] = nil
+node.default['daris']['transform_branch'] = 'master'
+node.default['daris']['daris_repo'] = nil
+node.default['daris']['daris_branch'] = 'master'
 
 # Local packages.  These WON'T be downloaded.
 node.default['daris']['local_pkgs'] = {}
