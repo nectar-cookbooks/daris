@@ -45,7 +45,7 @@ end
 git dir do
   repository node['daris']['transform_repo']
   revision node['daris']['transform_branch']
-  ssh_wrapper "#{build_tree}/ssh_wrapper.sh" if private_key_file
+  ssh_wrapper "#{build_tree}/ssh_wrapper.sh" if node['daris']['private_key_file']
 end
 
 link "#{dir}/lib/aplugin.jar" do
