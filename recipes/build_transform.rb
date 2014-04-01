@@ -1,8 +1,8 @@
 #
 # Cookbook Name:: daris
-# Recipe:: dicom-client
+# Recipe:: build_transform
 #
-# Copyright (c) 2013, 2014, The University of Queensland
+# Copyright (c) 2014, The University of Queensland
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -26,46 +26,33 @@
 # CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
 
-include_recipe "daris::common"
+include_recipe 'daris::build_common'
 
 ::Chef::Recipe.send(:include, DarisUrls)
 
+build_tree = node['daris']['build_tree']
+dir = "#{build_tree}/git/transform"
+
 mflux_home = node['mediaflux']['home']
-mflux_bin = node['mediaflux']['bin'] || "#{mflux_home}/bin"
 mflux_user_home = node['mediaflux']['user_home'] || mflux_home
-refresh = node['daris']['force_refresh'] || false
-bootstrap = node['daris']['force_bootstrap'] || false
-
-if unstableRelease?(node) && bootstrap then
-  refresh = true
-end
-
-wget_opts = wgetOpts(node, refresh)
-
 installers = node['mediaflux']['installers'] || 'installers'
 if ! installers.start_with?('/') then
   installers = mflux_user_home + '/' + installers
 end
 
-dc_url, dc_file = darisUrlAndFile(node, 'dicom_client')
-
-if dc_url then
-  bash "fetch-dicom-client" do
-    user 'root'
-    code "wget #{wget_opts} -P #{installers} #{dc_url}"
-    not_if { !refresh && ::File.exists?("#{installers}/#{dc_file}") }
-  end
+git dir do
+  repository node['daris']['transform_repo']
+  revision node['daris']['transform_branch']
+  ssh_wrapper "#{build_tree}/ssh_wrapper.sh" if node['daris']['private_key_file']
 end
 
-bash "extract-dicom-client" do
-  cwd mflux_bin
-  user 'root'
-  code "unzip -o #{installers}/#{dc_file} dicom-client.jar"
+link "#{dir}/lib/aplugin.jar" do
+  to "#{mflux_home}/dev/plugin/lib/aplugin.jar"
 end
 
-cookbook_file "#{mflux_bin}/dicom-mf.sh" do
-  owner 'root'
-  mode 0755
-  source "dicom-mf.sh"
+bash "build transform" do
+  code "ant clean mf-package && cp #{build_tree}/dist/transform/* #{installers}"
+  cwd dir
 end

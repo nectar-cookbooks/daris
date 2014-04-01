@@ -1,8 +1,8 @@
 #
 # Cookbook Name:: daris
-# Recipe:: dicom-client
+# Recipe:: build_daris
 #
-# Copyright (c) 2013, 2014, The University of Queensland
+# Copyright (c) 2014, The University of Queensland
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -27,45 +27,25 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-include_recipe "daris::common"
+include_recipe 'java'
 
-::Chef::Recipe.send(:include, DarisUrls)
-
-mflux_home = node['mediaflux']['home']
-mflux_bin = node['mediaflux']['bin'] || "#{mflux_home}/bin"
-mflux_user_home = node['mediaflux']['user_home'] || mflux_home
-refresh = node['daris']['force_refresh'] || false
-bootstrap = node['daris']['force_bootstrap'] || false
-
-if unstableRelease?(node) && bootstrap then
-  refresh = true
+build_tree = node['daris']['build_tree']
+if Pathname.new(build_tree).relative? then
+  raise "The build_tree must be an absolute pathname"
 end
 
-wget_opts = wgetOpts(node, refresh)
+package "ant"
 
-installers = node['mediaflux']['installers'] || 'installers'
-if ! installers.start_with?('/') then
-  installers = mflux_user_home + '/' + installers
-end
+directory "#{build_tree}"
+directory "#{build_tree}/build"
+directory "#{build_tree}/dist"
+directory "#{build_tree}/git"
 
-dc_url, dc_file = darisUrlAndFile(node, 'dicom_client')
-
-if dc_url then
-  bash "fetch-dicom-client" do
-    user 'root'
-    code "wget #{wget_opts} -P #{installers} #{dc_url}"
-    not_if { !refresh && ::File.exists?("#{installers}/#{dc_file}") }
-  end
-end
-
-bash "extract-dicom-client" do
-  cwd mflux_bin
-  user 'root'
-  code "unzip -o #{installers}/#{dc_file} dicom-client.jar"
-end
-
-cookbook_file "#{mflux_bin}/dicom-mf.sh" do
-  owner 'root'
-  mode 0755
-  source "dicom-mf.sh"
+private_key_file = node['daris']['private_key_file']
+if private_key_file then
+  template "#{build_tree}/ssh_wrapper.sh" do
+    source "ssh_wrapper.sh.erb"
+    variables ({"private_key_file" => private_key_file})
+    mode 0755
+  end 
 end
