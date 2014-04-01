@@ -36,7 +36,11 @@ package "ant"
 log "current directory is #{Dir.pwd}"
 log "build-tree is #{build_tree}"
 
-raise "Bailing out ..."
+ruby_block "debugging" do
+  block do
+    raise "Bailing out ..."
+  end
+end
 
 directory "#{build_tree}"
 directory "#{build_tree}/build"
