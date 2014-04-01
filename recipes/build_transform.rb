@@ -32,7 +32,7 @@ include_recipe 'daris::build_common'
 
 ::Chef::Recipe.send(:include, DarisUrls)
 
-build_tree = File.absolute_path(node['daris']['build_tree'])
+build_tree = node['daris']['build_tree']
 dir = "#{build_tree}/git/transform"
 
 mflux_home = node['mediaflux']['home']

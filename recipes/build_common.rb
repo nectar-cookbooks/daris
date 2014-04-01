@@ -29,18 +29,12 @@
 
 include_recipe 'java'
 
-build_tree = File.absolute_path(node['daris']['build_tree'])
+build_tree = node['daris']['build_tree']
+if Pathname.new(build_tree).relative? then
+  raise "The build_tree must be an absolute pathname"
+end
 
 package "ant"
-
-log "current directory is #{Dir.pwd}"
-log "build-tree is #{build_tree}"
-
-ruby_block "debugging" do
-  block do
-    raise "Bailing out ..."
-  end
-end
 
 directory "#{build_tree}"
 directory "#{build_tree}/build"

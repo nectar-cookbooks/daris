@@ -40,7 +40,7 @@ node.default['daris']['dicom_client'] = nil
 node.default['daris']['dcmtools'] = nil
 
 # This is where we do the builds
-node.default['daris']['build_tree'] = 'local-build'
+node.default['daris']['build_tree'] = '/tmp/daris-build'
 
 # If an SSH private key is used to checkout the daris code ...
 node.default['daris']['private_key_file'] = nil

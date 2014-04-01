@@ -29,7 +29,7 @@
 
 include_recipe 'daris::build_common'
 
-build_tree = File.absolute_path(node['daris']['build_tree'])
+build_tree = node['daris']['build_tree']
 dir = "#{build_tree}/git/daris"
 
 mflux_home = node['mediaflux']['home']
