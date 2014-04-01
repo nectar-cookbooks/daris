@@ -1,5 +1,8 @@
 Change Log for the Daris cookbook
 =================================
+Version 0.9.1
+-------------
+ - Support for local builds for the DaRIS software (#6 & #7)
 
 Version 0.9.0
 -------------
