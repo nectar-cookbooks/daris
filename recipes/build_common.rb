@@ -33,6 +33,8 @@ build_tree = File.absolute_path(node['daris']['build_tree'])
 
 package "ant"
 
+directory "#{build_tree}"
+directory "#{build_tree}/build"
 directory "#{build_tree}/dist"
 directory "#{build_tree}/git"
 

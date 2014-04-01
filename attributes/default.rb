@@ -39,8 +39,8 @@ node.default['daris']['pvupload'] = nil
 node.default['daris']['dicom_client'] = nil
 node.default['daris']['dcmtools'] = nil
 
-# This is where we put the git checkouts and where we build.
-node.default['daris']['build_tree'] = '.'  # e.g. the chef-solo current dir.
+# This is where we do the builds
+node.default['daris']['build_tree'] = 'local-build'
 
 # If an SSH private key is used to checkout the daris code ...
 node.default['daris']['private_key_file'] = nil
