@@ -36,6 +36,8 @@ package "ant"
 log "current directory is #{Dir.pwd}"
 log "build-tree is #{build_tree}"
 
+raise "Bailing out ..."
+
 directory "#{build_tree}"
 directory "#{build_tree}/build"
 directory "#{build_tree}/dist"
