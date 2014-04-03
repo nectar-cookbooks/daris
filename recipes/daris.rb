@@ -310,3 +310,9 @@ bash "run-initial-daris-config" do
          "#{mfcommand} source #{mflux_config}/initial_daris_conf.tcl && " +
          "#{mfcommand} logoff"
 end
+
+cookbook_file "#{mflux_bin}/sshsink" do
+  user mflux_user
+  source "sshsink"
+  mode 0755
+end
