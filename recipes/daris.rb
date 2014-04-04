@@ -313,6 +313,6 @@ end
 
 cookbook_file "#{mflux_bin}/sshsink" do
   user mflux_user
-  source "sshsink"
+  source "sshsink.sh"
   mode 0755
 end
