@@ -5,6 +5,8 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+MFCOMMAND=${MFLUX_BIN}/mfcommand
+
 #
 # Utility for configuring DaRIS SSH sinks.
 #
