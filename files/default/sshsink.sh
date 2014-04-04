@@ -17,22 +17,24 @@ addsink() {
 }
 
 removesink() {
-    echo "not implemented yet"
-    exit 1
+    $MFCOMMAND logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD
+    $MFCOMMAND sink.remove $2
+    RC=$?
+    $MFCOMMAND logoff
 }
 
 listsinks() {
     $MFCOMMAND logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD
     $MFCOMMAND sink.list
+    RC=$?
     $MFCOMMAND logoff
-    exit 1
 }
 
-listsinks() {
+describesink() {
     $MFCOMMAND logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD
     $MFCOMMAND sink.describe $2
+    RC=$?
     $MFCOMMAND logoff
-    exit 1
 }
 
 help() {
@@ -61,3 +63,4 @@ case $1 in
     exit 1
     ;;
 esac
+exit $RC
