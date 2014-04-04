@@ -18,7 +18,7 @@ addsink() {
 
 removesink() {
     $MFCOMMAND logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD
-    $MFCOMMAND sink.remove $2
+    $MFCOMMAND sink.remove :name $2
     RC=$?
     $MFCOMMAND logoff
 }
@@ -32,7 +32,7 @@ listsinks() {
 
 describesink() {
     $MFCOMMAND logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD
-    $MFCOMMAND sink.describe $2
+    $MFCOMMAND sink.describe :name $2
     RC=$?
     $MFCOMMAND logoff
 }
