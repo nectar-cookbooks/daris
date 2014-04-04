@@ -28,6 +28,13 @@ listsinks() {
     exit 1
 }
 
+listsinks() {
+    $MFCOMMAND logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD
+    $MFCOMMAND sink.describe $2
+    $MFCOMMAND logoff
+    exit 1
+}
+
 help() {
     echo "not implemented yet"
     exit 1
@@ -35,15 +42,16 @@ help() {
 
 case $1 in
   add)
-    shift
     addsink
     ;;
   remove)
-    shift
     removesink
     ;;
   list)
     listsinks
+    ;;
+  describe)
+    describesink
     ;;
   help)
     help
