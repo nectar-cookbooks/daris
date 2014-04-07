@@ -12,17 +12,22 @@ MFCOMMAND=${MFLUX_BIN}/mfcommand
 #
 
 addsink() {
+    SCRIPT=/tmp/sshsink_$$
+    cat > $SCRIPT <<EOF
+        sink.add :name $1 \
+	    :destination < \
+                :type scp :arg -name host $2 \
+	        :arg -name port 22 \
+                :arg -name hostkey [xvalue host-key [ssh.host.key.scan \
+                                                     :host $2 :type rsa]] \
+                :arg -name decompress true \
+            >  
+EOF
     $MFCOMMAND logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD
-    $MFCOMMAND sink.add :name $1 \
-	:destination \< \
-            :type scp :arg -name host $2 \
-	    :arg -name port 22 \
-            :arg -name hostkey \[xvalue host-key \[ssh.host.key.scan :host $2 \
-                                                   :type rsa\]\] \
-            :arg -name decompress true \
-        \>  
+    $MFCOMMAND source $SCRIPT
     RC=$?
     $MFCOMMAND logoff
+    rm $SCRIPT
 }
 
 removesink() {
