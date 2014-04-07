@@ -142,7 +142,7 @@ module DarisUrls
     if ! relname then
       raise "No DaRIS release has been specified"
     end 
-    release = DARIS_RELEASES[release_name]
+    release = DARIS_RELEASES[relname]
     if ! release then
       raise "There is no 'releases' entry for release '#{relname}'"
     end
