@@ -122,7 +122,8 @@ module DarisUrls
     local = node['daris']['use_local_daris_builds']
     pat = DARIS_PATTERNS[item]
     if ! pat then
-      raise "There is no filename pattern for '#{item}'"
+      relname = node['daris']['release']      
+      raise "There is no filename pattern for '#{item}' in release '#{relname}"
     end 
     release = getRelease(node)
     version_info = release[item] || ['1.0', '1.0', false]
@@ -137,13 +138,13 @@ module DarisUrls
   end
 
   def getRelease(node)
-    release_name = node['daris']['release']
-    if ! release_name then
+    relname = node['daris']['release']
+    if ! relname then
       raise "No DaRIS release has been specified"
     end 
     release = DARIS_RELEASES[release_name]
     if ! release then
-      raise "There is no 'releases' entry for release '#{release_name}'"
+      raise "There is no 'releases' entry for release '#{relname}'"
     end
     return release
   end
