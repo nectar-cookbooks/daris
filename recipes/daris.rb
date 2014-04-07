@@ -56,10 +56,10 @@ pkgs = {
   'daris_portal' => darisUrlAndFile(node, 'daris_portal')
 }
 
-if ['daris']['load_sinks'] then
+if node['daris']['load_sinks'] then
   pkgs.store('sinks', darisUrlAndFile(node, 'sinks'))
 end
-if ['daris']['load_transform'] then
+if node['daris']['load_transform'] then
   pkgs.store('transform', darisUrlAndFile(node, 'transform'))
 end
 
