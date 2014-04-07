@@ -68,7 +68,8 @@ module DarisUrls
     'pvupload' => 'pvupload-%{ver}%{type}.zip',
     'dicom_client' => 'dicom-client-%{ver}%{type}.zip',
     'dcmtools' => 'dcmtools-%{ver}%{type}.zip',
-    'sinks' => 'mfpkg-nig_sinks-%{ver}-mf%{mver}%{type}.zip'
+    'sinks' => 'mfpkg-nig_sinks-%{ver}-mf%{mver}%{type}.zip',
+    'transform' => 'mfpkg-transform-%{ver}-mf%{mver}%{type}.zip'
   }
 
   # Options for 'wget'ing DaRIS downloadables.
@@ -122,8 +123,7 @@ module DarisUrls
     local = node['daris']['use_local_daris_builds']
     pat = DARIS_PATTERNS[item]
     if ! pat then
-      relname = node['daris']['release']      
-      raise "There is no filename pattern for '#{item}' in release '#{relname}"
+      raise "There is no filename pattern for '#{item}'"
     end 
     release = getRelease(node)
     version_info = release[item] || ['1.0', '1.0', false]
