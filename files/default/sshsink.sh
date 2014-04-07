@@ -18,7 +18,7 @@ addsink() {
 
 removesink() {
     $MFCOMMAND logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD
-    $MFCOMMAND sink.remove :name $2
+    $MFCOMMAND sink.remove :name $1
     RC=$?
     $MFCOMMAND logoff
 }
@@ -32,7 +32,7 @@ listsinks() {
 
 describesink() {
     $MFCOMMAND logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD
-    $MFCOMMAND sink.describe :name $2
+    $MFCOMMAND sink.describe :name $1
     RC=$?
     $MFCOMMAND logoff
 }
@@ -44,19 +44,24 @@ help() {
 
 case $1 in
   add)
-    addsink
+    shift
+    addsink "$@"
     ;;
   remove)
-    removesink
+    shift
+    removesink "$@"
     ;;
   list)
-    listsinks
+    shift
+    listsinks "$@"
     ;;
   describe)
-    describesink
+    shift
+    describesink "$@"
     ;;
   help)
-    help
+    shift
+    help "$@"
     ;;
   *)
     echo "Unknown subcommand '$1' - run '$0 help' for help"
