@@ -54,7 +54,7 @@ module DarisUrls
       'dcmtools' => ['0.29'],
       'nig-commons' => ['0.41'],
       'sinks' => ['0.03', '3.9.002', false],
-      'transform' => ['1.3.03', '3.8.059', false]
+      'transform' => ['1.3.02', '3.8.059', false]
     }
   }
   
