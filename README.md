@@ -50,13 +50,14 @@ You also need to:
 
 * copy the "mfpkg*.zip" file containing your PSSD localization to the local installers location (e.g. ~mediaflux/installers), and
 * add entry to the "pkgs" map; e.g. in the "node.json" file ...
-        
+``` 
         "daris": {
            "pkgs: {
               "cai_pssd": "mfpkg-cai_pssd-0.02-mf3.8.029.zip"
            },
            "ns": "cai"
         }
+```
 
 Creating users
 ==============
@@ -65,7 +66,7 @@ The "daris::users" recipe will create initial DaRIS users based on the contents 
 "daris_users" data bag.  To make use of this facility, you need to do the following:
 
 1.  For each user, add a JSON descriptor file to the "data-bags/daris_users" directory.  A typical file would look like this:
-        
+```
         file:  humphrey.json
         ----------------
         {
@@ -78,7 +79,7 @@ The "daris::users" recipe will create initial DaRIS users based on the contents 
             "project_creator": true,
             "password": "secret"
         }
-        
+```
     The attributes are as follows:
     * `'id'` - mandatory. This must match the filename.
     * `'name'` - optional. This gives the Mediaflux user name.  If it is omitted, `id` is used instead.
