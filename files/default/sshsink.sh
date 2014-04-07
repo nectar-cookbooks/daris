@@ -12,8 +12,17 @@ MFCOMMAND=${MFLUX_BIN}/mfcommand
 #
 
 addsink() {
-    echo "not implemented yet"
-    exit 1
+    $MFCOMMAND logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD
+    $MFCOMMAND sink.add :name $1 \
+	:destination \< \
+            :type scp :arg -name host $2 \
+	    :arg -name port 22 \
+            :arg -name hostkey \[xvalue host-key \[ssh.host.key.scan :host $2 \
+                                                   :type rsa\]\] \
+            :arg -name decompress true \
+        \>  
+    RC=$?
+    $MFCOMMAND logoff
 }
 
 removesink() {
