@@ -53,9 +53,15 @@ pkgs = {
   'nig_essentials' => darisUrlAndFile(node, 'nig_essentials'),  
   'nig_transcode' => darisUrlAndFile(node, 'nig_transcode'),  
   'pssd' => darisUrlAndFile(node, 'pssd'),
-  'daris_portal' => darisUrlAndFile(node, 'daris_portal'),
-  'sinks' => darisUrlAndFile(node, 'sinks'),
+  'daris_portal' => darisUrlAndFile(node, 'daris_portal')
 }
+
+if ['daris']['load_sinks'] then
+  pkgs['sinks'] = darisUrlAndFile(node, 'sinks')
+end
+if ['daris']['load_transform'] then
+  pkgs['transform'] = darisUrlAndFile(node, 'transform')
+end
 
 local_pkg_names = node['daris']['local_pkgs'] || {}
 local_pkgs = {}

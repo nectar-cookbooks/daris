@@ -26,6 +26,10 @@ node.default['daris']['dicom_proxy_user_names'] = ['DICOM-TEST']
 node.default['daris']['dicom_ingest_notifications'] = []
 node.default['daris']['manage_firewall'] = false
 
+# These determine whether DaRIS extension packages are loaded ...
+node.default['daris']['load_sinks'] = false
+node.default['daris']['load_transform'] = false
+
 # These attributes give specific versions of the downloadables.  If
 # they are not set (e.g. in the Node, Role or Recipe) then they
 # are generated using templates and the 'releases' map.
@@ -37,6 +41,8 @@ node.default['daris']['pssd'] = nil
 node.default['daris']['daris_portal'] = nil
 node.default['daris']['pvupload'] = nil
 node.default['daris']['dicom_client'] = nil
+node.default['daris']['sinks'] = nil
+node.default['daris']['transform'] = nil
 node.default['daris']['dcmtools'] = nil
 
 # This is where we do the builds
