@@ -65,7 +65,7 @@ Creating users
 The "daris::users" recipe will create initial DaRIS users based on the contents of the 
 "daris_users" data bag.  To make use of this facility, you need to do the following:
 
-1.  For each user, add a JSON descriptor file to the "data-bags/daris_users" directory.  A typical file would look like this:
+Step 1:  For each user, add a JSON descriptor file to the "data-bags/daris_users" directory.  A typical file would look like this:
 ```
         file:  humphrey.json
         ----------------
@@ -80,21 +80,21 @@ The "daris::users" recipe will create initial DaRIS users based on the contents 
             "password": "secret"
         }
 ```
-    The attributes are as follows:
-    * `'id'` - mandatory. This must match the filename.
-    * `'name'` - optional. This gives the Mediaflux user name.  If it is omitted, `id` is used instead.
-    * `'domain'` - optional.  This gives the Mediaflux domain for the user.  It defaults to `node['mediaflux']['authentication_domain']` which in turn defaults to `'users'`.
-    * `'groups'` - mandatory.  A list of "group names".  The meaning of this is explained below.
-    * `'names'`  - optional.  A list of names for the user in order "first" name, "middle" names, "last" name.  (If only one name is given, it is treated as a "first" name.)
-    * `'email'` - mandatory.  The user's (external) email address.
-    * `'project_creator'` - optional.  If true, the user has DaRIS project creation rights.
-    * `'roles'` - optional. A list of additional Mediaflux "roles" to be granted to the user.  For example, you would typically grant one or more roles defined by the PSSD localization package.
-    * `'password'` - optional.  The user's initial password.  If omitted, the initial password is given by the `node['daris']['default_password']` attribute.
+The attributes are as follows:
+  * `'id'` - mandatory. This must match the filename.
+  * `'name'` - optional. This gives the Mediaflux user name.  If it is omitted, `id` is used instead.
+  * `'domain'` - optional.  This gives the Mediaflux domain for the user.  It defaults to `node['mediaflux']['authentication_domain']` which in turn defaults to `'users'`.
+  * `'groups'` - mandatory.  A list of "group names".  The meaning of this is explained below.
+  * `'names'`  - optional.  A list of names for the user in order "first" name, "middle" names, "last" name.  (If only one name is given, it is treated as a "first" name.)
+  * `'email'` - mandatory.  The user's (external) email address.
+  * `'project_creator'` - optional.  If true, the user has DaRIS project creation rights.
+  * `'roles'` - optional. A list of additional Mediaflux "roles" to be granted to the user.  For example, you would typically grant one or more roles defined by the PSSD localization package.
+  * `'password'` - optional.  The user's initial password.  If omitted, the initial password is given by the `node['daris']['default_password']` attribute.
 
-1. In the node JSON file:
+Step 2: In the node JSON file:
 
-    * Add a 'daris' / 'user_groups' whose value is an array of "group names".
-    * Add `"recipe[daris::users]"` to the node's runlist (after 
+  * Add a 'daris' / 'user_groups' whose value is an array of "group names".
+  * Add `"recipe[daris::users]"` to the node's runlist (after 
 
 When the recipe is run, it selects all users which have a "group name" that is in the "user groups" list that you configured.  For each selected user, it attempts to create the DaRIS account (using `om.pssd.user.create`).  If the user account already exists in DaRIS, it is not updated.
 
@@ -108,7 +108,7 @@ The "daris::dicom-hosts" recipe uses the information in the "dicom_hosts" data b
 * If `node['daris']['manage_firewall']` is true, it will create local firewall rules to allow the DICOM hosts to connect using the DICOM port.
 
 A typical "dicom-hosts" databag entry looks like this:
-
+```
         file: imager.json
         ----------------
         {
@@ -117,12 +117,12 @@ A typical "dicom-hosts" databag entry looks like this:
             "hostname": "imager.example.com",
             "port": "6666"
         }
-        
-    The attributes are as follows:
-    * `'id'` - mandatory. This must match the filename.
-    * `'name'` - optional. This gives the proxy user name.  If it is omitted, `id` is used instead.
-    * `'hostname'` - optional.  This gives hostname for the firewall entry.
-    * `'port'` - optional.  This gives the port number for the firewall entry; defaults to `node['daris']['dicom_port']` which in turn defaults to "6666".
+```
+The attributes are as follows:
+  * `'id'` - mandatory. This must match the filename.
+  * `'name'` - optional. This gives the proxy user name.  If it is omitted, `id` is used instead.
+  * `'hostname'` - optional.  This gives hostname for the firewall entry.
+  * `'port'` - optional.  This gives the port number for the firewall entry; defaults to `node['daris']['dicom_port']` which in turn defaults to "6666".
 
 Note that firewall management is not yet implemented because the standard recipies for firewall management are currently Debian / Ubuntu specific.
 
@@ -168,12 +168,12 @@ run the respective builds, and then copy the built components into the local
 installer cache directory.  However, there is a slight snag.  The build 
 scripts create the components with different names to the ones used on the
 download site.  (This is arguably a good thing ...).  So, if you want to
-use the downloadables, you need to set these attrubutes:
+use the downloadables, you need to set these attributes:
 
 * `node['daris']['release']` - This must be set to "latest".
 * `node['daris']['use_local_daris_builds']` - This must be "true".
 
-In addition, you need to set the following:
+The following attributes also apply:
 
 * `node['daris']['nigtk_repo']` - The url of the NIGTK git repository.
 * `node['daris']['nigtk_branch']` -The NIGTK branch to use; defaults to "master".
@@ -181,5 +181,35 @@ In addition, you need to set the following:
 * `node['daris']['transform_branch']` - The Transform branch to use; defaults to "master".
 * `node['daris']['daris_repo']` - The url of the DaRIS git repository.
 * `node['daris']['daris_branch']` - The DaRIS branch to use; defaults to "master".
- 
+* 
+* `node['daris']['private_key_file']` - The name of an SSH private key file for git checkouts.  It is convenient (but less secure) if the key file doesn't have a pass phrase.  Defaults to 'nil' which means that no private key is used.  (This should work in the future when DaRIS becomes fully open-source.)
+* `node['daris']['build_tree']` - The directory in which checkouts and builds are performed.  Defaults to "/tmp/daris-build".
+
 Finally, you need to ensure that the 'daris::build_*' recipes are run before the 'daris::daris' recipe.
+
+Extension packages
+==================
+
+DaRIS provides some additional packages that do not need to be installed by 
+default:
+
+  * The "sinks" package defines some new Mediaflux sinks for importing and 
+    exporting files.  The "owncloud" sink type allows you to communicate
+    with a service such as AARNET's "sloudstor+".  The "scp/ssh" sink allows
+    you to import and export files using SCP.
+
+  * The "transform" package allows you to integrate external processing
+    of objects (e.g. using Kepler workflows) into DaRIS.
+  
+Both of these packages are currently "experimental", and only available via
+the DaRIS source-code repositories.  To include them you need to use the
+"build::nigtk", "build::daris" and/or "build::transform" recipes to do
+a local checkout and build (see above).
+
+If you want the resulting packages to be loaded during the DaRIS bootstrap,
+you need to set these attributes:
+
+* `node['daris']['load_sinks']` - Set to 'true' to load the "sinks" package.
+* `node['daris']['load_transform']` - Set to 'true' to load the "transform" 
+  package.
+
