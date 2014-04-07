@@ -57,10 +57,10 @@ pkgs = {
 }
 
 if ['daris']['load_sinks'] then
-  pkgs.store('sinks', darisUrlAndFile(node, 'sinks')
+  pkgs.store('sinks', darisUrlAndFile(node, 'sinks'))
 end
 if ['daris']['load_transform'] then
-  pkgs.store('transform', darisUrlAndFile(node, 'transform')
+  pkgs.store('transform', darisUrlAndFile(node, 'transform'))
 end
 
 local_pkg_names = node['daris']['local_pkgs'] || {}
