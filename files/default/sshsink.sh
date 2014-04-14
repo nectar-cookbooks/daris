@@ -16,7 +16,7 @@ addsink() {
     PORT=22
     DESC=
     DECOMP=true
-    FILEMODE=600]
+    NOHOSTKEY=0
     shift
     while [ $# -gt 0 ] ; do
 	case $1 in
@@ -44,6 +44,10 @@ addsink() {
 		HOSTKEY="$2"
 		shift 2
 		;;
+	    --nohostkey)
+		NOHOSTKEY=1
+		shift
+		;;
 	    --filemode)
 		FILEMODE="$2"
 		shift 2
@@ -68,15 +72,36 @@ addsink() {
 	    
 	esac
     done
+
+    ARGS=
+    if [ ! -z "$USER" ] ; then
+	ARGS="$ARGS :arg -name user \"$USER\""
+    fi
+    if [ ! -z "$PASSWORD" ] ; then
+	ARGS="$ARGS :arg -name password \"$PASSWORD\""
+    fi
+    if [ -z "$HOSTKEY" -a $NOHOSTKEY -eq 0 ] ; then
+	HOSTKEY=`ssh-keyscan -t rsa $HOST | grep -v \# | cut -f 3`
+    fi
+    if [ ! -z "$HOSTKEY" ] ; then
+	ARGS="$ARGS :arg -name hostkey \"$HOSTKEY\""
+    fi
+    if [ ! -z "$FILEMODE" ] ; then
+	ARGS="$ARGS :arg -name filemode \"$FILEMODE\""
+    fi
+    if [ ! -z "$PKFILE" ] ; then
+        KEY=`cat $PKFILE`
+	ARGS="$ARGS :arg -name prvkey \"$KEY\""
+    fi
+
     SCRIPT=/tmp/sshsink_$$
     cat > $SCRIPT <<EOF
         sink.add :name "$NAME" \
 	    :destination < \
                 :type "$TYPE" :arg -name host "$HOST" \
 	        :arg -name port "$PORT" \
-                :arg -name hostkey [xvalue host-key [ssh.host.key.scan \
-                                                     :host "$HOST" :type rsa]] \
                 :arg -name decompress "$DECOMP" \
+                $ARGS \
             > \
             :description "$DESC"
 EOF
