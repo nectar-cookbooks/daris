@@ -81,7 +81,7 @@ addsink() {
 	ARGS="$ARGS :arg -name password \"$PASSWORD\""
     fi
     if [ -z "$HOSTKEY" -a $NOHOSTKEY -eq 0 ] ; then
-	HOSTKEY=`ssh-keyscan -t rsa $HOST | grep -v \# | cut -f 3`
+	HOSTKEY=`ssh-keyscan -t rsa $HOST 2>/dev/null | awk '{print $3}'`
     fi
     if [ ! -z "$HOSTKEY" ] ; then
 	ARGS="$ARGS :arg -name hostkey \"$HOSTKEY\""
