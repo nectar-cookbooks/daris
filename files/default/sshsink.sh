@@ -16,16 +16,16 @@ addsink() {
     PORT=22
     DESC=
     DECOMP=true
-    FILEMODE=600
-    shift 2
-    while [ ?# -gt 0 ] ; do
+    FILEMODE=600]
+    shift
+    while [ $# -gt 0 ] ; do
 	case $1 in
 	    --host)
-		HOST=$2
+		HOST="$2"
 		shift 2
 		;;
 	    --port)
-		PORT=$2
+		PORT="$2"
 		shift 2
 		;;
 	    --desc*)
@@ -41,23 +41,23 @@ addsink() {
 		shift
 		;;
 	    --hostkey)
-		HOSTKEY=$2
+		HOSTKEY="$2"
 		shift 2
 		;;
 	    --filemode)
-		FILEMODE=$2
+		FILEMODE="$2"
 		shift 2
 		;;
 	    --user)
-		USER=$2
+		USER="$2"
 		shift 2
 		;;
 	    --password)
-		PASSWORD=$2
+		PASSWORD="$2"
 		shift 2
 		;;
-	    --pkfile
-	        PKFILE=$2
+	    --pkfile)
+	        PKFILE="$2"
 		shift 2
 		;;
 	    --*)
