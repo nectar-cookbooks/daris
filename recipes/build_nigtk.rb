@@ -60,6 +60,7 @@ BUILT_COMPONENTS =
    "nig_essentials/mfpkg-nig_essentials-*.zip",
    "nig_pvupload/pvupload-*.zip",
    "nig_transcode/mfpkg-nig_transcode-*.zip",
+   "nig_sinks/mfpkg-nig_sinks-*.zip",
    "pssd/mfpkg-pssd-*.zip"]
 
 BUILT_COMPONENTS.each() do | path |
