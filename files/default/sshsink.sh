@@ -12,12 +12,87 @@ RC=0
 
 addsink() {
     NAME=$1
-    TYPE=scp
-    PORT=22
+    TYPE=$2
     DESC=
-    DECOMP=true
+    shift 2
+    case $TYPE in
+        scp)
+            scp "$@"
+            ;;
+        owncloud)
+            owncloud "$@"
+            ;;
+        webdav)
+            webdav "$@"
+            ;;
+        filesystem)
+            filesystem "$@"
+            ;;
+        *)
+            echo "Unknown sink type $TYPE"
+    esac
+    $MFCOMMAND logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD
+    $MFCOMMAND source $SCRIPT
+    RC=$?
+    $MFCOMMAND logoff
+    rm $SCRIPT
+}
+
+owncloud() {
+    URL=
+    CHUNKED=true
+    DECOMP=false
+    while [ $# -gt 0 ] ; do
+	case $1 in
+	    --url)
+		URL="$2"
+		shift 2
+		;;
+	    --desc*)
+		DESC="$2"
+		shift 2
+		;;
+	    --decomp*)
+		DECOMP=true
+		shift
+		;;
+	    --unchunked)
+		CHUNKED=false
+		shift
+		;;
+	    --*)
+		echo "unknown option $1"
+		RC=1
+		exit
+		;;
+	esac
+    done
+
+    if [ -z "$URL" ] ; then
+	echo "No --url specified"
+	RC=1
+	exit
+    fi
+
+    SCRIPT=/tmp/owncloudsink_$$
+    if [ -z "$HOST" ] ; then
+	cat > $SCRIPT <<EOF
+            sink.add :name "$NAME" \
+	        :destination < \
+                    :type "$TYPE" :arg -name url $URL" \
+                    :arg -name chunked "$CHUNKED" \
+                    :arg -name decompress "$DECOMP" \
+                > \
+            :description "$DESC"
+EOF
+	exit
+    fi
+}
+
+scp() {
+    PORT=22
+    DECOMP=false
     NOHOSTKEY=0
-    shift
     while [ $# -gt 0 ] ; do
 	case $1 in
 	    --host)
@@ -36,10 +111,6 @@ addsink() {
 		DECOMP=true
 		shift
 		;;
-	    --nodecomp*)
-		DECOMP=false
-		shift
-		;;
 	    --hostkey)
 		HOSTKEY="$2"
 		shift 2
@@ -50,6 +121,10 @@ addsink() {
 		;;
 	    --filemode)
 		FILEMODE="$2"
+		shift 2
+		;;
+            --basedir)
+		BASEDIR="$2"
 		shift 2
 		;;
 	    --user)
@@ -69,9 +144,21 @@ addsink() {
 		RC=1
 		exit
 		;;
-	    
 	esac
     done
+
+    SCRIPT=/tmp/sshsink_$$
+    if [ -z "$HOST" ] ; then
+	cat > $SCRIPT <<EOF
+            sink.add :name "$NAME" \
+	        :destination < \
+                    :type "$TYPE" :arg -name port "$PORT" \
+                    :arg -name decompress "$DECOMP" \
+                > \
+            :description "$DESC"
+EOF
+	exit
+    fi
 
     ARGS=
     if [ ! -z "$USER" ] ; then
@@ -87,14 +174,16 @@ addsink() {
 	ARGS="$ARGS :arg -name hostkey \"$HOSTKEY\""
     fi
     if [ ! -z "$FILEMODE" ] ; then
-	ARGS="$ARGS :arg -name filemode \"$FILEMODE\""
+ 	ARGS="$ARGS :arg -name filemode \"$FILEMODE\""
+    fi
+    if [ ! -z "$BASEDIR" ] ; then
+ 	ARGS="$ARGS :arg -name basedir \"$BASEDIR\""
     fi
     if [ ! -z "$PKFILE" ] ; then
         KEY=`cat $PKFILE`
-	ARGS="$ARGS :arg -name prvkey \"$KEY\""
+ 	ARGS="$ARGS :arg -name prvkey \"$KEY\""
     fi
 
-    SCRIPT=/tmp/sshsink_$$
     cat > $SCRIPT <<EOF
         sink.add :name "$NAME" \
 	    :destination < \
@@ -105,11 +194,6 @@ addsink() {
             > \
             :description "$DESC"
 EOF
-    $MFCOMMAND logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD
-    $MFCOMMAND source $SCRIPT
-    RC=$?
-    $MFCOMMAND logoff
-    rm $SCRIPT
 }
 
 removesink() {
@@ -134,16 +218,127 @@ describesink() {
 }
 
 help() {
-    echo "Usage: $1 subcommand [<args>]"
-    echo "where the subcommands are:"
-    echo "  add <sinkname> --host <hostname> [ --port <port> ]"
-    echo "               [ --description <description> ]" 
-    echo "               [ --decompress | --nodecompress ]" 
-    echo "                      - adds an SSH/SCP sink"
-    echo "  describe <sinkname> - describes a sink"
-    echo "  list                - lists all registered sink names"
-    echo "  remove <sinkname>   - removes a sink"
+    if [ $# -eq 0 ]; then
+	echo "The $0 command allows you to manage DaRIS / Mediaflux sinks" 
+	echo "  from the command line.  Most operations require Mediaflux"
+	echo "  administrator privilege."
+        echo 
+	echo "Usage: $0 subcommand [<args>]"
+	echo "where the subcommands are:"
+	echo "    add <sinkname> <type> --desc <description> ..."
+        echo "                             - defines a sink"
+	echo "    describe <sinkname>      - describes a sink"
+	echo "    help [ <subcommand> ...] - outputs command help"
+	echo "    list                     - lists registered sinks"
+	echo "    remove <sinkname>        - removes a sink"
+    else
+	case $1 in
+	    add)
+		shift
+		helpadd "$@"
+		;;
+	    help)
+		echo "$0 help                  - outputs command help"
+		echo "$0 help <subcommand> ... - outputs help for a subcommand"
+		;;
+	    describe)
+		echo "$0 describe <sinkname> - describes a sink"
+		;;
+	    list)
+		echo "$0 list - lists registered sinks"
+		;;
+	    remove)
+		echo "$0 remove <sinkname> - removes a sink"
+		;;
+	    *)
+		echo "Unknown subcommand '$1'"
+		help
+		;;
+	esac
+    fi
+    RC=1
 }
+
+helpadd() {
+    if [ $# -eq 0 ]; then
+	echo "$0 add <sinkname> <type> ..."
+	echo "   where <sinkname> is a sink name and <type> is the sink type"
+        echo "Adds a sink descriptor to Mediaflux.  The supported sink types"
+        echo "are scp, webdav, owncloud or filesystem.  For the options for"
+        echo "each sink type, run '$0 help add <type>'"
+    else
+	case $1 in
+	    scp)
+		helpaddscp
+		;;
+	    webdav)
+		helpaddwebdav
+		;;
+	    owncloud)
+		helpaddowncloud
+		;;
+	    filesystem)
+		helpaddfilesystem
+		;;
+	    *)
+		echo "Unknown sink type $1"
+		echo "Valid types are scp, webdav, owncloud or filesystem"
+		;;
+	esac
+    fi
+}
+
+helpaddscp() {
+    echo "$0 add <sinkname> scp [ --host <host> ]" 
+    echo "    [ --port <port> ] [ --hostkey <hostkey> ] [ --nohostkey ]"
+    echo "    [ --user <user> ( --password <password> | --pkfile <file> ) ]"
+    echo "    [ --decomp ] [ --filemode <mode> ] [ --basedir <path> ]" 
+    echo "    [ --desc '<description string>' ]" 
+    echo "This command adds an SSH/SCP sink.  The sink can be generic, or"
+    echo "you can provide a specific host, authorization and other details."
+    echo "RSA and IPv4 are assumed by this script, and the default port is"
+    echo "the standard SSH port.  Many options are ignored for generic sinks."
+    echo ""
+    echo "Host identification: The --host can be sepecified either as a DNS"
+    echo "name or as an IPv4 address.  The --hostkey (if provided) is used"
+    echo "for definitive SSH host identification (to guard against spoofing"
+    echo "or man-in-the-middle attacks).  If neither --hostkey or --nohostkey"
+    echo "is given, ssh-scankeys is run to find the RSA hostkey for the host."
+    echo "If you set --nohostkey, the sink will not verify the identity of"
+    echo "the remote host when the user does a transfer."
+    echo ""
+    echo "Authorization: If --user is given, --password or --pkfile is required"
+    echo "also.  NOTE: putting user credentials into a sink definition is"
+    echo "insecure because they are visible to anyone with Mediaflux admin"
+    echo "privilege, or system-level 'root' privilege."
+    echo ""
+    echo "Other options: if --basedir is provided, it is the default base"
+    echo "directory for the host.  Otherwise, the default base location is the"
+    echo "the (remote) user's (remote) home directory.  The --filemode is the"
+    echo "the default UNIX/Linux file mode for copied files: default 0660.  The"
+    echo "--decomp option enables automatic decompression of the asset by the"
+    echo "sink.  This is disabled by default.  If enabled, the user's data is"
+    echo "decompressed on the server, and transferred in uncompressed form."
+}
+
+helpaddowncloud() {
+    echo "$0 add <sinkname> owncloud --url <url>" 
+    echo "    [ --decomp ] [ --unchunked ] [ --desc '<description string>' ]" 
+    echo "This command adds an owncloud sink.  The <url> is mandatory and"
+    echo "should be the WebDAV base URL for the service.  It is recommended"
+    echo "that you use an HTTPS URL rather than HTTP."
+    echo ""
+    echo "Other options: The --decomp option enables automatic decompression "
+    echo "of the asset by the sink.  This is disabled by default.  If enabled,"
+    echo "the user's data is decompressed on the server, and transferred in"
+    echo "uncompressed form.  The --unchunked option disables chunking."
+}
+
+
+if [ $# -eq 0 ] ; then
+    help
+    exit 1
+;;
 
 case $1 in
   add)
@@ -163,8 +358,11 @@ case $1 in
     describesink "$@"
     ;;
   help)
-    CMD=$0
-    help "$0"
+    help "$@"
+    ;;
+  -*)
+    help
+    exit 1
     ;;
   *)
     echo "Unknown subcommand '$1' - run '$0 help' for help"
