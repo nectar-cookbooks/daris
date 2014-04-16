@@ -53,7 +53,7 @@ module DarisUrls
       'dicom_client' => ['1.0'],
       'dcmtools' => ['0.29'],
       'nig-commons' => ['0.41'],
-      'sinks' => ['0.03', '3.9.002', false],
+      'sinks' => ['0.05', '3.9.002', false],
       'transform' => ['1.3.03', '3.9.002', false]
     }
   }
