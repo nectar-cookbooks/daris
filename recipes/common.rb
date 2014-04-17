@@ -2,7 +2,7 @@
 # Cookbook Name:: daris
 # Recipe:: common
 #
-# Copyright (c) 2013, The University of Queensland
+# Copyright (c) 2013, 2014 The University of Queensland
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -27,15 +27,6 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-mflux_home = node['mediaflux']['home']
-mflux_user = node['mediaflux']['user']
-mflux_user_home = node['mediaflux']['user_home'] || mflux_home
-
-installers = node['mediaflux']['installers'] || 'installers'
-if ! installers.start_with?('/') then
-  installers = mflux_user_home + '/' + installers
-end
-
 package "wget" do
   action :install
   not_if { ::File.exists?("/usr/bin/wget") }
@@ -46,8 +37,7 @@ package "unzip" do
   not_if { ::File.exists?('/usr/bin/unzip') }
 end
 
-directory installers do
-  owner mflux_user
-end
+include_recipe 'mediaflux::installer_cache'
+
 
 
