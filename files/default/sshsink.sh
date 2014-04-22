@@ -79,7 +79,7 @@ filesystem() {
 	exit
     fi
 
-    if [ -z "$PATH" -a -z "$DECOMP" ] then
+    if [ -z "$PATH" -a -z "$DECOMP" ] ; then
 	echo "A --path must be specified when not decompressing"
 	RC=1
 	exit
@@ -321,11 +321,12 @@ helpaddscp() {
     echo ""
     echo "Host identification: The --host can be sepecified either as a DNS"
     echo "name or as an IPv4 address.  The --hostkey (if provided) is used"
-    echo "for definitive SSH host identification (to guard against spoofing"
-    echo "or man-in-the-middle attacks).  If neither --hostkey or --nohostkey"
+    echo "for definitive SSH host identification to guard against spoofing"
+    echo "or man-in-the-middle attacks.  If neither --hostkey or --nohostkey"
     echo "is given, ssh-scankeys is run to find the RSA hostkey for the host."
     echo "If you set --nohostkey, the sink will not verify the identity of"
-    echo "the remote host when the user does a transfer."
+    echo "the remote host when the user does a transfer.  If you provide a"
+    echo "hostkey explicitly, it must be an RSA hostkey."
     echo ""
     echo "Authorization: If --user is given, --password or --pkfile is required"
     echo "also.  NOTE: putting user credentials into a sink definition is"
