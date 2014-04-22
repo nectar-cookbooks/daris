@@ -38,14 +38,19 @@ addsink() {
     rm $SCRIPT
 }
 
-owncloud() {
-    URL=
-    CHUNKED=true
-    DECOMP=false
+filesystem() {
+    DIRECTORY=
+    PATH=
+    SAVE=
+    DECOMP=
     while [ $# -gt 0 ] ; do
 	case $1 in
-	    --url)
-		URL="$2"
+	    --directory)
+		DIRECTORY="$2"
+		shift 2
+		;;
+	    --path)
+		PATH="$2"
 		shift 2
 		;;
 	    --desc*)
@@ -53,12 +58,12 @@ owncloud() {
 		shift 2
 		;;
 	    --decomp*)
-		DECOMP=true
-		shift
+		DECOMP=$2
+		shift 2
 		;;
-	    --unchunked)
-		CHUNKED=false
-		shift
+	    --save)
+		SAVE=$2
+		shift 2
 		;;
 	    --*)
 		echo "unknown option $1"
@@ -68,10 +73,26 @@ owncloud() {
 	esac
     done
 
-    if [ -z "$URL" ] ; then
-	echo "No --url specified"
+    if [ -z "$DIRECTORY" ] ; then
+	echo "No --directory specified"
 	RC=1
 	exit
+    fi
+
+    if [ -z "$PATH" -a -z "$DECOMP" ] then
+	echo "A --path must be specified when not decompressing"
+	RC=1
+	exit
+    fi
+    ARGS=
+    if [ ! -z "$PATH" ] ; then
+	ARGS=":arg name path \"$PATH\""
+    fi
+    if [ ! -z "$SAVE" ] ; then
+	ARGS="$ARGS :arg name save $SAVE"
+    fi
+    if [ ! -z "$DECOMP" ] ; then
+	ARGS="$ARGS :arg name decompress $DECOMP"
     fi
 
     SCRIPT=/tmp/owncloudsink_$$
@@ -79,9 +100,8 @@ owncloud() {
 	cat > $SCRIPT <<EOF
             sink.add :name "$NAME" \
 	        :destination < \
-                    :type "$TYPE" :arg -name url $URL" \
-                    :arg -name chunked "$CHUNKED" \
-                    :arg -name decompress "$DECOMP" \
+                    :type "$TYPE" :arg -name directory "$DIRECTORY" \
+                    $ARGS
                 > \
             :description "$DESC"
 EOF
@@ -324,9 +344,23 @@ helpaddscp() {
 helpaddowncloud() {
     echo "$0 add <sinkname> owncloud --url <url>" 
     echo "    [ --decomp ] [ --unchunked ] [ --desc '<description string>' ]" 
-    echo "This command adds an owncloud sink.  The <url> is mandatory and"
-    echo "should be the WebDAV base URL for the service.  It is recommended"
-    echo "that you use an HTTPS URL rather than HTTP."
+    echo "This command adds an OwnCloud compatible sink.  The <url> is "
+    echo "mandatory and should be the WebDAV base URL for the service.  It"
+    echo "is recommended that you use an https URL rather than http."
+    echo ""
+    echo "Other options: The --decomp option enables automatic decompression "
+    echo "of the asset by the sink.  This is disabled by default.  If enabled,"
+    echo "the user's data is decompressed on the server, and transferred in"
+    echo "uncompressed form.  The --unchunked option disables chunking."
+}
+
+helpaddfilesystem() {
+    echo "$0 add <sinkname> filesystem --directory <dir>" 
+    echo "    [ --decomp <levels> ] [ --path <path> ] [ --save <saved> ]"
+    echo "    [ --desc '<description string>' ]" 
+    echo "This command adds a file-system sink.  The <dir> is mandatory and"
+    echo "should give the absolute path to an existing directory that is"
+    echo "writeable by the Linux mediaflux user (mflux)."
     echo ""
     echo "Other options: The --decomp option enables automatic decompression "
     echo "of the asset by the sink.  This is disabled by default.  If enabled,"
