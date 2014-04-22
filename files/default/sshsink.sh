@@ -295,9 +295,11 @@ helpadd() {
     if [ $# -eq 0 ]; then
 	echo "$0 add <sinkname> <type> ..."
 	echo "   where <sinkname> is a sink name and <type> is the sink type"
-        echo "Adds a sink descriptor to Mediaflux.  The supported sink types"
-        echo "are scp, webdav, owncloud or filesystem.  For the options for"
-        echo "each sink type, run '$0 help add <type>'"
+        echo "This subcommand defines a Mediaflux sink.  The supported types"
+        echo "are 'scp', 'webdav', 'owncloud' or 'filesystem'.  Run:" 
+        echo "   '$0 help add <type>'"
+        echo "for the options for each sink type.  There is more documentation"
+        echo "on the DaRIS Wiki."
     else
 	case $1 in
 	    scp)
@@ -405,6 +407,7 @@ case $1 in
     describesink "$@"
     ;;
   help)
+    shift
     help "$@"
     ;;
   -*)
