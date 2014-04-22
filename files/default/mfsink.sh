@@ -40,7 +40,7 @@ addsink() {
 
 filesystem() {
     DIRECTORY=
-    PATH=
+    SPATH=
     SAVE=
     DECOMP=
     while [ $# -gt 0 ] ; do
@@ -50,7 +50,7 @@ filesystem() {
 		shift 2
 		;;
 	    --path)
-		PATH="$2"
+		SPATH="$2"
 		shift 2
 		;;
 	    --desc*)
@@ -79,14 +79,14 @@ filesystem() {
 	exit
     fi
 
-    if [ -z "$PATH" -a -z "$DECOMP" ] ; then
+    if [ -z "$SPATH" -a -z "$DECOMP" ] ; then
 	echo "A --path must be specified when not decompressing"
 	RC=1
 	exit
     fi
     ARGS=
-    if [ ! -z "$PATH" ] ; then
-	ARGS=":arg name path \"$PATH\""
+    if [ ! -z "$SPATH" ] ; then
+	ARGS=":arg name path \"$SPATH\""
     fi
     if [ ! -z "$SAVE" ] ; then
 	ARGS="$ARGS :arg name save $SAVE"
@@ -95,18 +95,196 @@ filesystem() {
 	ARGS="$ARGS :arg name decompress $DECOMP"
     fi
 
-    SCRIPT=/tmp/owncloudsink_$$
-    if [ -z "$HOST" ] ; then
-	cat > $SCRIPT <<EOF
+    if [ -z "$DESC" ] ; then
+        DESC_ARG=
+    else
+        DESC_ARG=":description \"$DESC\""
+    fi
+
+    SCRIPT=/tmp/filesystemsink_$$
+    cat > $SCRIPT <<EOF
             sink.add :name "$NAME" \
 	        :destination < \
                     :type "$TYPE" :arg -name directory "$DIRECTORY" \
                     $ARGS
                 > \
-            :description "$DESC"
+            $DESC_ARG
 EOF
+}
+
+owncloud() {
+    URL=
+    BASEDIR=
+    RUSER=
+    RPASSWORD=
+    CHUNKED=
+    DECOMP=
+    while [ $# -gt 0 ] ; do
+	case $1 in
+	    --url)
+		URL="$2"
+		shift 2
+		;;
+	    --user)
+		RUSER="$2"
+		shift 2
+		;;
+	    --password)
+		RPASSWORD="$2"
+		shift 2
+		;;
+	    --basedir)
+		BASEDIR="$2"
+		shift 2
+		;;
+	    --desc*)
+		DESC="$2"
+		shift 2
+		;;
+	    --decomp*)
+		DECOMP=true
+		shift
+		;;
+	    --nodecomp*)
+		DECOMP=false
+		shift
+		;;
+	    --chunked)
+		CHUNKED=true
+		shift
+		;;
+	    --unchunked)
+		CHUNKED=false
+		shift
+		;;
+	    --*)
+		echo "unknown option $1"
+		RC=1
+		exit
+		;;
+	esac
+    done
+
+    if [ -z "$URL" ] ; then
+	echo "No --url specified"
+	RC=1
 	exit
     fi
+
+    ARGS=
+    if [ ! -z "$RUSER" ] ; then
+	ARGS=":arg name user \"$RUSER\""
+    fi
+    if [ ! -z "$RPASSWORD" ] ; then
+	ARGS="$ARGS :arg name password \"$RPASSWORD\""
+    fi
+    if [ ! -z "$BASEDIR" ] ; then
+	ARGS="$ARGS :arg name basedir \"$BASEDIR\""
+    fi
+    if [ ! -z "$DECOMP" ] ; then
+	ARGS="$ARGS :arg name decompress $DECOMP"
+    fi
+    if [ ! -z "$CHUNKED" ] ; then
+	ARGS="$ARGS :arg name chunked $CHUNKED"
+    fi
+
+    if [ -z "$DESC" ] ; then
+        DESC_ARG=
+    else
+        DESC_ARG=":description \"$DESC\""
+    fi
+
+
+    SCRIPT=/tmp/owncloudsink_$$
+    cat > $SCRIPT <<EOF
+            sink.add :name "$NAME" \
+	        :destination < \
+                    :type "$TYPE" :arg -name url "$URL" \
+                    $ARGS
+                > \
+            $DESC_ARG
+EOF
+}
+
+webdav() {
+    URL=
+    BASEDIR=
+    RUSER=
+    RPASSWORD=
+    DECOMP=
+    while [ $# -gt 0 ] ; do
+	case $1 in
+	    --url)
+		URL="$2"
+		shift 2
+		;;
+	    --user)
+		RUSER="$2"
+		shift 2
+		;;
+	    --password)
+		RPASSWORD="$2"
+		shift 2
+		;;
+	    --basedir)
+		BASEDIR="$2"
+		shift 2
+		;;
+	    --desc*)
+		DESC="$2"
+		shift 2
+		;;
+	    --decomp*)
+		DECOMP=true
+		shift
+		;;
+	    --nodecomp*)
+		DECOMP=false
+		shift
+		;;
+	    --*)
+		echo "unknown option $1"
+		RC=1
+		exit
+		;;
+	esac
+    done
+
+    if [ -z "$URL" ] ; then
+	echo "No --url specified"
+	RC=1
+	exit
+    fi
+
+    ARGS=
+    if [ ! -z "$RUSER" ] ; then
+	ARGS=":arg name user \"$RUSER\""
+    fi
+    if [ ! -z "$RPASSWORD" ] ; then
+	ARGS="$ARGS :arg name password \"$RPASSWORD\""
+    fi
+    if [ ! -z "$BASEDIR" ] ; then
+	ARGS="$ARGS :arg name basedir \"$BASEDIR\""
+    fi
+    if [ ! -z "$DECOMP" ] ; then
+	ARGS="$ARGS :arg name decompress $DECOMP"
+    fi
+
+    if [ -z "$DESC" ] ; then
+        DESC_ARG=
+    else
+        DESC_ARG=":description \"$DESC\""
+    fi
+
+    SCRIPT=/tmp/webdavsink_$$
+    cat > $SCRIPT <<EOF
+            sink.add :name "$NAME" \
+	        :destination < \
+                    :type "$TYPE" :arg -name url "$URL" \
+                    $ARGS
+                > \
+            $DESC_ARG
+EOF
 }
 
 scp() {
@@ -251,9 +429,9 @@ describesink() {
 
 help() {
     if [ $# -eq 0 ]; then
-	echo "The $0 command allows you to manage DaRIS / Mediaflux sinks" 
-	echo "  from the command line.  Most operations require Mediaflux"
-	echo "  administrator privilege."
+	echo "The $0 manages DaRIS / Mediaflux sinks from the command line."
+        echo "Most operations require Mediaflux administrator privilege; i.e."
+        echo "they need to be run as the 'mflux' user."
         echo 
 	echo "Usage: $0 subcommand [<args>]"
 	echo "where the subcommands are:"
@@ -261,7 +439,7 @@ help() {
         echo "                             - defines a sink"
 	echo "    describe <sinkname>      - describes a sink"
 	echo "    help [ <subcommand> ...] - outputs command help"
-	echo "    list                     - lists registered sinks"
+	echo "    list                     - lists all registered sinks"
 	echo "    remove <sinkname>        - removes a sink"
     else
 	case $1 in
@@ -303,16 +481,16 @@ helpadd() {
     else
 	case $1 in
 	    scp)
-		helpaddscp
+		helpscp
 		;;
 	    webdav)
-		helpaddwebdav
+		helpwebdav
 		;;
 	    owncloud)
-		helpaddowncloud
+		helpowncloud
 		;;
 	    filesystem)
-		helpaddfilesystem
+		helpfs
 		;;
 	    *)
 		echo "Unknown sink type $1"
@@ -322,7 +500,7 @@ helpadd() {
     fi
 }
 
-helpaddscp() {
+helpscp() {
     echo "$0 add <sinkname> scp [ --host <host> ]" 
     echo "    [ --port <port> ] [ --hostkey <hostkey> ] [ --nohostkey ]"
     echo "    [ --user <user> ( --password <password> | --pkfile <file> ) ]"
@@ -356,31 +534,67 @@ helpaddscp() {
     echo "decompressed on the server, and transferred in uncompressed form."
 }
 
-helpaddowncloud() {
+helpowncloud() {
     echo "$0 add <sinkname> owncloud --url <url>" 
-    echo "    [ --decomp ] [ --unchunked ] [ --desc '<description string>' ]" 
+    echo "    [ --user <user> ] [ --password <password> ] "
+    echo "    [ --basedir <path> ] [ --decomp | --nodecomp ]"
+    echo "    [ --chunked | --unchunked ] "
+    echo "    [ --desc '<description string>' ]" 
     echo "This command adds an OwnCloud compatible sink.  The <url> is "
     echo "mandatory and should be the WebDAV base URL for the service.  It"
     echo "is recommended that you use an https URL rather than http."
     echo ""
-    echo "Other options: The --decomp option enables automatic decompression "
+    echo "Authentication: The --user and --password provide owncloud user"
+    echo "credentials.  NOTE: putting user credentials into a sink definition"
+    echo "is insecure because they are visible to anyone with Mediaflux admin"
+    echo "privilege, or system-level 'root' privilege."
+    echo ""
+    echo "Other options: The --decomp/--nodecomp options control decompression" 
     echo "of the asset by the sink.  This is disabled by default.  If enabled,"
     echo "the user's data is decompressed on the server, and transferred in"
-    echo "uncompressed form.  The --unchunked option disables chunking."
+    echo "uncompressed form.  The --chunked/--unchunked options control"
+    echo "chunking.  This ise enabled by default.  The --basedir option sets "
+    echo "the directory within the owncloud tree."
 }
 
-helpaddfilesystem() {
+helpwebdav() {
+    echo "$0 add <sinkname> webdav --url <url>" 
+    echo "    [ --user <user> ] [ --password <password> ] "
+    echo "    [ --basedir <path> ] [ --decomp | --nodecomp ]"
+    echo "    [ --desc '<description string>' ]" 
+    echo "This command adds an OwnCloud compatible sink.  The <url> is "
+    echo "mandatory and should be the WebDAV base URL for the service.  It"
+    echo "is recommended that you use an https URL rather than http."
+    echo ""
+    echo "Authentication: The --user and --password provide owncloud user"
+    echo "credentials.  NOTE: putting user credentials into a sink definition"
+    echo "is insecure because they are visible to anyone with Mediaflux admin"
+    echo "privilege, or system-level 'root' privilege."
+    echo ""
+    echo "Other options: The --decomp/--nodecomp options control decompression" 
+    echo "of the asset by the sink.  This is disabled by default.  If enabled,"
+    echo "the user's data is decompressed on the server, and transferred in"
+    echo "uncompressed form.  The --basedir option sets the directory within"
+    echo "the WebDAV tree."
+}
+
+helpfs() {
     echo "$0 add <sinkname> filesystem --directory <dir>" 
     echo "    [ --decomp <levels> ] [ --path <path> ] [ --save <saved> ]"
     echo "    [ --desc '<description string>' ]" 
     echo "This command adds a file-system sink.  The <dir> is mandatory and"
     echo "should give the absolute path to an existing directory that is"
-    echo "writeable by the Linux mediaflux user (mflux)."
+    echo "writeable by the Linux mediaflux user (mflux).  This will be the root"
+    echo "directory of the sink."
     echo ""
-    echo "Other options: The --decomp option enables automatic decompression "
-    echo "of the asset by the sink.  This is disabled by default.  If enabled,"
-    echo "the user's data is decompressed on the server, and transferred in"
-    echo "uncompressed form.  The --unchunked option disables chunking."
+    echo "Other options: The --decomp option controls automatic decompression "
+    echo "of the asset by the sink.  The --save says what should be saved by"
+    echo "the sink.  The <saved> value is one of 'meta', 'content' or 'both'."
+    echo "The default is 'content'.  The --path optoin gives a path relative"
+    echo "to the sink's root directory."
+    echo ""
+    echo "Both the <dir> and <path> strings can contain metadata references"
+    echo "that will be substituted when the sink is used."
 }
 
 
