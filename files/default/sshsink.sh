@@ -113,6 +113,12 @@ scp() {
     PORT=22
     DECOMP=false
     NOHOSTKEY=0
+    HOSTKEY=
+    PKFILE=
+    BASEDIR=
+    FILEMODE=
+    RUSER=
+    RPASSWORD=
     while [ $# -gt 0 ] ; do
 	case $1 in
 	    --host)
@@ -148,11 +154,11 @@ scp() {
 		shift 2
 		;;
 	    --user)
-		USER="$2"
+		RUSER="$2"
 		shift 2
 		;;
 	    --password)
-		PASSWORD="$2"
+		RPASSWORD="$2"
 		shift 2
 		;;
 	    --pkfile)
@@ -167,6 +173,12 @@ scp() {
 	esac
     done
 
+    if [ -z "$DESC" ] ; then
+        DESC_ARG=
+    else
+        DESC_ARG=":description \"$DESC\""
+    fi
+
     SCRIPT=/tmp/sshsink_$$
     if [ -z "$HOST" ] ; then
 	cat > $SCRIPT <<EOF
@@ -175,7 +187,7 @@ scp() {
                     :type "$TYPE" :arg -name port "$PORT" \
                     :arg -name decompress "$DECOMP" \
                 > \
-            :description "$DESC"
+            $DESC_ARG
 EOF
 	exit
     fi
@@ -212,7 +224,7 @@ EOF
                 :arg -name decompress "$DECOMP" \
                 $ARGS \
             > \
-            :description "$DESC"
+            $DESC_ARG
 EOF
 }
 
