@@ -30,6 +30,9 @@ addsink() {
             ;;
         *)
             echo "Unknown sink type $TYPE"
+            RC=1
+            exit
+            ;;
     esac
     $MFCOMMAND logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD
     $MFCOMMAND source $SCRIPT
@@ -476,8 +479,9 @@ helpadd() {
         echo "This subcommand defines a Mediaflux sink.  The supported types"
         echo "are 'scp', 'webdav', 'owncloud' or 'filesystem'.  Run:" 
         echo "   '$0 help add <type>'"
-        echo "for the options for each sink type.  There is more documentation"
-        echo "on the DaRIS Wiki."
+        echo "for the options for each sink type.  Please refer to the DaRIS"
+        echo "wiki or the Mediaflux documentation fpr mor information on"
+        echo "configuring sinks."
     else
 	case $1 in
 	    scp)
@@ -494,7 +498,7 @@ helpadd() {
 		;;
 	    *)
 		echo "Unknown sink type $1"
-		echo "Valid types are scp, webdav, owncloud or filesystem"
+		echo "Valid types are 'scp', 'webdav', 'owncloud' or 'filesystem'"
 		;;
 	esac
     fi
@@ -594,7 +598,8 @@ helpfs() {
     echo "to the sink's root directory."
     echo ""
     echo "Both the <dir> and <path> strings can contain metadata references"
-    echo "that will be substituted when the sink is used."
+    echo "that will be substituted when the sink is used.  Refer to the DaRIS"
+    echo "wiki or the Mediaflux documentation."
 }
 
 
