@@ -317,8 +317,8 @@ bash "run-initial-daris-config" do
          "#{mfcommand} logoff"
 end
 
-cookbook_file "#{mflux_bin}/sshsink" do
+cookbook_file "#{mflux_bin}/mfsink" do
   user mflux_user
-  source "sshsink.sh"
+  source "mfsink.sh"
   mode 0755
 end
