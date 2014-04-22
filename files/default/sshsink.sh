@@ -194,10 +194,10 @@ EOF
 
     ARGS=
     if [ ! -z "$USER" ] ; then
-	ARGS="$ARGS :arg -name user \"$USER\""
+	ARGS="$ARGS :arg -name user \"$RUSER\""
     fi
     if [ ! -z "$PASSWORD" ] ; then
-	ARGS="$ARGS :arg -name password \"$PASSWORD\""
+	ARGS="$ARGS :arg -name password \"$RPASSWORD\""
     fi
     if [ -z "$HOSTKEY" -a $NOHOSTKEY -eq 0 ] ; then
 	HOSTKEY=`ssh-keyscan -t rsa $HOST 2>/dev/null | awk '{print $3}'`
