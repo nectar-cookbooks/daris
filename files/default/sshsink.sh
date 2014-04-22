@@ -373,7 +373,7 @@ helpaddfilesystem() {
 if [ $# -eq 0 ] ; then
     help
     exit 1
-;;
+fi
 
 case $1 in
   add)
