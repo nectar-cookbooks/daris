@@ -193,10 +193,10 @@ EOF
     fi
 
     ARGS=
-    if [ ! -z "$USER" ] ; then
+    if [ ! -z "$RUSER" ] ; then
 	ARGS="$ARGS :arg -name user \"$RUSER\""
     fi
-    if [ ! -z "$PASSWORD" ] ; then
+    if [ ! -z "$RPASSWORD" ] ; then
 	ARGS="$ARGS :arg -name password \"$RPASSWORD\""
     fi
     if [ -z "$HOSTKEY" -a $NOHOSTKEY -eq 0 ] ; then
