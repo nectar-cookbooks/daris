@@ -322,3 +322,9 @@ cookbook_file "#{mflux_bin}/mfsink" do
   source "mfsink.sh"
   mode 0755
 end
+
+cookbook_file "#{mflux_bin}/keplerconfig" do
+  user mflux_user
+  source "keplerconfig.sh"
+  mode 0755
+end
