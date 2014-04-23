@@ -78,7 +78,7 @@ workflow() {
    cat >> $SCRIPT <<EOF
        set uid [xvalue //*\[@name='SNAME'\]/@uid \
                        [transform.definition.list]]
-       if {$uid == '') {
+       if {string length \$uid == 0} {
            transform.definition.create :type kepler :name $NAME :in file:$WF
        } else {
            transform.definition.update :uid \$uid :name $NAME :in file:$WF
