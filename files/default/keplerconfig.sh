@@ -2,7 +2,10 @@
 #
 # Admin command for configuring kepler workflows, etc
 
-. /etc/mediaflux/mediafluxrc
+. /etc/mediaflux/servicerc
+if [ $? -ne 0 ]; then
+    exit 1
+fi
 
 
 KEPLER=/usr/local/kepler
