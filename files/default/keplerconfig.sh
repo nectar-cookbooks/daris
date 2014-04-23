@@ -7,13 +7,11 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-
-KEPLER=/usr/local/kepler
 MFCOMMAND=${MFLUX_BIN}/mfcommand
 
 provider() {
    if [ $# -eq 3 ] ; then
-       # ...
+       KEPLER=/usr/local/kepler
    elif [ $# -eq 4 ] ; then
        KEPLER="$4"
    else
@@ -48,7 +46,7 @@ EOF
 }
 
 workflow() {
-   if [ $# -ne 1 ] ; then
+   if [ $# -lt 1 ] ; then
        echo "syntax: $0 workflow <workflow.kar> [--name <name>] "
        RC=1
        exit
@@ -92,6 +90,12 @@ EOF
     RC=$?
     $MFCOMMAND logoff
     rm $SCRIPT
+}
+
+help() {
+    echo "Don't panic!"
+    RC=1
+    exit
 }
 
 case "$1" in 
