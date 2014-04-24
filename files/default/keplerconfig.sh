@@ -149,6 +149,11 @@ case "$1" in
     workflow "$@"
     ;;
 
+  method)
+    shift
+    method "$@"
+    ;;
+
   help)
     shift 
     help "$@"
