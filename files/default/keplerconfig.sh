@@ -115,7 +115,7 @@ EOF
             :step < \\
                 :name \"$WF_NAME\" \\
                 :transform < \\
-                    :definition \$wf_${WF_NAME}_uid \\
+                    :definition -version 0 \$wf_${WF_NAME}_uid \\
                 > \\
             > \\
 EOF
