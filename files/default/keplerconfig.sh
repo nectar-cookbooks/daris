@@ -116,12 +116,13 @@ EOF
                 :name \"$WF_NAME\" \
                 :transform < \
                     :definition \$wf_${WF_NAME}_uid \
-                > /
-            >
+                > \
+            > \
 EOF
     done
     cat >> $SCRIPT <<EOF
-        om.pssd.method.create :name \"$NAME\" :namespace "/pssd/methods"
+        om.pssd.method.create :name \"$NAME\" :namespace "/pssd/methods" \
+            :description \"Workflow collection $NAME\" \
 EOF
     cat >> $SCRIPT < $SCRIPT_2
 
