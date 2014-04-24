@@ -121,7 +121,7 @@ EOF
 EOF
     done
     cat >> $SCRIPT <<EOF
-        om.pssd.method.create.for.subject :name \"$NAME\" :namespace "/pssd/methods" \\
+        om.pssd.method.for.subject.create :name \"$NAME\" :namespace "/pssd/methods" \\
             :description \"Workflow collection $NAME\" \\
 EOF
     cat >> $SCRIPT < $SCRIPT_2
