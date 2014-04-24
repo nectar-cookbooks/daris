@@ -94,7 +94,7 @@ EOF
 
 method() {
     if [ $# -lt 1 ] ; then
-	echo "syntax: $0 method <name> [ <workflow> ... ] "
+	echo "syntax: $0 method <name> <workflow> ..."
 	RC=1
 	exit
     fi
@@ -121,7 +121,7 @@ EOF
 EOF
     done
     cat >> $SCRIPT <<EOF
-        om.pssd.method.create :name \"$NAME\" :namespace "/pssd/methods" \\
+        om.pssd.method.create.for.subject :name \"$NAME\" :namespace "/pssd/methods" \\
             :description \"Workflow collection $NAME\" \\
 EOF
     cat >> $SCRIPT < $SCRIPT_2
