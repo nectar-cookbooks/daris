@@ -108,21 +108,21 @@ method() {
 	WF_NAME=$1
 	shift
 	cat >> $SCRIPT <<EOF
-        set wf_${WF_NAME}_uid [xvalue //*\[@name='$WF_NAME'\]/@uid \
+        set wf_${WF_NAME}_uid [xvalue //*\[@name='$WF_NAME'\]/@uid \\
                                   [transform.definition.list]]
 EOF
 	cat >> $SCRIPT_2 <<EOF
-            :step < \
-                :name \"$WF_NAME\" \
-                :transform < \
-                    :definition \$wf_${WF_NAME}_uid \
-                > \
-            > \
+            :step < \\
+                :name \"$WF_NAME\" \\
+                :transform < \\
+                    :definition \$wf_${WF_NAME}_uid \\
+                > \\
+            > \\
 EOF
     done
     cat >> $SCRIPT <<EOF
-        om.pssd.method.create :name \"$NAME\" :namespace "/pssd/methods" \
-            :description \"Workflow collection $NAME\" \
+        om.pssd.method.create :name \"$NAME\" :namespace "/pssd/methods" \\
+            :description \"Workflow collection $NAME\" \\
 EOF
     cat >> $SCRIPT < $SCRIPT_2
 
