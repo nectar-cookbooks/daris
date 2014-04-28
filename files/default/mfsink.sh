@@ -10,7 +10,23 @@ fi
 MFCOMMAND=${MFLUX_BIN}/mfcommand
 RC=0
 
+expect() {
+    EXPECTED=$1
+    KEYWORD=$2
+    shift 2
+    if [ $# -lt $EXPECTED ] ; then
+        if [ $EXPECTED -eq 1 ] ; then
+	    echo "syntax error: expected a value after '$KEYWORD'"
+	else
+	    echo "syntax error: expected $EXPECTED values after '$KEYWORD'"
+	fi
+	RC=1
+	exit
+    fi
+}
+
 addsink() {
+    expect 2 "$@"
     NAME=$1
     TYPE=$2
     DESC=
@@ -49,22 +65,27 @@ filesystem() {
     while [ $# -gt 0 ] ; do
 	case $1 in
 	    --directory)
+		expect 1 "$@"
 		DIRECTORY="$2"
 		shift 2
 		;;
 	    --path)
+		expect 1 "$@"
 		SPATH="$2"
 		shift 2
 		;;
 	    --desc*)
+		expect 1 "$@"
 		DESC="$2"
 		shift 2
 		;;
 	    --decomp*)
+		expect 1 "$@"
 		DECOMP=$2
 		shift 2
 		;;
 	    --save)
+		expect 1 "$@"
 		SAVE=$2
 		shift 2
 		;;
@@ -125,22 +146,27 @@ owncloud() {
     while [ $# -gt 0 ] ; do
 	case $1 in
 	    --url)
+		expect 1 "$@"
 		URL="$2"
 		shift 2
 		;;
 	    --user)
+		expect 1 "$@"
 		RUSER="$2"
 		shift 2
 		;;
 	    --password)
+		expect 1 "$@"
 		RPASSWORD="$2"
 		shift 2
 		;;
 	    --basedir)
+		expect 1 "$@"
 		BASEDIR="$2"
 		shift 2
 		;;
 	    --desc*)
+		expect 1 "$@"
 		DESC="$2"
 		shift 2
 		;;
@@ -218,22 +244,27 @@ webdav() {
     while [ $# -gt 0 ] ; do
 	case $1 in
 	    --url)
+		expect 1 "$@"
 		URL="$2"
 		shift 2
 		;;
 	    --user)
+		expect 1 "$@"
 		RUSER="$2"
 		shift 2
 		;;
 	    --password)
+		expect 1 "$@"
 		RPASSWORD="$2"
 		shift 2
 		;;
 	    --basedir)
+		expect 1 "$@"
 		BASEDIR="$2"
 		shift 2
 		;;
 	    --desc*)
+		expect 1 "$@"
 		DESC="$2"
 		shift 2
 		;;
@@ -303,14 +334,17 @@ scp() {
     while [ $# -gt 0 ] ; do
 	case $1 in
 	    --host)
+		expect 1 "$@"
 		HOST="$2"
 		shift 2
 		;;
 	    --port)
+		expect 1 "$@"
 		PORT="$2"
 		shift 2
 		;;
 	    --desc*)
+		expect 1 "$@"
 		DESC="$2"
 		shift 2
 		;;
@@ -319,6 +353,7 @@ scp() {
 		shift
 		;;
 	    --hostkey)
+		expect 1 "$@"
 		HOSTKEY="$2"
 		shift 2
 		;;
@@ -327,22 +362,27 @@ scp() {
 		shift
 		;;
 	    --filemode)
+		expect 1 "$@"
 		FILEMODE="$2"
 		shift 2
 		;;
             --basedir)
+		expect 1 "$@"
 		BASEDIR="$2"
 		shift 2
 		;;
 	    --user)
+		expect 1 "$@"
 		RUSER="$2"
 		shift 2
 		;;
 	    --password)
+		expect 1 "$@"
 		RPASSWORD="$2"
 		shift 2
 		;;
 	    --pkfile)
+		expect 1 "$@"
 	        PKFILE="$2"
 		shift 2
 		;;
