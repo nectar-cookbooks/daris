@@ -72,6 +72,7 @@ workflow() {
    SCRIPT=/tmp/keplerconfig_$$
    SCRIPT_2=/tmp/keplerconfig_$$_2
    rm -f $SCRIPT $SCRIPT_2
+   touch $SCRIPT_2
    while [ $# -gt 0 ] ; do
        case $1 in
 	   --name)
@@ -118,6 +119,7 @@ EOF
 		   cat >> $SCRIPT_2 <<EOF
                :parameter $PARAM_ARGS < :value \"$PARAM_VALUE\" > \\
 EOF
+               fi
 	       ;;
 	   --*)
 	       echo "Unknown option $1"
