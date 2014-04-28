@@ -9,6 +9,21 @@ fi
 
 MFCOMMAND=${MFLUX_BIN}/mfcommand
 
+expect() {
+    EXPECTED=$1
+    KEYWORD=$2
+    shift 2
+    if [ $# -lt $EXPECTED ] ; then
+        if [ $EXPECTED -eq 1 ] ; then
+	    echo "syntax error: expected a value after '$KEYWORD'"
+	else
+	    echo "syntax error: expected $EXPECTED values after '$KEYWORD'"
+	fi
+	RC=1
+	exit
+    fi
+}
+
 provider() {
    if [ $# -eq 3 ] ; then
        KEPLER=/usr/local/kepler
@@ -57,6 +72,7 @@ workflow() {
    while [ $# -gt 0 ] ; do
        case $1 in
 	   --name)
+	       expect 1 "$@"
 	       NAME=$2
 	       shift 2
 	       ;;
@@ -111,6 +127,7 @@ method() {
 	    RC=1
 	    exit
 	fi
+	expect 1 "$@"
 	WF_NAME=$2
         STEP_NAME=WF_NAME
 	shift 2
@@ -123,10 +140,12 @@ EOF
         while [ $# -gt 0 ] ; do
 	    case $1 in
 		--name)
+ 		    expect 1 "$@"
 		    STEP_NAME=$2
 		    shift 2
 		    ;;
 		--param)
+		    expect 2 "$@"
 		    PARAM=$2
 		    VALUE=$3
 		    shift 3
@@ -135,6 +154,7 @@ EOF
 EOF
 		    ;;
 		--iterator)
+		    expect 4 "$@"
 		    SCOPE=$1
 		    TYPE=$2
 		    QUERY=$3
