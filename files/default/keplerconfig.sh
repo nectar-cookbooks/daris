@@ -119,6 +119,7 @@ method() {
                                   [transform.definition.list]]
 EOF
         rm -f $SCRIPT_3
+        touch $SCRIPT_3
         while [ $# -gt 0 ] ; do
 	    case $1 in
 		--name)
@@ -127,9 +128,10 @@ EOF
 		    ;;
 		--param)
 		    PARAM=$2
-		    shift 2
+		    VALUE=$3
+		    shift 3
 		    cat >> $SCRIPT_3 <<EOF
-                    :parameter -name $PARAM \\
+                    :parameter -name $PARAM \"$VALUE\" \\
 EOF
 		    ;;
 		--iterator)
@@ -137,6 +139,7 @@ EOF
 		    TYPE=$2
 		    QUERY=$3
 		    PARAM=$4
+                    shift 5
 		    cat >> $SCRIPT_3 <<EOF
                     :iterator < \\
                         :parameter $PARAM \\
