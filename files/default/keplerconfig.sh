@@ -94,7 +94,7 @@ EOF
 
 method() {
     if [ $# -lt 1 ] ; then
-	echo "syntax: $0 method <name> <workflow> ..."
+	echo "usage: $0 method <name> ( --workflow <name> <options> ) ..."
 	RC=1
 	exit
     fi
@@ -102,20 +102,63 @@ method() {
     shift
     SCRIPT=/tmp/keplerconfig_$$
     SCRIPT_2=/tmp/keplerconfig_$$_2
+    SCRIPT_3=/tmp/keplerconfig_$$_3
     NOS_WORKFLOWS=$#
     rm -f $SCRIPT $SCRIPT_2
     while [ $# -gt 0 ] ; do
-	WF_NAME=$1
-	shift
+        if [ "$1" != "--workflow" ] ; then
+	    echo "syntax error: expected a '--workflow' option - found '$1'"
+	    RC=1
+	    exit
+	fi
+	WF_NAME=$2
+        STEP_NAME=WF_NAME
+	shift 2
 	cat >> $SCRIPT <<EOF
         set wf_${WF_NAME}_uid [xvalue //*\[@name='$WF_NAME'\]/@uid \\
                                   [transform.definition.list]]
 EOF
+        rm -f $SCRIPT_3
+        while [ $# -gt 0 ] ; do
+	    case $1 in
+		--name)
+		    STEP_NAME=$2
+		    shift 2
+		    ;;
+		--param)
+		    PARAM=$2
+		    shift 2
+		    cat >> $SCRIPT_3 <<EOF
+                    :parameter -name $PARAM \\
+EOF
+		    ;;
+		--iterator)
+		    SCOPE=$1
+		    TYPE=$2
+		    QUERY=$3
+		    PARAM=$4
+		    cat >> $SCRIPT_3 <<EOF
+                    :iterator < \\
+                        :parameter $PARAM \\
+                        :query \"$QUERY\" \\
+                        :scope $SCOPE \\
+                        :type $TYPE \\
+                    > \\
+EOF
+		    ;;
+		--workflow)
+		    break
+		    ;;
+	    esac
+	done
 	cat >> $SCRIPT_2 <<EOF
             :step < \\
                 :name \"$WF_NAME\" \\
                 :transform < \\
                     :definition -version 0 \$wf_${WF_NAME}_uid \\
+EOF
+	cat >> $SCRIPT_2 < $SCRIPT_3
+        cat >> $SCRIPT_2 <<EOF
                 > \\
             > \\
 EOF
@@ -123,6 +166,7 @@ EOF
     cat >> $SCRIPT <<EOF
         om.pssd.method.for.subject.create :name \"$NAME\" :namespace "/pssd/methods" \\
             :description \"Workflow collection $NAME\" \\
+            :subject < > \\
 EOF
     cat >> $SCRIPT < $SCRIPT_2
 
@@ -130,7 +174,7 @@ EOF
     $MFCOMMAND source $SCRIPT
     RC=$?
     $MFCOMMAND logoff
-    rm $SCRIPT $SCRIPT_2
+    rm -f $SCRIPT $SCRIPT_2 $SCRIPT_3
 }
 
 help() {
