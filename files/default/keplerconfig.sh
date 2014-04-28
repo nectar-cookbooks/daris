@@ -157,7 +157,7 @@ EOF
     $MFCOMMAND source $SCRIPT
     RC=$?
     $MFCOMMAND logoff
-    rm $SCRIPT
+    rm $SCRIPT $SCRIPT_2
 }
 
 method() {
