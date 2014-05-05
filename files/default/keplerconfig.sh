@@ -241,7 +241,7 @@ EOF
     cat >> $SCRIPT <<EOF
         om.pssd.method.for.subject.create :name \"$NAME\" :namespace "/pssd/methods" \\
             :description \"Workflow collection $NAME\" \\
-            :subject < > \\
+            :subject < :project <> > \\
 EOF
     cat >> $SCRIPT < $SCRIPT_2
 
