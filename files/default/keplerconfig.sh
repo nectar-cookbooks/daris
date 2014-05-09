@@ -25,28 +25,93 @@ expect() {
 }
 
 provider() {
-   if [ $# -eq 3 ] ; then
-       KEPLER=/usr/local/kepler
-   elif [ $# -eq 4 ] ; then
-       KEPLER="$4"
-   else
-       echo "syntax: $0 provider <host> <user> <password> [ <kepler-dir> ]"
-       RC=1
-       exit
-   fi
-   SCRIPT=/tmp/keplerconfig_$$
-   cat > $SCRIPT <<EOF
+    if [ $# -eq 0 ] ; then
+	echo "syntax: provider --user user --host host <options> ..."
+        RC=1
+	exit
+    fi
+    DUSER=
+    RUSER=
+    RHOST=
+    PK_KEY=
+    PWD_KEY=
+    KEPLER_CMD="/mnt/Applications/kepler-2.4/keplernk.sh --single"
+    while [ $# -gt 0 ] ; do
+	case $1 in
+	    --user)
+		expect 1 "$@"
+		DUSER="$2"
+		shift 2
+		;;
+	    --host)
+		expect 1 "$@"
+		RHOST="$2"
+		shift 2
+		;;
+	    --remote-user)
+		expect 1 "$@"
+		RUSER="$2"
+		shift 2
+		;;
+	    --pk-key)
+		expect 1 "$@"
+		PK_KEY="$2"
+		shift 2
+		;;
+	    --password-key)
+		expect 1 "$@"
+		PWD_KEY="$2"
+		shift 2
+		;;
+            --command)
+		expect 1 "$@"
+		COMMAND="$2"
+		shift 2
+		;;		
+	    -*)
+		echo "Unrecognized option $1"
+		RC=1
+		exit
+		;;
+	    *)
+		echo "Unexpected argument $1"
+		RC=1
+		exit
+		;;
+	esac
+    done
+    if [ -z "$DUSER" -o -z "$RHOST" ] ; then
+	echo "usage error: the --user and --host options are mandatory"
+	RC=1
+	exit
+    fi
+    if [ -z "$RUSER" ] ; then
+	RUSER="$USER"
+    fi
+    if [ -z "$PK_KEY" ] ; then
+        if [ -z "$PWD_KEY" ] ; then
+	    echo "usage error: you must specify a secure wallet keyname for " \
+		"either the user's password or private key"
+	    RC=1
+	    exit
+	fi
+        CREDENTIALS=":user < :name \"$RUSER\" :password-key \"$PWD_KEY\" >"
+    else
+	CREDENTIALS=":private-key < :name \"$RUSER\" :key-key \"$PK_KEY\" >"
+    fi
+    SCRIPT=/tmp/keplerconfig_$$
+    cat > $SCRIPT <<EOF
 transform.provider.user.settings.set \
     :domain users :user "$2" \
     :type kepler \
     :settings < \
         :kepler.server < \
-            :host "$1" \
+            :host "$RHOST" \
             :launcher-service -name secure.shell.execute < \
                 :args < \
-                    :host "$1" \
-                    :user  < :name "$2" :password "$3" > \
-                    :command "$KEPLER/keplernk.sh --single" \
+                    :host "$RHOST" \
+                    $CREDENTIALS \
+                    :command "$KEPLER_CMD" \
                  > \
                  :port-xpath stdout \
             > \
@@ -58,6 +123,7 @@ EOF
     RC=$?
     $MFCOMMAND logoff
     rm $SCRIPT
+    
 }
 
 workflow() {
