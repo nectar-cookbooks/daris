@@ -86,7 +86,7 @@ provider() {
 	exit
     fi
     if [ -z "$RUSER" ] ; then
-	RUSER="$USER"
+	RUSER="$DUSER"
     fi
     if [ -z "$PK_KEY" ] ; then
         if [ -z "$PWD_KEY" ] ; then
@@ -102,7 +102,7 @@ provider() {
     SCRIPT=/tmp/keplerconfig_$$
     cat > $SCRIPT <<EOF
 transform.provider.user.settings.set \
-    :domain users :user "$2" \
+    :domain users :user "$DUSER" \
     :type kepler \
     :settings < \
         :kepler.server < \
