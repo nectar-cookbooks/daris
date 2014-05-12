@@ -213,3 +213,42 @@ you need to set these attributes:
 * `node['daris']['load_transform']` - Set to 'true' to load the "transform" 
   package.
 
+DaRIS Commands
+==============
+
+The main "daris::daris" recipe installs a couple of shell commands into the 
+Mediaflux bin directory:
+
+  * The "mfsink" command is used for configuring generic and DaRIS specific
+    "sinks".
+  * The "keplerconfig" command is used for configuring the DaRIS / Kepler
+    workflow integration.
+
+Both of these command must be run as the "mflux" user, as they require 
+Mediaflux admin privilege.
+
+Note: these commands work by running Mediaflux Tcl scripts.  If something 
+does wrong, you are likely to see an ugly Mediaflux stacktrace.  This is 
+unfortunate, but it would difficult to extract decent diagnostics from 
+the script output. 
+
+The mfsink command
+------------------
+
+The "mfsink" command allows you to create, remove, list and describe the
+Mediaflux data sink configurations.  
+
+The primary command documentation is provided by the "help" subcommand.
+
+  * `mfsink help` lists the subcommands.
+  * `mfsink help <subcommand>` gives help for the subcommand.
+
+Here are a couple of examples:
+
+```
+    mfsink add my-sink scp   # defines a 'generic' SCP sink
+    mfsink add my-cvl scp --host xxx.xxx.xxx.xxx --pk-key pk-cvl
+                             # defines a sink for a specific host
+			     # using a private key in the user's wallet
+```
+

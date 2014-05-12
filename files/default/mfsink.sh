@@ -160,6 +160,11 @@ owncloud() {
 		RPASSWORD="$2"
 		shift 2
 		;;
+	    --password-key)
+		expect 1 "$@"
+		RPASSWORD=swkey:$2
+		shift 2
+		;;
 	    --basedir)
 		expect 1 "$@"
 		BASEDIR="$2"
@@ -256,6 +261,11 @@ webdav() {
 	    --password)
 		expect 1 "$@"
 		RPASSWORD="$2"
+		shift 2
+		;;
+	    --password-key)
+		expect 1 "$@"
+		RPASSWORD=swkey:$2
 		shift 2
 		;;
 	    --basedir)
@@ -381,9 +391,29 @@ scp() {
 		RPASSWORD="$2"
 		shift 2
 		;;
+	    --password-key)
+		expect 1 "$@"
+		RPASSWORD=swkey:$2
+		shift 2
+		;;
+	    --pk-key)
+		expect 1 "$@"
+		PK=swkey:$2
+		shift 2
+		;;
 	    --pkfile)
 		expect 1 "$@"
-	        PKFILE="$2"
+		PK=`cat $2`
+		shift 2
+		;;
+	    --pk-passphrase)
+		expect 1 "$@"
+		PASSPHRASE="$2"
+		shift 2
+		;;
+	    --pk-passphrase-key)
+		expect 1 "$@"
+		PASSPHRASE=swkey:$2
 		shift 2
 		;;
 	    --*)
@@ -432,9 +462,11 @@ EOF
     if [ ! -z "$BASEDIR" ] ; then
  	ARGS="$ARGS :arg -name basedir \"$BASEDIR\""
     fi
-    if [ ! -z "$PKFILE" ] ; then
-        KEY=`cat $PKFILE`
- 	ARGS="$ARGS :arg -name prvkey \"$KEY\""
+    if [ ! -z "$PK" ] ; then
+ 	ARGS="$ARGS :arg -name prvkey \"$PK\""
+    fi
+    if [ ! -z "$PASSPHRASE" ] ; then
+ 	ARGS="$ARGS :arg -name passphrase \"$PASSPHRASE\""
     fi
 
     cat > $SCRIPT <<EOF
@@ -472,10 +504,6 @@ describesink() {
 
 help() {
     if [ $# -eq 0 ]; then
-	echo "The $0 manages DaRIS / Mediaflux sinks from the command line."
-        echo "Most operations require Mediaflux administrator privilege; i.e."
-        echo "they need to be run as the 'mflux' user."
-        echo 
 	echo "Usage: $0 subcommand [<args>]"
 	echo "where the subcommands are:"
 	echo "    add <sinkname> <type> --desc <description> ..."
@@ -484,6 +512,11 @@ help() {
 	echo "    help [ <subcommand> ...] - outputs command help"
 	echo "    list                     - lists all registered sinks"
 	echo "    remove <sinkname>        - removes a sink"
+        echo
+	echo "The $0 manages DaRIS / Mediaflux sinks from the command line."
+        echo "The command requires Mediaflux administrator privilege; i.e."
+        echo "it needs to be run as the 'mflux' user, or as 'root'."
+        echo 
     else
 	case $1 in
 	    add)
@@ -495,13 +528,21 @@ help() {
 		echo "$0 help <subcommand> ... - outputs help for a subcommand"
 		;;
 	    describe)
-		echo "$0 describe <sinkname> - describes a sink"
+		echo "Usage: $0 describe <sinkname>"
+                echo 
+                echo "This uses the Mediaflux 'sink.describe' command to output"
+                echo "the named sink's configuration parameters"
 		;;
 	    list)
-		echo "$0 list - lists registered sinks"
+		echo "Usage: $0 list"
+                echo
+                echo "This uses the Mediaflux 'sink.list' command to list all sinks"
 		;;
 	    remove)
-		echo "$0 remove <sinkname> - removes a sink"
+		echo "$0 remove <sinkname>"
+                echo
+                echo "This uses the Mediaflux 'sink.remove' command to remove"
+                echo "the named sink"
 		;;
 	    *)
 		echo "Unknown subcommand '$1'"
@@ -514,14 +555,15 @@ help() {
 
 helpadd() {
     if [ $# -eq 0 ]; then
-	echo "$0 add <sinkname> <type> ..."
+	echo "Usage: $0 add <sinkname> <type> ..."
 	echo "   where <sinkname> is a sink name and <type> is the sink type"
+        echo 
         echo "This subcommand defines a Mediaflux sink.  The supported types"
-        echo "are 'scp', 'webdav', 'owncloud' or 'filesystem'.  Run:" 
-        echo "   '$0 help add <type>'"
-        echo "for the options for each sink type.  Please refer to the DaRIS"
-        echo "wiki or the Mediaflux documentation fpr mor information on"
-        echo "configuring sinks."
+        echo "are 'scp', 'webdav', 'owncloud' or 'filesystem'."
+        echo 
+        echo "Use '$0 help add <type>' for the options for each sink type."
+        echo "Please refer to the DaRIS wiki or the Mediaflux documentation"
+        echo "for more information on configuring sinks."
     else
 	case $1 in
 	    scp)
@@ -545,17 +587,20 @@ helpadd() {
 }
 
 helpscp() {
-    echo "$0 add <sinkname> scp [ --host <host> ]" 
+    echo "Usage: $0 add <sinkname> scp [ --host <host> ]" 
     echo "    [ --port <port> ] [ --hostkey <hostkey> ] [ --nohostkey ]"
-    echo "    [ --user <user> ( --password <password> | --pkfile <file> ) ]"
+    echo "    [ --user <user> ] [ --password <pwd> | --password-key <key> ]" 
+    echo "    [ --pk-file <file> | --pk-key <key> ]"
+    echo "    [ --passphrase <passphrase> | --passphrase-key <key> ]"
     echo "    [ --decomp ] [ --filemode <mode> ] [ --basedir <path> ]" 
     echo "    [ --desc '<description string>' ]" 
+    echo 
     echo "This command adds an SSH/SCP sink.  The sink can be generic, or"
     echo "you can provide a specific host, authorization and other details."
     echo "RSA and IPv4 are assumed by this script, and the default port is"
     echo "the standard SSH port.  Many options are ignored for generic sinks."
     echo ""
-    echo "Host identification: The --host can be sepecified either as a DNS"
+    echo "Host identification: The --host can be specified either as a DNS"
     echo "name or as an IPv4 address.  The --hostkey (if provided) is used"
     echo "for definitive SSH host identification to guard against spoofing"
     echo "or man-in-the-middle attacks.  If neither --hostkey or --nohostkey"
@@ -564,10 +609,17 @@ helpscp() {
     echo "the remote host when the user does a transfer.  If you provide a"
     echo "hostkey explicitly, it must be an RSA hostkey."
     echo ""
-    echo "Authorization: If --user is given, --password or --pkfile is required"
-    echo "also.  NOTE: putting user credentials into a sink definition is"
+    echo "Authorization: If --user is given, a password or private key is"
+    echo "required also.  If a private key is required, you can supply a"
+    echo "corresponding passphrase.  The password, private key and passphrase"
+    echo "can be either provided directly (BAD!) or by giving a secure wallet"
+    echo "key (GOOD!).  In the latter case, the actual credentials will be"
+    echo "retrieved from the current user's wallet when the sink is used." 
+    echo
+    echo "NOTE: putting end-user credentials into a sink definition is"
     echo "insecure because they are visible to anyone with Mediaflux admin"
-    echo "privilege, or system-level 'root' privilege."
+    echo "privilege, or system-level 'root' privilege.  Furthermore, any"
+    echo "credentials in a sink definition will be shared by all users." 
     echo ""
     echo "Other options: if --basedir is provided, it is the default base"
     echo "directory for the host.  Otherwise, the default base location is the"
@@ -579,19 +631,23 @@ helpscp() {
 }
 
 helpowncloud() {
-    echo "$0 add <sinkname> owncloud --url <url>" 
-    echo "    [ --user <user> ] [ --password <password> ] "
+    echo "Usage: $0 add <sinkname> owncloud --url <url>" 
+    echo "    [ --user <user> ] [ --password <pwd> | --password-key <key> ]"
     echo "    [ --basedir <path> ] [ --decomp | --nodecomp ]"
     echo "    [ --chunked | --unchunked ] "
-    echo "    [ --desc '<description string>' ]" 
+    echo "    [ --desc '<description string>' ]"
+    echo 
     echo "This command adds an OwnCloud compatible sink.  The <url> is "
     echo "mandatory and should be the WebDAV base URL for the service.  It"
     echo "is recommended that you use an https URL rather than http."
     echo ""
-    echo "Authentication: The --user and --password provide owncloud user"
-    echo "credentials.  NOTE: putting user credentials into a sink definition"
-    echo "is insecure because they are visible to anyone with Mediaflux admin"
-    echo "privilege, or system-level 'root' privilege."
+    echo "Authentication: The --user and --password or --password-key provide"
+    echo "owncloud user credentials."
+    echo
+    echo "NOTE: putting end-user credentials into a sink definition is"
+    echo "insecure because they are visible to anyone with Mediaflux admin"
+    echo "privilege, or system-level 'root' privilege.  Furthermore, any"
+    echo "credentials in a sink definition will be shared by all users." 
     echo ""
     echo "Other options: The --decomp/--nodecomp options control decompression" 
     echo "of the asset by the sink.  This is disabled by default.  If enabled,"
@@ -603,17 +659,20 @@ helpowncloud() {
 
 helpwebdav() {
     echo "$0 add <sinkname> webdav --url <url>" 
-    echo "    [ --user <user> ] [ --password <password> ] "
+    echo "    [ --user <user> ] [ --password <pwd> | --password-key <key> ]"
     echo "    [ --basedir <path> ] [ --decomp | --nodecomp ]"
     echo "    [ --desc '<description string>' ]" 
     echo "This command adds an OwnCloud compatible sink.  The <url> is "
     echo "mandatory and should be the WebDAV base URL for the service.  It"
     echo "is recommended that you use an https URL rather than http."
     echo ""
-    echo "Authentication: The --user and --password provide owncloud user"
-    echo "credentials.  NOTE: putting user credentials into a sink definition"
-    echo "is insecure because they are visible to anyone with Mediaflux admin"
-    echo "privilege, or system-level 'root' privilege."
+    echo "Authentication: The --user and --password or --password-key provide"
+    echo "owncloud user credentials."
+    echo
+    echo "NOTE: putting end-user credentials into a sink definition is"
+    echo "insecure because they are visible to anyone with Mediaflux admin"
+    echo "privilege, or system-level 'root' privilege.  Furthermore, any"
+    echo "credentials in a sink definition will be shared by all users." 
     echo ""
     echo "Other options: The --decomp/--nodecomp options control decompression" 
     echo "of the asset by the sink.  This is disabled by default.  If enabled,"
@@ -623,9 +682,10 @@ helpwebdav() {
 }
 
 helpfs() {
-    echo "$0 add <sinkname> filesystem --directory <dir>" 
+    echo "Usage $0 add <sinkname> filesystem --directory <dir>" 
     echo "    [ --decomp <levels> ] [ --path <path> ] [ --save <saved> ]"
-    echo "    [ --desc '<description string>' ]" 
+    echo "    [ --desc '<description string>' ]"
+    echo 
     echo "This command adds a file-system sink.  The <dir> is mandatory and"
     echo "should give the absolute path to an existing directory that is"
     echo "writeable by the Linux mediaflux user (mflux).  This will be the root"
