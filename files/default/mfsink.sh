@@ -8,6 +8,7 @@ if [ $? -ne 0 ]; then
 fi
 
 MFCOMMAND=${MFLUX_BIN}/mfcommand
+CMD=`basename $0`
 RC=0
 
 expect() {
@@ -16,9 +17,9 @@ expect() {
     shift 2
     if [ $# -lt $EXPECTED ] ; then
         if [ $EXPECTED -eq 1 ] ; then
-	    echo "syntax error: expected a value after '$KEYWORD'"
+	    echo "Syntax error: expected a value after '$KEYWORD'"
 	else
-	    echo "syntax error: expected $EXPECTED values after '$KEYWORD'"
+	    echo "Syntax error: expected $EXPECTED values after '$KEYWORD'"
 	fi
 	RC=1
 	exit
@@ -90,7 +91,7 @@ filesystem() {
 		shift 2
 		;;
 	    --*)
-		echo "unknown option $1"
+		echo "Unknown option $1"
 		RC=1
 		exit
 		;;
@@ -200,7 +201,7 @@ owncloud() {
     done
 
     if [ -z "$URL" ] ; then
-	echo "No --url specified"
+	echo "Error: no --url specified"
 	RC=1
 	exit
     fi
@@ -482,6 +483,11 @@ EOF
 }
 
 removesink() {
+    if [ $# -ne 1 ] ; then
+	echo "Error: expected a <sinkname>"
+	RC=1
+        exit
+    fi
     $MFCOMMAND logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD
     $MFCOMMAND sink.remove :name $1
     RC=$?
@@ -489,6 +495,11 @@ removesink() {
 }
 
 listsinks() {
+    if [ $# -ne 0 ] ; then
+	echo "Error: no arguments or options expected"
+	RC=1
+        exit
+    fi
     $MFCOMMAND logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD
     $MFCOMMAND sink.list
     RC=$?
@@ -496,6 +507,11 @@ listsinks() {
 }
 
 describesink() {
+    if [ $# -ne 1 ] ; then
+	echo "Error: expected a <sinkname>"
+	RC=1
+        exit
+    fi
     $MFCOMMAND logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD
     $MFCOMMAND sink.describe :name $1
     RC=$?
@@ -504,7 +520,7 @@ describesink() {
 
 help() {
     if [ $# -eq 0 ]; then
-	echo "Usage: $0 subcommand [<args>]"
+	echo "Usage: $CMD subcommand [<args>]"
 	echo "where the subcommands are:"
 	echo "    add <sinkname> <type> --desc <description> ..."
         echo "                             - defines a sink"
@@ -513,7 +529,7 @@ help() {
 	echo "    list                     - lists all registered sinks"
 	echo "    remove <sinkname>        - removes a sink"
         echo
-	echo "The $0 manages DaRIS / Mediaflux sinks from the command line."
+	echo "$CMD manages DaRIS / Mediaflux sinks from the command line."
         echo "The command requires Mediaflux administrator privilege; i.e."
         echo "it needs to be run as the 'mflux' user, or as 'root'."
         echo 
@@ -524,29 +540,31 @@ help() {
 		helpadd "$@"
 		;;
 	    help)
-		echo "$0 help                  - outputs command help"
-		echo "$0 help <subcommand> ... - outputs help for a subcommand"
+		echo "$CMD help                  - shows command help"
+		echo "$CMD help <subcommand> ... - shows subcommand help"
 		;;
 	    describe)
-		echo "Usage: $0 describe <sinkname>"
+		echo "Usage: $CMD describe <sinkname>"
                 echo 
-                echo "This uses the Mediaflux 'sink.describe' command to output"
-                echo "the named sink's configuration parameters"
+                echo "This subcommand uses the Mediaflux 'sink.describe' "
+                echo "service to output the named sink's configuration"
 		;;
 	    list)
-		echo "Usage: $0 list"
+		echo "Usage: $CMD list"
                 echo
-                echo "This uses the Mediaflux 'sink.list' command to list all sinks"
+                echo "This subcommand uses the Mediaflux 'sink.list' service"
+                echo "to list all sinks"
 		;;
 	    remove)
-		echo "$0 remove <sinkname>"
+		echo "$CMD remove <sinkname>"
                 echo
-                echo "This uses the Mediaflux 'sink.remove' command to remove"
-                echo "the named sink"
+                echo "This subcommand uses the Mediaflux 'sink.remove' service"
+                echo "to remove the named sink"
 		;;
 	    *)
-		echo "Unknown subcommand '$1'"
-		help
+		echo "Unknown subcommand '$1'.  Supported commands are 'add'"
+                echo "'help', 'list' and 'remove'" 
+		RC=1
 		;;
 	esac
     fi
@@ -555,13 +573,13 @@ help() {
 
 helpadd() {
     if [ $# -eq 0 ]; then
-	echo "Usage: $0 add <sinkname> <type> ..."
+	echo "Usage: $CMD add <sinkname> <type> ..."
 	echo "   where <sinkname> is a sink name and <type> is the sink type"
         echo 
         echo "This subcommand defines a Mediaflux sink.  The supported types"
         echo "are 'scp', 'webdav', 'owncloud' or 'filesystem'."
         echo 
-        echo "Use '$0 help add <type>' for the options for each sink type."
+        echo "Use '$CMD help add <type>' for the options for each sink type."
         echo "Please refer to the DaRIS wiki or the Mediaflux documentation"
         echo "for more information on configuring sinks."
     else
@@ -587,7 +605,7 @@ helpadd() {
 }
 
 helpscp() {
-    echo "Usage: $0 add <sinkname> scp [ --host <host> ]" 
+    echo "Usage: $CMD add <sinkname> scp [ --host <host> ]" 
     echo "    [ --port <port> ] [ --hostkey <hostkey> ] [ --nohostkey ]"
     echo "    [ --user <user> ] [ --password <pwd> | --password-key <key> ]" 
     echo "    [ --pk-file <file> | --pk-key <key> ]"
@@ -631,7 +649,7 @@ helpscp() {
 }
 
 helpowncloud() {
-    echo "Usage: $0 add <sinkname> owncloud --url <url>" 
+    echo "Usage: $CMD add <sinkname> owncloud --url <url>" 
     echo "    [ --user <user> ] [ --password <pwd> | --password-key <key> ]"
     echo "    [ --basedir <path> ] [ --decomp | --nodecomp ]"
     echo "    [ --chunked | --unchunked ] "
@@ -658,7 +676,7 @@ helpowncloud() {
 }
 
 helpwebdav() {
-    echo "$0 add <sinkname> webdav --url <url>" 
+    echo "$CMD add <sinkname> webdav --url <url>" 
     echo "    [ --user <user> ] [ --password <pwd> | --password-key <key> ]"
     echo "    [ --basedir <path> ] [ --decomp | --nodecomp ]"
     echo "    [ --desc '<description string>' ]" 
@@ -682,7 +700,7 @@ helpwebdav() {
 }
 
 helpfs() {
-    echo "Usage $0 add <sinkname> filesystem --directory <dir>" 
+    echo "Usage $CMD add <sinkname> filesystem --directory <dir>" 
     echo "    [ --decomp <levels> ] [ --path <path> ] [ --save <saved> ]"
     echo "    [ --desc '<description string>' ]"
     echo 
@@ -734,7 +752,7 @@ case $1 in
     exit 1
     ;;
   *)
-    echo "Unknown subcommand '$1' - run '$0 help' for help"
+    echo "Unknown subcommand '$1' - run '$CMD help' for help"
     exit 1
     ;;
 esac
