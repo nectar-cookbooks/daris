@@ -27,7 +27,11 @@ expect() {
 }
 
 addsink() {
-    expect 2 "$@"
+    if [ $# -lt 2 ] ; then
+	echo "Syntax error: expected <sinkname> <type>"
+	RC=1
+	exit
+    fi
     NAME=$1
     TYPE=$2
     DESC=
@@ -671,7 +675,7 @@ helpowncloud() {
     echo "of the asset by the sink.  This is disabled by default.  If enabled,"
     echo "the user's data is decompressed on the server, and transferred in"
     echo "uncompressed form.  The --chunked/--unchunked options control"
-    echo "chunking.  This ise enabled by default.  The --basedir option sets "
+    echo "chunking.  This is enabled by default.  The --basedir option sets "
     echo "the directory within the owncloud tree."
 }
 
