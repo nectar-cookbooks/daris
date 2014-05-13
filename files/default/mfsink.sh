@@ -401,12 +401,12 @@ scp() {
 		PK=`cat $2`
 		shift 2
 		;;
-	    --pk-passphrase)
+	    --passphrase)
 		expect 1 "$@"
 		PASSPHRASE="$2"
 		shift 2
 		;;
-	    --pk-passphrase-key)
+	    --passphrase-key)
 		expect 1 "$@"
 		PASSPHRASE=swkey:$2
 		shift 2

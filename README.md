@@ -252,3 +252,20 @@ Here are a couple of examples:
 			     # using a private key in the user's wallet
 ```
 
+Note that the mfsink command allows you to embed credentials into a sink
+definition.  You should use this facility with caution because it has 
+serious security implications:
+
+  * Any embedded credentials will be visible to any user with mediaflux
+    administrator privilege (or 'root' access).
+  
+  * Any embedded credentials will stored in the Mediaflux database in 
+    the clear.
+  
+  * An sink with embedded credentials could be used by any DaRIS / Mediaflux
+    user.
+
+It is difficult to envisage a case in which embedding credentials into
+sink configurations is a good idea.  The only case might be when the
+sink writes to a shared file store where there ar no individual accounts
+and anyone is permitted to see or overwrite anybody else's files.
