@@ -21,16 +21,14 @@ expect() {
 	else
 	    echo "Syntax error: expected $EXPECTED values after '$KEYWORD'"
 	fi
-	RC=1
-	exit
+	exit 1
     fi
 }
 
 addsink() {
     if [ $# -lt 2 ] ; then
 	echo "Syntax error: expected <sinkname> <type>"
-	RC=1
-	exit
+	exit 1
     fi
     NAME=$1
     TYPE=$2
@@ -51,8 +49,7 @@ addsink() {
             ;;
         *)
             echo "Unknown sink type $TYPE"
-            RC=1
-            exit
+            exit 1
             ;;
     esac
     $MFCOMMAND logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD
@@ -96,22 +93,19 @@ filesystem() {
 		;;
 	    --*)
 		echo "Unknown option $1"
-		RC=1
-		exit
+		exit 1
 		;;
 	esac
     done
 
     if [ -z "$DIRECTORY" ] ; then
 	echo "No --directory specified"
-	RC=1
-	exit
+	exit 1
     fi
 
     if [ -z "$SPATH" -a -z "$DECOMP" ] ; then
 	echo "A --path must be specified when not decompressing"
-	RC=1
-	exit
+	exit 1
     fi
     ARGS=
     if [ ! -z "$SPATH" ] ; then
@@ -198,16 +192,14 @@ owncloud() {
 		;;
 	    --*)
 		echo "unknown option $1"
-		RC=1
-		exit
+		exit 1
 		;;
 	esac
     done
 
     if [ -z "$URL" ] ; then
 	echo "Error: no --url specified"
-	RC=1
-	exit
+	exit 1
     fi
 
     ARGS=
@@ -293,16 +285,14 @@ webdav() {
 		;;
 	    --*)
 		echo "unknown option $1"
-		RC=1
-		exit
+		exit 1
 		;;
 	esac
     done
 
     if [ -z "$URL" ] ; then
 	echo "No --url specified"
-	RC=1
-	exit
+	exit 1
     fi
 
     ARGS=
@@ -423,8 +413,7 @@ scp() {
 		;;
 	    --*)
 		echo "unknown option $1"
-		RC=1
-		exit
+		exit 1
 		;;
 	esac
     done
@@ -445,7 +434,7 @@ scp() {
                 > \
             $DESC_ARG
 EOF
-	exit
+	return
     fi
 
     ARGS=
@@ -489,8 +478,7 @@ EOF
 removesink() {
     if [ $# -ne 1 ] ; then
 	echo "Error: expected a <sinkname>"
-	RC=1
-        exit
+        exit 1
     fi
     $MFCOMMAND logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD
     $MFCOMMAND sink.remove :name $1
@@ -501,8 +489,7 @@ removesink() {
 listsinks() {
     if [ $# -ne 0 ] ; then
 	echo "Error: no arguments or options expected"
-	RC=1
-        exit
+        exit 1
     fi
     $MFCOMMAND logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD
     $MFCOMMAND sink.list
@@ -513,8 +500,7 @@ listsinks() {
 describesink() {
     if [ $# -ne 1 ] ; then
 	echo "Error: expected a <sinkname>"
-	RC=1
-        exit
+        exit 1
     fi
     $MFCOMMAND logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD
     $MFCOMMAND sink.describe :name $1
@@ -568,11 +554,10 @@ help() {
 	    *)
 		echo "Unknown subcommand '$1'.  Supported commands are 'add'"
                 echo "'help', 'list' and 'remove'" 
-		RC=1
 		;;
 	esac
     fi
-    RC=1
+    exit 1
 }
 
 helpadd() {
@@ -727,7 +712,6 @@ helpfs() {
 
 if [ $# -eq 0 ] ; then
     help
-    exit 1
 fi
 
 case $1 in
@@ -753,7 +737,6 @@ case $1 in
     ;;
   -*)
     help
-    exit 1
     ;;
   *)
     echo "Unknown subcommand '$1' - run '$CMD help' for help"
