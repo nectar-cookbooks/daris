@@ -35,7 +35,8 @@ provider() {
     RHOST=
     PK_KEY=
     PWD_KEY=
-    KEPLER_CMD="/mnt/Applications/kepler-2.4/keplernk.sh --single"
+    KPATH="/mnt/Applications/kepler-2.4"
+    KCMD="keplernk.sh --single"
     while [ $# -gt 0 ] ; do
 	case $1 in
 	    --user)
@@ -63,9 +64,14 @@ provider() {
 		PWD_KEY="$2"
 		shift 2
 		;;
-            --command)
+            --kpath)
 		expect 1 "$@"
-		COMMAND="$2"
+		KPATH="$2"
+		shift 2
+		;;		
+            --kcommand)
+		expect 1 "$@"
+		KCMD="$2"
 		shift 2
 		;;		
 	    -*)
@@ -111,7 +117,7 @@ transform.provider.user.settings.set \
                 :args < \
                     :host "$RHOST" \
                     $CREDENTIALS \
-                    :command "$KEPLER_CMD" \
+                    :command "${KPATH}/${KCMD}" \
                  > \
                  :port-xpath stdout \
             > \
