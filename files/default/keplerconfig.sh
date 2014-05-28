@@ -247,8 +247,10 @@ method() {
     UPDATE=
     rm -f $SCRIPT $SCRIPT_2
     while [ $# -gt 0 ] ; do
-        if [ "$1" == "update" ] ; then
-            UPDATE=1
+        if [ "$1" == "--update" ] ; then
+            expect 1 "$@"
+	    UPDATE=$2
+	    shift 2
 	    continue
         elif [ "$1" != "--workflow" ] ; then
 	    echo "syntax error: expected a '--workflow' option - found '$1'"
