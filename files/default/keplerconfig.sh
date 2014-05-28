@@ -234,7 +234,8 @@ EOF
 
 method() {
     if [ $# -lt 1 ] ; then
-	echo "usage: $0 method <name> [--update] (--workflow <name> <options>) ..."
+	echo "usage: $0 method <name> [--update cid] "
+        echo "          (--workflow <name> <options>) ..."
 	RC=1
 	exit
     fi
@@ -243,10 +244,10 @@ method() {
     SCRIPT=/tmp/keplerconfig_$$
     SCRIPT_2=/tmp/keplerconfig_$$_2
     SCRIPT_3=/tmp/keplerconfig_$$_3
-    UPDATE=0
+    UPDATE=
     rm -f $SCRIPT $SCRIPT_2
     while [ $# -gt 0 ] ; do
-        if [ "$1" == "update" ] then
+        if [ "$1" == "update" ] ; then
             UPDATE=1
 	    continue
         elif [ "$1" != "--workflow" ] ; then
@@ -313,10 +314,10 @@ EOF
             > \\
 EOF
     done
-    if [ $UPDATE = 1 ] ; then
-	VERB="om.pssd.method.for.subject.update :replace true"
-    else
+    if [ -z "$UPDATE" ] ; then
 	VERB="om.pssd.method.for.subject.create"
+    else
+	VERB="om.pssd.method.for.subject.update :id $UPDATE :replace true"
     fi
     cat >> $SCRIPT <<EOF
         $VERB :name \"$NAME\" :namespace "/pssd/methods" \\
