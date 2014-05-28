@@ -234,7 +234,7 @@ EOF
 
 method() {
     if [ $# -lt 1 ] ; then
-	echo "usage: $0 method <name> ( --workflow <name> <options> ) ..."
+	echo "usage: $0 method <name> [--update] (--workflow <name> <options>) ..."
 	RC=1
 	exit
     fi
@@ -243,10 +243,13 @@ method() {
     SCRIPT=/tmp/keplerconfig_$$
     SCRIPT_2=/tmp/keplerconfig_$$_2
     SCRIPT_3=/tmp/keplerconfig_$$_3
-    NOS_WORKFLOWS=$#
+    UPDATE=0
     rm -f $SCRIPT $SCRIPT_2
     while [ $# -gt 0 ] ; do
-        if [ "$1" != "--workflow" ] ; then
+        if [ "$1" == "update" ] then
+            UPDATE=1
+	    continue
+        elif [ "$1" != "--workflow" ] ; then
 	    echo "syntax error: expected a '--workflow' option - found '$1'"
 	    RC=1
 	    exit
@@ -310,8 +313,13 @@ EOF
             > \\
 EOF
     done
+    if [ $UPDATE = 1 ] ; then
+	VERB="om.pssd.method.for.subject.update :replace true"
+    else
+	VERB="om.pssd.method.for.subject.create"
+    fi
     cat >> $SCRIPT <<EOF
-        om.pssd.method.for.subject.create :name \"$NAME\" :namespace "/pssd/methods" \\
+        $VERB :name \"$NAME\" :namespace "/pssd/methods" \\
             :description \"Workflow collection $NAME\" \\
             :subject < :project <> > \\
 EOF
