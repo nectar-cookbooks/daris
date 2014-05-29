@@ -8,6 +8,8 @@ if [ $? -ne 0 ]; then
 fi
 
 MFCOMMAND=${MFLUX_BIN}/mfcommand
+DEBUG=0
+RC=0
 
 expect() {
     EXPECTED=$1
@@ -21,6 +23,17 @@ expect() {
 	fi
 	RC=1
 	exit
+    fi
+}
+
+run() {
+    $MFCOMMAND logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD
+    $MFCOMMAND source "$1"
+    RC=$?
+    $MFCOMMAND logoff
+
+    if [ $DEBUG -eq 0 ] ; then
+	rm "$@"
     fi
 }
 
@@ -39,47 +52,47 @@ provider() {
     KCMD="keplernk.sh --single"
     while [ $# -gt 0 ] ; do
 	case $1 in
-	    --user)
+	    --user )
 		expect 1 "$@"
 		DUSER="$2"
 		shift 2
 		;;
-	    --host)
+	    --host )
 		expect 1 "$@"
 		RHOST="$2"
 		shift 2
 		;;
-	    --remote-user)
+	    --remote-user )
 		expect 1 "$@"
 		RUSER="$2"
 		shift 2
 		;;
-	    --pk-key)
+	    --pk-key )
 		expect 1 "$@"
 		PK_KEY="$2"
 		shift 2
 		;;
-	    --password-key)
+	    --password-key )
 		expect 1 "$@"
 		PWD_KEY="$2"
 		shift 2
 		;;
-            --kpath)
+            --kpath )
 		expect 1 "$@"
 		KPATH="$2"
 		shift 2
 		;;		
-            --kcommand)
+            --kcommand )
 		expect 1 "$@"
 		KCMD="$2"
 		shift 2
 		;;		
-	    -*)
+	    -* )
 		echo "Unrecognized option $1"
 		RC=1
 		exit
 		;;
-	    *)
+	    * )
 		echo "Unexpected argument $1"
 		RC=1
 		exit
@@ -124,12 +137,7 @@ transform.provider.user.settings.set \
         > \
     >
 EOF
-    $MFCOMMAND logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD
-    $MFCOMMAND source $SCRIPT
-    RC=$?
-    $MFCOMMAND logoff
-    rm $SCRIPT
-    
+    run $SCRIPT
 }
 
 workflow() {
@@ -147,37 +155,37 @@ workflow() {
    touch $SCRIPT_2
    while [ $# -gt 0 ] ; do
        case $1 in
-	   --name)
+	   --name )
 	       expect 1 "$@"
 	       NAME=$2
 	       shift 2
 	       ;;
-           --param)
+           --param )
 	       expect 2 "$@"
 	       PARAM_ARGS="-name \"$2\" -type \"$3\""
 	       shift 3
 	       while [ $# -gt 0 ] ; do
 		   case $1 in
-		       --min-occurs)
+		       --min-occurs )
 			   expect 1 "$@"
                            PARAM_ARGS="$PARAM_ARGS -min-occurs $2"
                            shift 2
 			   ;;
-		       --max-occurs)
-                           shift 2
-                           PARAM_ARGS="$PARAM_ARGS -max-occurs $2"
+		       --max-occurs )
 			   expect 1 "$@"
+                           PARAM_ARGS="$PARAM_ARGS -max-occurs $2"
+                           shift 2
 			   ;;
-		       --value)
+		       --value )
 			   expect 1 "$@"
 			   PARAM_VALUE="$2"
                            shift 2
 			   ;;
-		       --*)
+		       --* )
 			   echo "Unknown --param option $1"
 			   exit
 			   ;;
-		       *)
+		       * )
 			   echo "Unexpected --param argument $1"
 			   exit
 			   ;;
@@ -193,11 +201,11 @@ EOF
 EOF
                fi
 	       ;;
-	   --*)
+	   --* )
 	       echo "Unknown option $1"
 	       exit
 	       ;;
-	   *)
+	   * )
 	       echo "Unexpected argument $1"
 	       exit
 	       ;;
@@ -224,12 +232,7 @@ EOF
    cat >> $SCRIPT <<EOF
        }
 EOF
-
-    $MFCOMMAND logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD
-    $MFCOMMAND source $SCRIPT
-    RC=$?
-    $MFCOMMAND logoff
-    rm $SCRIPT $SCRIPT_2
+    run $SCRIPT $SCRIPT_2
 }
 
 method() {
@@ -269,12 +272,12 @@ EOF
         touch $SCRIPT_3
         while [ $# -gt 0 ] ; do
 	    case $1 in
-		--name)
+		--name )
  		    expect 1 "$@"
 		    STEP_NAME=$2
 		    shift 2
 		    ;;
-		--param)
+		--param )
 		    expect 2 "$@"
 		    PARAM=$2
 		    VALUE=$3
@@ -283,7 +286,7 @@ EOF
                     :parameter -name $PARAM \"$VALUE\" \\
 EOF
 		    ;;
-		--iterator)
+		--iterator )
 		    expect 4 "$@"
 		    SCOPE=$1
 		    TYPE=$2
@@ -299,7 +302,7 @@ EOF
                     > \\
 EOF
 		    ;;
-		--workflow)
+		--workflow )
 		    break
 		    ;;
 	    esac
@@ -328,11 +331,7 @@ EOF
 EOF
     cat >> $SCRIPT < $SCRIPT_2
 
-    $MFCOMMAND logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD
-    $MFCOMMAND source $SCRIPT
-    RC=$?
-    $MFCOMMAND logoff
-    rm -f $SCRIPT $SCRIPT_2 $SCRIPT_3
+    run $SCRIPT $SCRIPT_2 $SCRIPT_3
 }
 
 help() {
@@ -341,28 +340,44 @@ help() {
     exit
 }
 
+while [ $# -gt 0 ] ; do
+    case $1 in
+	--debug | -d )
+	    DEBUG=1
+	    shift
+	    ;;
+	-* )
+	    echo "Unknown option $1"
+	    exit
+	    ;;
+	* )
+	    break
+	    ;;
+    esac
+done
+
 case "$1" in 
-  provider) 
+  provider ) 
     shift
     provider "$@"
     ;;
 
-  workflow)
+  workflow )
     shift
     workflow "$@"
     ;;
 
-  method)
+  method )
     shift
     method "$@"
     ;;
 
-  help)
+  help )
     shift 
     help "$@"
     ;;
 
-  *)
+  * )
     help
     RC=1
     ;;
