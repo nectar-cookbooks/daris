@@ -337,6 +337,7 @@ EOF
 }
 
 help() {
+    if [ $# -eq 0 ] ; then
 	echo "Usage: $CMD <global-opts> subcommand [<args>]"
 	echo "where the subcommands are:"
 	echo "    provider --user user --host host <options>"
@@ -360,23 +361,23 @@ help() {
         echo 
     else
 	case $1 in
-	    method)
+	    method )
 		shift
 		helpmethod "$@"
 		;;
-	    help)
+	    help )
 		echo "$CMD help                  - shows command help"
 		echo "$CMD help <subcommand> ... - shows subcommand help"
 		;;
-	    workflow)
+	    workflow )
 		shift
 		helpworkflow "$@"
 		;;
-	    provider)
+	    provider )
 		shift
 		helpprovider "$@"
 		;;
-	    *)
+	    * )
 		echo "Unknown command '$1'.  Supported commands are 'method'"
                 echo "'workflow', 'provider' and 'help'" 
 		;;
