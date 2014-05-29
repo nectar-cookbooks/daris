@@ -10,6 +10,8 @@ fi
 MFCOMMAND=${MFLUX_BIN}/mfcommand
 DEBUG=0
 RC=0
+CMD=`basename $0`
+
 
 expect() {
     EXPECTED=$1
@@ -39,7 +41,7 @@ run() {
 
 provider() {
     if [ $# -eq 0 ] ; then
-	echo "syntax: provider --user user --host host <options> ..."
+	echo "syntax: $CMD provider --user user --host host <options> ..."
         RC=1
 	exit
     fi
@@ -142,7 +144,7 @@ EOF
 
 workflow() {
    if [ $# -lt 1 ] ; then
-       echo "syntax: $0 workflow <workflow.kar> [--name <name>] "
+       echo "syntax: $CMD workflow <workflow.kar> [<options>] "
        RC=1
        exit
    fi
@@ -335,10 +337,80 @@ EOF
 }
 
 help() {
-    echo "Don't panic!"
-    RC=1
-    exit
+	echo "Usage: $CMD <global-opts> subcommand [<args>]"
+	echo "where the subcommands are:"
+	echo "    provider --user user --host host <options>"
+        echo "                             - sets the user's kepler provider settings"
+	echo "    workflow <workflow.kar> [ <options> ]"
+        echo "                             - creates or updates the DaRIS "
+        echo "                               'transform definition' for a workflow "
+	echo "    help [ <subcommand> ...] - outputs command help"
+	echo "    method <methodname> <options> --workflow ... "
+        echo "                             - creates or updates a DaRIS method"
+	echo "                               containing 'transform steps' for"
+	echo "                               one or more workflows"
+        echo
+	echo "$CMD configures the DaRIS side of the DaRIS / Kepler workflow"
+        echo "integration from the command line.  The only global option is"
+	echo "--debug (or -d) which causes the command keep the Mediaflux"
+        echo "script files after they have been executed."
+        echo
+        echo "The command requires Mediaflux administrator privilege; i.e."
+        echo "it needs to be run as the 'mflux' user, or as 'root'."
+        echo 
+    else
+	case $1 in
+	    method)
+		shift
+		helpmethod "$@"
+		;;
+	    help)
+		echo "$CMD help                  - shows command help"
+		echo "$CMD help <subcommand> ... - shows subcommand help"
+		;;
+	    workflow)
+		shift
+		helpworkflow "$@"
+		;;
+	    provider)
+		shift
+		helpprovider "$@"
+		;;
+	    *)
+		echo "Unknown command '$1'.  Supported commands are 'method'"
+                echo "'workflow', 'provider' and 'help'" 
+		;;
+	esac
+    fi
+    exit 1
 }
+
+helpmethod() {
+    echo "Usage: $CMD method <methodname> [ --update <cid> ]" 
+    echo "    ( --workflow <workflowname> "
+    echo "           [ --name <stepname> ]"
+    echo "           [ --param <pname> <type> ] ..."
+    echo "           [ --iterator <scope> <type> <query> <param>] ... ) ..."
+    echo 
+    echo "This command either creates or updates a DaRIS 'Method' to hold a"
+    echo "collection of workflows; e.g. previously defined using the 'workflow'"
+    echo "subcommand."
+    echo 
+    echo "Updating a method requires the CID for the existing method.  Note"
+    echo "this does not (yet) refresh any Ex-methods that were instantiated"
+    echo "from the previous version."
+    echo
+    echo "Each workflow to be included in the method, needs a --workflow option"
+    echo "followed by any options that relate to the particular workflow:"
+    echo " - A '--name' option sets the method's 'step' name to the provided"
+    echo "   value.  Otherwise the 'step' name defaults to the <workflowname>."
+    echo " - A '--param' option specifies a workflow parameter to be entered"
+    echo "   by the user from the DaRIS UI prior to starting the workflow."
+    echo "   Multiple parameters may be specified."
+    echo " - An '--iterator' option specifies a transform iterator and its"
+    echo "   attributes.  Ask the DaRIS team for details."
+}
+
 
 while [ $# -gt 0 ] ; do
     case $1 in
