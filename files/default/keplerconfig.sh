@@ -168,6 +168,9 @@ workflow() {
 	       shift 3
 	       while [ $# -gt 0 ] ; do
 		   case $1 in
+                       --param )
+			   break
+			   ;;
 		       --min-occurs )
 			   expect 1 "$@"
                            PARAM_ARGS="$PARAM_ARGS -min-occurs $2"
