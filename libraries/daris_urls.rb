@@ -91,7 +91,7 @@ module DarisUrls
       'dcmtools' => ['0.29'],
       'nig-commons' => ['0.41'],
       'sinks' => ['0.06', '3.9.005', false],
-      'transform' => ['1.3.03', '3.9.005', false]
+      'transform' => ['1.3.03', '3.9.002', false]
     }
   }
   
