@@ -91,8 +91,8 @@ module DarisUrls
       'dcmtools' => ['0.29'],
       'nig-commons' => ['0.41'],
       'sinks' => ['0.06', '3.9.005', false],
-      'transform' => ['1.3.03', '3.9.002', false]
-    }
+      'transform' => ['1.3.04', '3.9.002', false]
+      }
   }
   
   DARIS_PATTERNS = {
@@ -107,6 +107,20 @@ module DarisUrls
     'dcmtools' => 'dcmtools-%{ver}%{type}.zip',
     'sinks' => 'mfpkg-nig_sinks-%{ver}-mf%{mver}%{type}.zip',
     'transform' => 'mfpkg-transform-%{ver}-mf%{mver}%{type}.zip'
+  }
+
+  CHECKOUTS = {
+    'nig_essentials' => ['nigtk', 'mfp-essentials'],
+    'nig_transcode' => ['nigtk', 'mfp-transcode'],
+    'pssd' => ['nigtk', 'mfp-pssd'],
+    'daris_portal' => ['daris', ''],
+    'server_config' => ['nigtk', 'mfc-server-config'],
+    'pvupload' => ['nigtk', 'mfc-pvupload'],
+    'dicom_client' => ['nigtk', 'mfc-dicom-client'],
+    'dcmtools' => ['niktk', 'dcmtools'],
+    'nig-commons' => ['nigtk', 'commons'],
+    'sinks' => ['nigtk', 'mfp-sinks'],
+    'transform' => ['transform', '']
   }
 
   # Options for 'wget'ing DaRIS downloadables.
@@ -157,7 +171,7 @@ module DarisUrls
   end
 
   def _buildDarisFileAndType(node, item)
-    local = node['daris']['use_local_daris_builds']
+    local = node['daris']['release'] == 'local_builds'
     pat = DARIS_PATTERNS[item]
     if ! pat then
       raise "There is no filename pattern for '#{item}'"
@@ -178,12 +192,44 @@ module DarisUrls
     relname = node['daris']['release']
     if ! relname then
       raise "No DaRIS release has been specified"
-    end 
-    release = DARIS_RELEASES[relname]
-    if ! release then
-      raise "There is no 'releases' entry for release '#{relname}'"
+    end
+    if relname == 'local_builds' then
+      release = _extractReleaseInfoFromCheckout(node)
+    else
+      release = DARIS_RELEASES[relname]
+      if ! release then
+        raise "There is no 'releases' entry for release '#{relname}'"
+      end
     end
     return release
+  end
+  
+  def _extractReleaseInfoFromCheckout(node)
+    checkout_dir = "#{node['daris']['build_tree']}/git"
+    if ! File.exists?(checkout_dir) then
+      raise "Can't find the checkout directory #{checkout_dir}"
+    end
+    release = DARIS_RELEASES['latest'].clone()
+    CHECKOUTS.each() do |pkg, details|
+      checkout = "#{checkout_dir}/#{details[0]}"
+      if File.exists?(checkout) then
+        props_file = "#{checkout}/#{details[1]}/build.properties"
+        if ! File.exists?(props_file) then
+          raise "Can't find build properties for #{pkg} in #{checkout}"
+        end
+        props = new JavaProps(props_file)
+        app_version = props.properties['app.version']
+        mf_version = props.properties['mf.server.version']
+        if ! app_version then
+          raise "Can't find an 'app.version' property for #{pkg}"
+        end
+        if ! mf_version && release[pkg][1] then
+          raise "Can't find an 'mf.server.version' property for #{pkg}"
+        end
+        release[pkg] = mf_version ? [app_version, mf_version] : [app_version]
+      end
+    end
+    return release;
   end
 
   # If a release is not stable, we cannot assume that a cached local copy
@@ -208,5 +254,17 @@ module DarisUrls
       end
       return base + file
     end
-  end 
+  end
+  
+  class JavaProps
+    attr :file, :properties
+
+    def initialize file
+      @file = file
+      @properties = {}
+      IO.foreach(file) do |line|
+        @properties[$1.strip] = $2 if line =~ /([^=]*)=(.*)\/\/(.*)/ || line =~ /([^=]*)=(.*)/
+      end
+    end
+  end
 end 
