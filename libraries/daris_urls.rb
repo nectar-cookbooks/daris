@@ -213,6 +213,7 @@ module DarisUrls
         raise "There is no 'releases' entry for release '#{relname}'"
       end
     end
+    Chef::Log.info("DaRIS package release info: #{release}")
     return release
   end
   
@@ -239,6 +240,7 @@ module DarisUrls
           raise "Can't find an 'mf.server.version' property for #{pkg}"
         end
         release[pkg] = mf_version ? [app_version, mf_version] : [app_version]
+        Chef::Log.debug("Build info for #{pkg} is #{release[pkg]}")
       end
     end
     return release;
