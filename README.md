@@ -153,6 +153,10 @@ There are a couple of other things that you can do to work around these problems
         
   tells the recipe to use PSSD 2.03, irrespective of what the other component versions are.  (A download would likely fail, but that's a different issue.)
 
+Note that if you are using "local_builds" release, the package version numbers
+are determined by the "build.properties" file from the checkout.  The problem
+with hard-wired version numbers (see above) does not apply.
+
 Using the build recipes
 =======================
 
@@ -170,7 +174,7 @@ scripts create the components with different names to the ones used on the
 download site.  (This is arguably a good thing ...).  So, if you want to
 use the downloadables, you need to set these attributes:
 
-* `node['daris']['release']` - This must be set to "latest".
+* `node['daris']['release']` - This must be set to "local_builds".
 * `node['daris']['use_local_daris_builds']` - This must be "true".
 
 The following attributes also apply:
@@ -269,3 +273,8 @@ It is difficult to envisage a case in which embedding credentials into
 sink configurations is a good idea.  The only case might be when the
 sink writes to a shared file store where there ar no individual accounts
 and anyone is permitted to see or overwrite anybody else's files.
+
+The keplerconfig command
+------------------------
+
+TBD

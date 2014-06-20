@@ -1,5 +1,15 @@
 Change Log for the Daris cookbook
 =================================
+
+Version 0.9.2
+-------------
+ - Local builds now require the release name 'local_builds'
+ - In local build mode, we now interogate the respective 'build.properties'
+   files to find package and MF version numbers
+ - Optionally load the 'sinks' and 'transforms' packages.  (Note: transforms
+   are currently only available via local builds.)
+ - Implemented shell scripts for configuring Kepler workflows and sinks.
+
 Version 0.9.1
 -------------
  - Support for local builds for the DaRIS software (#6 & #7)
