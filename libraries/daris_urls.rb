@@ -90,7 +90,7 @@ module DarisUrls
       'dicom_client' => ['1.0'],
       'dcmtools' => ['0.29'],
       'nig-commons' => ['0.41'],
-      'sinks' => ['0.06', '3.9.005', false],
+      'sinks' => ['0.06', '3.9.005'],
       'transform' => ['1.3.04', '3.9.002', false]
       }
   }
@@ -122,6 +122,18 @@ module DarisUrls
     'sinks' => ['nigtk', 'mfp-sinks'],
     'transform' => ['transform', '']
   }
+
+  class JavaProps
+    attr :file, :properties
+
+    def initialize(file)
+      @file = file
+      @properties = {}
+      IO.foreach(file) do |line|
+        @properties[$1.strip] = $2 if line =~ /([^=]*)=(.*)\/\/(.*)/ || line =~ /([^=]*)=(.*)/
+      end
+    end
+  end
 
   # Options for 'wget'ing DaRIS downloadables.
   def wgetOpts(node, refresh)
@@ -217,7 +229,7 @@ module DarisUrls
         if ! File.exists?(props_file) then
           raise "Can't find build properties for #{pkg} in #{checkout}"
         end
-        props = new JavaProps(props_file)
+        props = JavaProps.new(props_file)
         app_version = props.properties['app.version']
         mf_version = props.properties['mf.server.version']
         if ! app_version then
@@ -256,15 +268,4 @@ module DarisUrls
     end
   end
   
-  class JavaProps
-    attr :file, :properties
-
-    def initialize file
-      @file = file
-      @properties = {}
-      IO.foreach(file) do |line|
-        @properties[$1.strip] = $2 if line =~ /([^=]*)=(.*)\/\/(.*)/ || line =~ /([^=]*)=(.*)/
-      end
-    end
-  end
 end 
