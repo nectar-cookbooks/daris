@@ -152,59 +152,12 @@ workflow() {
    shift
    NAME=
    SCRIPT=/tmp/keplerconfig_$$
-   SCRIPT_2=/tmp/keplerconfig_$$_2
-   rm -f $SCRIPT $SCRIPT_2
-   touch $SCRIPT_2
    while [ $# -gt 0 ] ; do
        case $1 in
 	   --name )
 	       expect 1 "$@"
 	       NAME=$2
 	       shift 2
-	       ;;
-           --param )
-	       expect 2 "$@"
-	       PARAM_ARGS="-name \"$2\" -type \"$3\""
-	       shift 3
-	       while [ $# -gt 0 ] ; do
-		   case $1 in
-                       --param )
-			   break
-			   ;;
-		       --min-occurs )
-			   expect 1 "$@"
-                           PARAM_ARGS="$PARAM_ARGS -min-occurs $2"
-                           shift 2
-			   ;;
-		       --max-occurs )
-			   expect 1 "$@"
-                           PARAM_ARGS="$PARAM_ARGS -max-occurs $2"
-                           shift 2
-			   ;;
-		       --value )
-			   expect 1 "$@"
-			   PARAM_VALUE="$2"
-                           shift 2
-			   ;;
-		       --* )
-			   echo "Unknown --param option $1"
-			   exit
-			   ;;
-		       * )
-			   echo "Unexpected --param argument $1"
-			   exit
-			   ;;
-		   esac
-	       done
-	       if [ -z "$PARAM_VALUE" ] ; then
-		   cat >> $SCRIPT_2 <<EOF
-               :parameter $PARAM_ARGS \\
-EOF
-	       else
-		   cat >> $SCRIPT_2 <<EOF
-               :parameter $PARAM_ARGS < :value \"$PARAM_VALUE\" > \\
-EOF
-               fi
 	       ;;
 	   --* )
 	       echo "Unknown option $1"
@@ -226,18 +179,12 @@ EOF
        if { [ string length \$uid ] == 0} {
            transform.definition.create :type kepler :name \"$NAME\" \\
                :in file:$WF \\
-EOF
-   cat >> $SCRIPT < $SCRIPT_2
-   cat >> $SCRIPT <<EOF
        } else {
            transform.definition.update :uid \$uid :name \"$NAME\" \\
                :in file:$WF \\
-EOF
-   cat >> $SCRIPT < $SCRIPT_2
-   cat >> $SCRIPT <<EOF
        }
 EOF
-    run $SCRIPT $SCRIPT_2
+    run $SCRIPT
 }
 
 method() {
