@@ -159,7 +159,7 @@ workflow() {
 	       NAME=$2
 	       shift 2
 	       ;;
-	   --* )
+	   -* )
 	       echo "Unknown option $1"
 	       exit
 	       ;;
@@ -173,23 +173,64 @@ workflow() {
    if [ -z "$NAME" ] ; then
        NAME=`basename $WF .kar`
    fi
-   cat >> $SCRIPT <<EOF
-       set uid [xvalue //*\[@name='$NAME'\]/@uid \
-                    [transform.definition.list]]
-       if { [ string length \$uid ] == 0} {
-           transform.definition.create :type kepler :name \"$NAME\" \\
-               :in file:$WF \\
-       } else {
-           transform.definition.update :uid \$uid :name \"$NAME\" \\
-               :in file:$WF \\
-       }
+   cat > $SCRIPT <<EOF
+set uid [xvalue //*\[@name='$NAME'\]/@uid [transform.definition.list]]
+if { [ string length \$uid ] == 0} {
+    transform.definition.create :type kepler :name \"$NAME\" :in file:$WF \\
+} else {
+    transform.definition.update :uid \$uid :name \"$NAME\" :in file:$WF \\
+}
 EOF
     run $SCRIPT
 }
 
+refresh() {
+    if [ $# -lt 1 ] ; then
+	echo "usage: $CMD refresh --all | <subject-cid> ..." 
+    fi
+    ALL=0
+    while [ $# -gt 0 ] ; do 
+	case "$1" in
+	    --all )
+		ALL=1
+		shift
+		;;
+	    -* )
+		echo "Unknown option $1"
+		exit
+		;;
+	    *)
+		break
+		;;
+	esac
+    done
+    SCRIPT=/tmp/keplerconfig_$$
+    if [ $ALL -eq 1 ] then;
+	cat > $SCRIPT << EOF
+set method_cids [ \\
+      asset.query :where xpath(pssd-object/type)='subject' \\
+                     and xpath(pssd-subject/method)='1036.2.25' \\
+                  :action get-value :xpath cid ]
+EOF
+    else
+	SAVE_IFS="$IFS"
+        IFS=","
+	cat > $SCRIPT << EOF
+set method_cids [ list "$*" ]
+EOF
+    fi
+    cat >> $SCRIPT <<EOF
+foreach S $method_cids {
+    om.pssd.subject.method.replace :id $S :recursive true
+}
+EOF
+    # run $SCRIPT
+}
+
+
 method() {
     if [ $# -lt 1 ] ; then
-	echo "usage: $0 method <name> [--update cid] "
+	echo "usage: $CMD method <name> [--update cid] "
         echo "          (--workflow <name> <options>) ..."
 	RC=1
 	exit
@@ -217,8 +258,8 @@ method() {
         STEP_NAME=WF_NAME
 	shift 2
 	cat >> $SCRIPT <<EOF
-        set wf_${WF_NAME}_uid [xvalue //*\[@name='$WF_NAME'\]/@uid \\
-                                  [transform.definition.list]]
+set wf_${WF_NAME}_uid [xvalue //*\[@name='$WF_NAME'\]/@uid \\
+                          [transform.definition.list]]
 EOF
         rm -f $SCRIPT_3
         touch $SCRIPT_3
@@ -235,7 +276,7 @@ EOF
 		    VALUE=$3
 		    shift 3
 		    cat >> $SCRIPT_3 <<EOF
-                    :parameter -name $PARAM \"$VALUE\" \\
+    :parameter -name $PARAM \"$VALUE\" \\
 EOF
 		    ;;
 		--iterator )
@@ -246,12 +287,8 @@ EOF
 		    PARAM=$4
                     shift 5
 		    cat >> $SCRIPT_3 <<EOF
-                    :iterator < \\
-                        :parameter $PARAM \\
-                        :query \"$QUERY\" \\
-                        :scope $SCOPE \\
-                        :type $TYPE \\
-                    > \\
+    :iterator < :parameter $PARAM :query \"$QUERY\" \\
+                :scope $SCOPE :type $TYPE > \\
 EOF
 		    ;;
 		--workflow )
@@ -260,15 +297,13 @@ EOF
 	    esac
 	done
 	cat >> $SCRIPT_2 <<EOF
-            :step < \\
-                :name \"$WF_NAME\" \\
-                :transform < \\
-                    :definition -version 0 \$wf_${WF_NAME}_uid \\
+    :step < :name \"$WF_NAME\" \\
+            :transform < :definition -version 0 \$wf_${WF_NAME}_uid \\
 EOF
 	cat >> $SCRIPT_2 < $SCRIPT_3
         cat >> $SCRIPT_2 <<EOF
-                > \\
-            > \\
+         > \\
+    > \\
 EOF
     done
     if [ -z "$UPDATE" ] ; then
@@ -277,9 +312,9 @@ EOF
 	VERB="om.pssd.method.for.subject.update :id $UPDATE :replace true"
     fi
     cat >> $SCRIPT <<EOF
-        $VERB :name \"$NAME\" :namespace "/pssd/methods" \\
-            :description \"Workflow collection $NAME\" \\
-            :subject < :project <> > \\
+$VERB :name \"$NAME\" :namespace "/pssd/methods" \\
+    :description \"Workflow collection $NAME\" \\
+    :subject < :project <> > \\
 EOF
     cat >> $SCRIPT < $SCRIPT_2
 
@@ -393,6 +428,11 @@ case "$1" in
   method )
     shift
     method "$@"
+    ;;
+
+  refresh )
+    shift
+    refresh "$@"
     ;;
 
   help )
