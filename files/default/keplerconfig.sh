@@ -205,12 +205,13 @@ refresh() {
 	esac
     done
     SCRIPT=/tmp/keplerconfig_$$
-    if [ $ALL -eq 1 ] then;
+    if [ $ALL -eq 1 ] ; then
 	cat > $SCRIPT << EOF
-set method_cids [ \\
+set res [ \\
       asset.query :where xpath(pssd-object/type)='subject' \\
                      and xpath(pssd-subject/method)='1036.2.25' \\
                   :action get-value :xpath cid ]
+set method_cids [ xvalues //
 EOF
     else
 	SAVE_IFS="$IFS"
@@ -220,8 +221,8 @@ set method_cids [ list "$*" ]
 EOF
     fi
     cat >> $SCRIPT <<EOF
-foreach S $method_cids {
-    om.pssd.subject.method.replace :id $S :recursive true
+foreach S \$method_cids {
+    om.pssd.subject.method.replace :id \$S :recursive true
 }
 EOF
     # run $SCRIPT
