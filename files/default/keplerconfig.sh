@@ -11,7 +11,7 @@ MFCOMMAND=${MFLUX_BIN}/mfcommand
 DEBUG=0
 RC=0
 CMD=`basename $0`
-
+SCRIPT_BASE=/tmp/keplerconfig_$$
 
 expect() {
     EXPECTED=$1
@@ -120,7 +120,7 @@ provider() {
     else
 	CREDENTIALS=":private-key < :name \"$RUSER\" :key-key \"$PK_KEY\" >"
     fi
-    SCRIPT=/tmp/keplerconfig_$$
+    SCRIPT=$SCRIPT_BASE
     cat > $SCRIPT <<EOF
 transform.provider.user.settings.set \
     :domain users :user "$DUSER" \
@@ -151,7 +151,7 @@ workflow() {
    WF=$1
    shift
    NAME=
-   SCRIPT=/tmp/keplerconfig_$$
+   SCRIPT=$SCRIPT_BASE
    while [ $# -gt 0 ] ; do
        case $1 in
 	   --name )
@@ -204,7 +204,7 @@ refresh() {
 		;;
 	esac
     done
-    SCRIPT=/tmp/keplerconfig_$$
+    SCRIPT=$SCRIPT_BASE
     if [ $ALL -eq 1 ] ; then
 	cat > $SCRIPT << EOF
 set res [ \\
@@ -238,9 +238,9 @@ method() {
     fi
     NAME=$1
     shift
-    SCRIPT=/tmp/keplerconfig_$$
-    SCRIPT_2=/tmp/keplerconfig_$$_2
-    SCRIPT_3=/tmp/keplerconfig_$$_3
+    SCRIPT=$SCRIPT_BASE
+    SCRIPT_2=${SCRIPT_BASE}_2
+    SCRIPT_3=${SCRIPT_BASE}_3
     UPDATE=
     rm -f $SCRIPT $SCRIPT_2
     while [ $# -gt 0 ] ; do
@@ -328,7 +328,7 @@ help() {
 	echo "where the subcommands are:"
 	echo "    provider --user user --host host <options>"
         echo "                             - sets the user's kepler provider settings"
-	echo "    workflow <workflow.kar> [ <options> ]"
+	echo "   workflow <workflow.kar> [ <options> ]"
         echo "                             - creates or updates the DaRIS "
         echo "                               'transform definition' for a workflow "
 	echo "    help [ <subcommand> ...] - outputs command help"
@@ -403,6 +403,7 @@ while [ $# -gt 0 ] ; do
     case $1 in
 	--debug | -d )
 	    DEBUG=1
+            SCRIPT_BASE=/tmp/keplerconfig_debug
 	    shift
 	    ;;
 	-* )
