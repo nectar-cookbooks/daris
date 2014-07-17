@@ -146,7 +146,7 @@ if [ -e $HOME/.ssh/$KEY_PAIR ] ; then
 else
     echo "Creating a new key-pair $KEY_PAIR"
 fi
-ssh-keygen -q -t rsa -C "$TAG" -f $KEY_PAIR 
+ssh-keygen -q -t rsa -N "" -C "$TAG" -f $HOME/.ssh/${KEY_PAIR}
 if [ $? -ne 0 ] ; then
     echo "SSH key generation failed"
     exit 1
