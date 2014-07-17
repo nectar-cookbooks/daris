@@ -29,14 +29,31 @@ expect() {
     fi
 }
 
-help() {
-    echo "Don't panic!"
-    exit 1
+usage() {
+    echo "Usage: $CMD [ --user <mflux-user> ] [ --domain <mflux-domain> ]"
+    echo "            [ --key-key <name> ] [ --host <host> ] [ --port <no> ]"
+    echo "            [ --transport <transport> ]"
 }
 
-if [ $# -eq 0 ] ; then
-    help
-fi
+help() {
+    usage
+    echo "This command enables SSH-sink access for a given Mediaflux user"
+    echo "to the current user's filespace on this machine.  This is done by"
+    echo "generating a passphrase-less SSH keypair, adding the public key to"
+    echo "the user's 'authorized_keys' file, and uploading the private key"
+    echo "to the mediaflux user's secure wallet.  You will be prompted for"
+    echo "the mediaflux user's password.  Other parameters can be supplied"
+    echo "via command options, or environment variables set in the user's" 
+    echo "'.mfluxrc' file."
+    echo
+    echo "Options:"
+    echo "  --user <mflux_user> The mediaflux user name (\$MFLUX_USER)"
+    echo "  --domain <mflux_domain> The mediaflux domain (\$MFLUX_DOMAIN)"
+    echo "  --host <host> The mediaflux server hostname (\$MFLUX_HOST)"
+    echo "  --host <port> The mediaflux server port (\$MFLUX_PORT)"
+    echo "  --transport <transport> The mediaflux transport (\$MFLUX_TRANSPORT)"
+    echo "  --key-key <name> The mediaflux wallet key-key; defaults to 'pk'."
+}
 
 KEY_KEY=pk
 
@@ -74,10 +91,12 @@ while [ $# -gt 0 ] ; do
 	    ;;
 	-h | --help)
 	    help
+            exit 0
 	    ;;
 	-*)
 	    echo "Unrecognized option"
-	    help
+	    usage
+            exit 1
 	    ;;
 	*)
 	    break
