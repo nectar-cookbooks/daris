@@ -124,7 +124,8 @@ if [ -z "$MFLUX_PORT" ] ; then
     exit 1
 fi
 
-read -s -p "Password for mediaflux user $MFLUX_USER" MFLUX_PASSWORD
+read -s -p "Password for mediaflux user $MFLUX_USER:  " MFLUX_PASSWORD
+echo
 
 if [ -z "$MFLUX_PASSWORD" ] ; then
     echo "No password supplied: bailing out"
@@ -145,7 +146,7 @@ if [ -e $HOME/.ssh/$KEY_PAIR ] ; then
 else
     echo "Creating a new key-pair $KEY_PAIR"
 fi
-ssh-keygen -q -t RSA -C "$TAG" -f $KEY_PAIR 
+ssh-keygen -q -t rsa -C "$TAG" -f $KEY_PAIR 
 if [ $? -ne 0 ] ; then
     echo "SSH key generation failed"
     exit 1
