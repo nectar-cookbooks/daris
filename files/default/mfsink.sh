@@ -11,7 +11,12 @@ if [ -r $HOME/.mfluxrc ] ; then
     . $HOME/.mfluxrc
 fi
 
-MFCOMMAND=${MFLUX_BIN}/mfcommand
+if [ -z "$MFLUX_BIN" ] ; then
+    MFCOMMAND=mfcommand
+else
+    MFCOMMAND=${MFLUX_BIN}/mfcommand
+fi
+
 CMD=`basename $0`
 RC=0
 
