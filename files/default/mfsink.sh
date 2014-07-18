@@ -173,8 +173,9 @@ fi
 chmod 600 $AK
 
 SCRIPT=$HOME/.ssh/mflux_script
+KEY=`sed '{:q;N;s/\n/\\n/g;t q}' < $HOME/.ssh/${KEY_PAIR}`
 cat <<EOF > $SCRIPT
-secure.wallet.set :key \"$KEY_KEY\" :value \"`cat $HOME/.ssh/${KEY_PAIR}`\"
+secure.wallet.set :key \"$KEY_KEY\" :value \"$KEY\"
 EOF
 $MFCOMMAND --norc logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD
 if [ $? -ne 0 ] ; then
