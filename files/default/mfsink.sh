@@ -7,6 +7,9 @@
 #   3) Logging into Mediaflux as the user and adding the private key
 #      to the user's secure wallet.
 
+if [ -r /etc/mediaflux/mfluxrc ] ; then
+    . /etc/mediaflux/mfluxrc
+fi
 if [ -r $HOME/.mfluxrc ] ; then
     . $HOME/.mfluxrc
 fi
