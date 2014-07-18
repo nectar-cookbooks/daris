@@ -161,20 +161,19 @@ if [ $? -ne 0 ] ; then
 fi
 
 echo "Adding the public key to 'authorized_keys'"
-if [ -e $HOME/.ssh/authorized_keys ] ; then
-    grep -v "$TAG" $HOME/.ssh/authorized_keys \ 
-        > $HOME/.ssh/authorized_keys.tmp && \
-        cat $HOME/.ssh/${KEY_PAIR}.pub >> $HOME/.ssh/authorized_keys.tmp
+AK=$HOME/.ssh/authorized_keys
+if [ -e $AK ] ; then
+    grep -v "$TAG" $AK > $AK.tmp && cat $HOME/.ssh/${KEY_PAIR}.pub >> $AK.tmp
     if [ $? -ne 0 ] ; then
 	echo "Something went wrong with the 'authorized_keys' edit"
-        echo "(Look in $HOME/.ssh/authorized_keys.tmp ...)"
+        echo "(Look in $AK.tmp ...)"
 	exit 1
     fi
-    mv $HOME/.ssh/authorized_keys.tmp $HOME/.ssh/authorized_keys
+    mv $AK.tmp $AK
 else
-    cp $HOME/.ssh/${KEY_PAIR}.pub $HOME/.ssh/authorized_keys
+    cp $HOME/.ssh/${KEY_PAIR}.pub $ak
 fi
-chmod 600 $HOME/.ssh/authorized_keys
+chmod 600 $AK
 
 SCRIPT=$HOME/.ssh/mflux_script
 cat <<EOF > $SCRIPT
