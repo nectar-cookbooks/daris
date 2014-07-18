@@ -317,12 +317,6 @@ bash "run-initial-daris-config" do
          "#{mfcommand} logoff"
 end
 
-cookbook_file "#{mflux_bin}/mfsink" do
-  user mflux_user
-  source "mfsink.sh"
-  mode 0755
-end
-
 cookbook_file "#{mflux_bin}/mfsink-admin" do
   user mflux_user
   source "mfsink-admin.sh"

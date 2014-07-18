@@ -1,8 +1,8 @@
 #
 # Cookbook Name:: daris
-# Recipe:: clients
+# Recipe:: mfsink-auth
 #
-# Copyright (c) 2013, The University of Queensland
+# Copyright (c) 2013, 2014, The University of Queensland
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -27,8 +27,15 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-include_recipe "daris::pvupload"
+include_recipe "mediaflux::common"
+include_recipe "daris::common"
 
-include_recipe "daris::dicom-client"
+mflux_home = node['mediaflux']['home']
+mflux_bin = node['mediaflux']['bin'] || "#{mflux_home}/bin"
 
-include_recipe "daris::mfsink-auth"
+cookbook_file "#{mflux_bin}/mfsink-auth" do
+  user 'root'
+  source "mfsink-auth.sh"
+  mode 0755
+end
+
