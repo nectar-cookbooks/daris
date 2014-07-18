@@ -6,7 +6,7 @@ description "Install and configures a DaRIS instance"
 long_description "Installs and configures a MediaFlux + DaRIS instance.  "
                  "Before you start, it is necessary to obtain access to the "
                  "MediaFlux installation media, and a MediaFlux license key."
-version "0.9.2"
+version "0.9.3"
 
 depends "java", ">= 1.13.0"
 depends "mediaflux", ">= 0.9.4"

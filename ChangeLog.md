@@ -1,6 +1,10 @@
 Change Log for the Daris cookbook
 =================================
 
+Version 0.9.3
+-------------
+ - Added command for configuring sink access into a remote machine.
+
 Version 0.9.2
 -------------
  - Local builds now require the release name 'local_builds'
