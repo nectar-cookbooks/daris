@@ -154,6 +154,7 @@ if [ -e $HOME/.ssh/$KEY_PAIR ] ; then
 else
     echo "Creating a new key-pair $KEY_PAIR"
 fi
+rm $HOME/.ssh/${KEY_PAIR} $HOME/.ssh/${KEY_PAIR}.pub
 ssh-keygen -q -t rsa -N "" -C "$TAG" -f $HOME/.ssh/${KEY_PAIR}
 if [ $? -ne 0 ] ; then
     echo "SSH key generation failed"
@@ -163,12 +164,8 @@ fi
 echo "Adding the public key to 'authorized_keys'"
 AK=$HOME/.ssh/authorized_keys
 if [ -e $AK ] ; then
-    grep -v "$TAG" $AK > $AK.tmp && cat $HOME/.ssh/${KEY_PAIR}.pub >> $AK.tmp
-    if [ $? -ne 0 ] ; then
-	echo "Something went wrong with the 'authorized_keys' edit"
-        echo "(Look in $AK.tmp ...)"
-	exit 1
-    fi
+    grep -v "$TAG" $AK > $AK.tmp
+    cat $HOME/.ssh/${KEY_PAIR}.pub >> $AK.tmp
     mv $AK.tmp $AK
 else
     cp $HOME/.ssh/${KEY_PAIR}.pub $ak
