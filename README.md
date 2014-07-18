@@ -234,12 +234,33 @@ Mediaflux admin privilege.
 Note: these commands work by running Mediaflux Tcl scripts.  If something 
 does wrong, you are likely to see an ugly Mediaflux stacktrace.  This is 
 unfortunate, but it would difficult to extract decent diagnostics from 
-the script output. 
+the script output.
 
-The mfsink command
-------------------
+The mfsink-auth command
+-----------------------
 
-The "mfsink" command allows you to create, remove, list and describe the
+The "mfsink-auth" command is designed to be installed on a Linux 
+system, and run by a Mediaflux / DaRIS user to allow SSH Sink access to the
+user's filespace from their DaRIS account.  It does the following:
+
+1. It generate an SSH key-pair.
+2. It adds the public key to the user's 'authorized_keys' file
+3. It logs into Mediaflux using the user's Mediaflux username and password.
+4. It adds the private key to the user's secure wallet.
+
+Security note: the private key has an empty passphrase, so you are advised
+to not reuse it for other purposes.
+
+The command reads the global "mfluxrc" file and the user's "~/.mfluxrc" file
+to obtain defaults for the mediaflux username, domain, hostname and port, 
+and for the local mediaflux installation directory.  These override any user
+environment settings, and can in (on some cases) be overridden by command
+line options.  The "--help" option will list the command line options.
+
+The mfsink-admin command
+------------------------
+
+The "mfsink-admin" command allows you to create, remove, list and describe the
 Mediaflux data sink configurations.  
 
 The primary command documentation is provided by the "help" subcommand.
