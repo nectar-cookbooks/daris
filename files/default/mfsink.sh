@@ -172,18 +172,23 @@ else
 fi
 chmod 600 $AK
 
+echo "Adding the private key to ${MFLUX_USER}'s secure wallet (as '$KEY_KEY')"
 SCRIPT=$HOME/.ssh/mflux_script
-KEY=`sed '{:q;N;s/\n/\\n/g;t q}' < $HOME/.ssh/${KEY_PAIR}`
+KEY=`sed '{:q;N;s/\n/\\\\n/g;t q}' < $HOME/.ssh/${KEY_PAIR}`
 cat <<EOF > $SCRIPT
 secure.wallet.set :key \"$KEY_KEY\" :value \"$KEY\"
 EOF
 $MFCOMMAND --norc logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD
 if [ $? -ne 0 ] ; then
     echo "Mediaflux login failed for domain $MFLUX_DOMAIN, user $MFLUX_USER"
+    exit 1
 fi
 $MFCOMMAND --norc source $SCRIPT
 RC=$?
 $MFCOMMAND --norc logoff
 rm $SCRIPT
 
+if [ $RC -eq 0 ] ; then
+    echo "Succeeded"
+fi
 exit $RC
