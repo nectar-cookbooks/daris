@@ -174,6 +174,7 @@ if [ -e $HOME/.ssh/authorized_keys ] ; then
 else
     cp $HOME/.ssh/${KEY_PAIR}.pub $HOME/.ssh/authorized_keys
 fi
+chmod 600 $HOME/.ssh/authorized_keys
 
 SCRIPT=$HOME/.ssh/mflux_script
 cat <<EOF > $SCRIPT
