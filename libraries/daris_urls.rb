@@ -213,7 +213,6 @@ module DarisUrls
         raise "There is no 'releases' entry for release '#{relname}'"
       end
     end
-    Chef::Log.info("DaRIS package release info: #{release}")
     return release
   end
   
