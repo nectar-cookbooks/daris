@@ -30,6 +30,9 @@
 include_recipe "mediaflux::common"
 include_recipe "daris::common"
 
+# This installs mfcommand as well ... which is what we need
+include_recipe "mediaflux::aterm"
+
 mflux_home = node['mediaflux']['home']
 mflux_bin = node['mediaflux']['bin'] || "#{mflux_home}/bin"
 

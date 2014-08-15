@@ -193,13 +193,13 @@ chmod 600 $AK
 echo "Creating ${MFLUX_USER}'s secure wallet entry(s)"
 SCRIPT=$HOME/.ssh/mflux_script
 KEY=`sed '{:q;N;s/\n/\\\\n/g;t q}' < $HOME/.ssh/${KEY_PAIR}`
-rm $SCRIPT
-if [ SINK -eq 1 ] ; then
+rm $SCRIPT 2> /dev/null
+if [ $SINK -eq 1 ] ; then
     cat <<EOF > $SCRIPT
 secure.wallet.set :key \"$KEY_KEY\" :value \"$KEY\"
 EOF
 fi
-if [ TRANSFORM -eq 1 ] ; then
+if [ $TRANSFORM -eq 1 ] ; then
     cat <<EOF >> $SCRIPT
 secure.wallet.set :key \"host-credentials:ssh://$IP\" \
     :xvalue < :user $USER :private-key \"$KEY\" >
