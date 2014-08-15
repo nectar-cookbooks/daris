@@ -22,6 +22,7 @@ fi
 
 CMD=`basename $0`
 RC=0
+IP=`hostname -i`
 
 expect() {
     EXPECTED=$1
@@ -39,13 +40,13 @@ expect() {
 
 usage() {
     echo "Usage: $CMD [ --user <mflux-user> ] [ --domain <mflux-domain> ]"
-    echo "            [ --key-key <name> ] [ --host <host> ] [ --port <no> ]"
-    echo "            [ --transport <transport> ]"
+    echo "            [ --key-key <name> ] [ --sink ] [ --transform ] "
+    echo "            [ --host <host> ] [ --port <no> ] [ --transport <transport> ]"
 }
 
 help() {
     usage
-    echo "This command enables SSH-sink access for a given Mediaflux user"
+    echo "This command enables SSH access for a given Mediaflux user"
     echo "to the current user's filespace on this machine.  This is done by"
     echo "generating a passphrase-less SSH keypair, adding the public key to"
     echo "the user's 'authorized_keys' file, and uploading the private key"
@@ -60,10 +61,15 @@ help() {
     echo "  --host <host> The mediaflux server hostname (\$MFLUX_HOST)"
     echo "  --host <port> The mediaflux server port (\$MFLUX_PORT)"
     echo "  --transport <transport> The mediaflux transport (\$MFLUX_TRANSPORT)"
-    echo "  --key-key <name> The mediaflux wallet key-key; defaults to 'pk'."
+    echo "  --sink Create a wallet entry for an SSH sink"
+    echo "  --transform Create a wallet entry for use as a Transform provider"
+    echo "  --key-key <name> The wallet key-key for the sink; "
+    echo "        defaults to 'pk://$IP'."
 }
 
-KEY_KEY=pk
+SINK=0
+TRANSFORM=0
+KEY_KEY=pk://$IP
 
 while [ $# -gt 0 ] ; do
     case $1 in
@@ -97,6 +103,14 @@ while [ $# -gt 0 ] ; do
 	    KEY_KEY=$2
 	    shift 2
 	    ;;
+	--sink )
+	    SINK=1
+	    shift 1
+	    ;;
+	--transform )
+	    TRANSFORM=1
+	    shift 1
+	    ;;
 	-h | --help)
 	    help
             exit 0
@@ -111,6 +125,10 @@ while [ $# -gt 0 ] ; do
 	    ;;
     esac
 done
+
+if [ $SINK -eq 0 -a $TRANSFORM -eq 0 ] ; then
+    SINK=1
+fi
 
 if [ -z "$MFLUX_USER" ] ; then 
     echo "Use --user to supply the Mediaflux / DaRIS user name"
@@ -172,12 +190,22 @@ else
 fi
 chmod 600 $AK
 
-echo "Adding the private key to ${MFLUX_USER}'s secure wallet (as '$KEY_KEY')"
+echo "Creating ${MFLUX_USER}'s secure wallet entry(s)"
 SCRIPT=$HOME/.ssh/mflux_script
 KEY=`sed '{:q;N;s/\n/\\\\n/g;t q}' < $HOME/.ssh/${KEY_PAIR}`
-cat <<EOF > $SCRIPT
+rm $SCRIPT
+if [ SINK -eq 1 ] ; then
+    cat <<EOF > $SCRIPT
 secure.wallet.set :key \"$KEY_KEY\" :value \"$KEY\"
 EOF
+fi
+if [ TRANSFORM -eq 1 ] ; then
+    cat <<EOF >> $SCRIPT
+secure.wallet.set :key \"host-credentials:ssh://$IP\" \
+    :xvalue < :user $USER :private-key \"$KEY\" >
+EOF
+fi
+
 $MFCOMMAND --norc logon $MFLUX_DOMAIN $MFLUX_USER $MFLUX_PASSWORD
 if [ $? -ne 0 ] ; then
     echo "Mediaflux login failed for domain $MFLUX_DOMAIN, user $MFLUX_USER"
