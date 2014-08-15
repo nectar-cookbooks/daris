@@ -131,7 +131,7 @@ transform.provider.user.settings.set \
             :launcher-service -name secure.shell.execute < \
                 :args < \
                     :host "$RHOST" \
-                    $CREDENTIALS \
+                    :use-wallet-entry true \
                     :command "${KPATH}/${KCMD}" \
                  > \
                  :port-xpath stdout \
@@ -140,6 +140,9 @@ transform.provider.user.settings.set \
     >
 EOF
     run $SCRIPT
+    echo The users SSH private key for $RHOST must be provided as a secure
+    echo wallet entry in the users wallet with the wallet key:
+    echo "        " \"host-credentials:ssh:$RHOST\"
 }
 
 workflow() {
