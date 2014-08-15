@@ -142,7 +142,7 @@ EOF
     run $SCRIPT
     echo The users SSH private key for $RHOST must be provided as a secure
     echo wallet entry in the users wallet with the wallet key:
-    echo "        " \"host-credentials:ssh:$RHOST\"
+    echo "        " \"host-credentials:ssh://$RHOST\"
 }
 
 workflow() {
