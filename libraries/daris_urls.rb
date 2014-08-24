@@ -79,19 +79,33 @@ module DarisUrls
       'dcmtools' => ['0.29'],
       'nig-commons' => ['0.41', '3.9.005']
     },
+    'stable-2-22' => {
+      'type' => 'stable',
+      'nig_essentials' => ['0.23', '4.0.005'],
+      'nig_transcode' => ['0.36', '4.0.005'],
+      'pssd' => ['2.18', '4.0.005'],
+      'daris_portal' => ['0.46', '4.0.005'],
+      'server_config' => ['1.0'],
+      'pvupload' => ['0.35'],
+      'dicom_client' => ['1.0'],
+      'dcmtools' => ['0.29'],
+      'nig-commons' => ['0.42', '4.0.004'],
+      'sinks' => ['0.07', '4.0.005'],
+      'transform' => ['1.3.07', '4.0.005']
+      }
     'latest' => {
       'type' => 'latest',
       'nig_essentials' => ['0.23', '4.0.005'],
       'nig_transcode' => ['0.36', '4.0.005'],
       'pssd' => ['2.18', '4.0.005'],
-      'daris_portal' => ['0.45', '4.0.005'],
+      'daris_portal' => ['0.46', '4.0.005'],
       'server_config' => ['1.0'],
       'pvupload' => ['0.35'],
       'dicom_client' => ['1.0'],
       'dcmtools' => ['0.29'],
-      'nig-commons' => ['0.41', '4.0.004'],
+      'nig-commons' => ['0.42', '4.0.004'],
       'sinks' => ['0.07', '4.0.005'],
-      'transform' => ['1.3.07', '4.0.005', false]
+      'transform' => ['1.3.07', '4.0.005']
       }
   }
   
