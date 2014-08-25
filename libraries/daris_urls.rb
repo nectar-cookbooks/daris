@@ -92,7 +92,7 @@ module DarisUrls
       'nig-commons' => ['0.42', '4.0.004'],
       'sinks' => ['0.07', '4.0.005'],
       'transform' => ['1.3.07', '4.0.005']
-      }
+    },
     'latest' => {
       'type' => 'latest',
       'nig_essentials' => ['0.23', '4.0.005'],
