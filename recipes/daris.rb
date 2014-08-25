@@ -128,7 +128,6 @@ pkgs.each() do | pkg, url_and_file |
   url, file = url_and_file
   if url then
     bash "fetch-#{pkg}" do
-      user mflux_user
       code "wget #{wget_opts} -P #{installers} #{url}"
       not_if { !refresh && File.exists?("#{installers}/#{file}") }
     end
