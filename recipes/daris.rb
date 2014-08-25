@@ -271,20 +271,19 @@ end
 
 # Inject the pssd and dicom stores into the set of stores to be backed up
 ["backup.tcl", "backup.sh"].each do |name|
-    begin
-      backup_resource = resources("template[#{name}]")
-      all_stores = backup_resource.variables['stores']
-      if all_stores then
-        if !all_stores.include?('pssd') then
-          all_stores << 'pssd'
-        end
-        if !all_stores.include?(dicom_store) then
-          all_stores << dicom_store
-        end
+  begin
+    backup_resource = resources("template[#{name}]")
+    all_stores = backup_resource.variables['stores']
+    if all_stores then
+      if !all_stores.include?('pssd') then
+        all_stores << 'pssd'
       end
-    rescue Chef::Exceptions::ResourceNotFound
-      # OK ... the template may not exist ...
+      if !all_stores.include?(dicom_store) then
+        all_stores << dicom_store
+      end
     end
+  rescue Chef::Exceptions::ResourceNotFound
+    # OK ... the template may not exist ...
   end
 end
 
