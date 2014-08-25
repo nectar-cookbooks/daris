@@ -273,14 +273,16 @@ end
 ["backup.tcl", "backup.sh"].each do |name|
   backup_resource = resources("template[#{name}]")
   if backup_resource then
-    all_stores = backup_resource.variables['stores']
-    if all_stores then
+    begin
+      all_stores = backup_resource.variables['stores']
       if !all_stores.include?('pssd') then
         all_stores << 'pssd'
       end
       if !all_stores.include?(dicom_store) then
         all_stores << dicom_store
       end
+    rescue Chef::Exceptions::ResourceNotFound
+      # OK ... the template may not exist ...
     end
   end
 end
