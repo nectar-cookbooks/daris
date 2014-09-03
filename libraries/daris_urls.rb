@@ -246,10 +246,14 @@ module DarisUrls
 
   def getRequiredMediafluxVersion(node) 
     release = getRelease(node)
+    puts "release = #{release}"
     version = nil
     release.each() do |key, value|
+      puts "key = #{key}, value = #{value}"
       if value.kind_of?(Array) then
+        puts "is array"
         if value.length >= 2 then
+          puts "is long enough"
           v = value[2]
           if version == nil || 
               Chef::VersionConstraint.new("> #{version}").include?(v)
