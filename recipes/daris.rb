@@ -88,7 +88,7 @@ ruby_block "check-preconditions" do
         "Have you installed Mediaflux?"
     end
     required = getRequiredMediafluxVersion(node)
-    installed = getInstalledMediafluxVersion()
+    installed = getInstalledMediafluxVersion(mflux_home)
     unless Chef::VersionConstraint(">= #{required}").include?(installed) then
       raise "The chosen version of DaRIS requires (at least) Mediaflux " +
         "#{required} but the installed version is Mediaflux #{installed}."
