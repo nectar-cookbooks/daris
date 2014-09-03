@@ -247,7 +247,7 @@ module DarisUrls
   def getRequiredMediafluxVersion(node) 
     release = getRelease(node)
     version = nil
-    release.each() do {key, value}
+    release.each() do |key, value|
       if value.kind_of?(Array) then
         if value.length >= 2 then
           v = value[2]
