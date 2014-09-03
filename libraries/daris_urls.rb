@@ -243,6 +243,24 @@ module DarisUrls
     end
     return release
   end
+
+  def getRequiredMediafluxVersion(node) 
+    release = getRelease(node)
+    version = nil
+    release.each() do {key, value}
+      if value.kind_of?(Array) then
+        if value.length >= 2 then
+          v = value[2]
+          if version == nil || 
+              Chef::VersionConstraint.new("> #{version}").include?(v)
+            version = v
+          end
+        end
+      end
+    end
+    raise "Cannot determine the required Mediaflux version" unless version
+    return version
+  end
   
   def _extractReleaseInfoFromCheckout(node)
     checkout_dir = "#{node['daris']['build_tree']}/git"
