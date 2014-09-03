@@ -78,6 +78,9 @@ end
 
 ruby_block "check-preconditions" do
   block do
+    ::Chef::Recipe.send(:include, DarisUrls)
+    ::Chef::Recipe.send(:include, MfluxHelpers)
+
     unless File::directory?("#{mflux_home}") then
       raise "Can't find the Mediaflux install directory #{mflux_home}. " +
         "Have you installed Mediaflux?"
