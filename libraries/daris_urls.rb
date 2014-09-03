@@ -254,9 +254,10 @@ module DarisUrls
         puts "is array"
         if value.length >= 2 then
           puts "is long enough"
-          v = value[2]
+          v = value[1]
           if version == nil || 
-              Chef::VersionConstraint.new("> #{version}").include?(v)
+              Chef::VersionConstraint.new("> #{version}").include?(v) then
+            puts "setting version to #{v}"
             version = v
           end
         end
