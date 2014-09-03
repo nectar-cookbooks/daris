@@ -1,6 +1,12 @@
 Change Log for the Daris cookbook
 =================================
 
+Version 0.9.4
+-------------
+ - Implemented checking of the installed Mediaflux version
+ - Updates to sink (and transform) authorization script
+ - Other fixes
+
 Version 0.9.3
 -------------
  - Added command for configuring sink access into a remote machine.
