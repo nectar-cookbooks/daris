@@ -33,7 +33,8 @@ include_recipe "minc-toolkit"
 include_recipe "daris::common"
 
 ::Chef::Recipe.send(:include, DarisUrls)
-::Chef::Recipe.send(:include, MfluxHelpers)
+::Chef::Resource::RubyBlock.send(:include, DarisUrls)
+::Chef::Resource::RubyBlock.send(:include, MfluxHelpers)
 
 mflux_home = node['mediaflux']['home']
 mflux_bin = node['mediaflux']['bin'] || "#{mflux_home}/bin"
@@ -78,9 +79,6 @@ end
 
 ruby_block "check-preconditions" do
   block do
-    ::Chef::Recipe.send(:include, DarisUrls)
-    ::Chef::Recipe.send(:include, MfluxHelpers)
-
     unless File::directory?("#{mflux_home}") then
       raise "Can't find the Mediaflux install directory #{mflux_home}. " +
         "Have you installed Mediaflux?"
