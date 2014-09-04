@@ -262,7 +262,7 @@ module DarisUrls
     return version
   end
 
-  def scrapDaRISRelease(node)
+  def scrapeRelease(node)
     version = node['daris']['version']
     user = node['daris']['download_user']
     password = node['daris']['download_password']
