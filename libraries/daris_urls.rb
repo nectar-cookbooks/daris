@@ -261,6 +261,64 @@ module DarisUrls
     raise "Cannot determine the required Mediaflux version" unless version
     return version
   end
+
+  def scrapDaRISRelease(node)
+    version = node['daris']['version']
+    user = node['daris']['download_user']
+    password = node['daris']['download_password']
+    url = node['daris']['download_url']
+    options = {:http_basic_authentication => [user, password]}
+    if version != 'latest' then
+      # Check that the current 'stable' build is the one we want.
+      stable = nil
+      OpenURI.open_uri(url, options) do |f|
+        if f.status[0] != '200' then
+          raise "Unable to fetch page #{page_url}: status = #{f.status}"
+        end
+        f.each do |line|
+          m = /Stable Builds \(([^)]+)\)/.match(line)
+          if m then
+            raise "Found multiple 'Stable Builds' lines" if stable
+          end
+          stable = m[1]
+        end
+        raise "Found no multiple 'Stable Builds' lines" unless stable
+      end
+      if stable != version then
+        Chef::Log.warn("The current DaRIS stable build is " +
+                       "#{stable} not #{version}")
+        return nil
+      end
+    end
+    type = version == 'latest' ? 'latest' : 'stable'
+    regexes = {
+      'nig_essentials' => "#{type}/mfpkg-nig_essentials",
+      'nig_transcode' => "#{type}/mfpkg-nig_transcode",
+      'pssd' => "#{type}/mfpkg-pssd",
+      'daris_portal' => "#{type}/mfpkg-daris",
+      'server_config' => "#{type}/server-config",
+      'pvupload' => "#{type}/pvupload",
+      'dicom_client' => "#{type}/dicom-client",
+      'dcmtools' => "#{type}/dcmtools",
+      'nig-commons' => "#{type}/nig-commons",
+      'sinks' => "#{type}/mfpkg-nig_sinks",
+      'transform' => "#{type}/mfpkg-transform"
+    }
+    urls = scrapeUrls(regexes, url, options)
+    release = { 'type' => type }
+    urls.each do |key, url|
+      m = /.+-([0-9.]+)-mf([0-9.]+)-.*/.match(url)
+      if m then
+        release[key] = [m[1], m[2]]
+      else
+        m = /.+-([0-9.]+)-.*/.match(url)
+        if m then 
+          release[key] = [m[1]]
+        end
+      end
+    end
+    return release
+  end
   
   def _extractReleaseInfoFromCheckout(node)
     checkout_dir = "#{node['daris']['build_tree']}/git"
