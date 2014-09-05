@@ -264,17 +264,14 @@ module DarisUrls
 
   def scrapeRelease(node)
     version = node['daris']['version']
-    download_user = node['daris']['download_user']
-    download_password = node['daris']['download_password']
+    auth = [node['daris']['download_user'], node['daris']['download_password']]
     download_url = node['daris']['download_url']
-    options = {
-      :http_basic_authentication => [download_user, download_password],
-      :ssl_verify_mode => OpenSSL::SSL::VERIFY_NONE
-    }
     if version != 'latest' then
       # Check that the current 'stable' build is the one we want.
       stable = nil
-      OpenURI.open_uri(download_url, *options) do |f|
+      OpenURI.open_uri(download_url, 
+                       http_basic_authentication: auth,
+                       ssl_verify_mode: OpenSSL::SSL::VERIFY_NONE) do |f|
         if f.status[0] != '200' then
           raise "Unable to fetch page #{page_url}: status = #{f.status}"
         end
@@ -307,7 +304,9 @@ module DarisUrls
       'sinks' => "#{type}/mfpkg-nig_sinks",
       'transform' => "#{type}/mfpkg-transform"
     }
-    urls = scrapeUrls(regexes, download_url, *options)
+    urls = scrapeUrls(regexes, download_url, 
+                      http_basic_authentication: auth,
+                      ssl_verify_mode: OpenSSL::SSL::VERIFY_NONE)
     release = { 'type' => type }
     urls.each do |key, url|
       m = /.+-([0-9.]+)-mf([0-9.]+)-.*/.match(url)
