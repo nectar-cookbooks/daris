@@ -1,6 +1,11 @@
 Change Log for the Daris cookbook
 =================================
 
+Version 0.9.5
+-------------
+ - Implemented scraping of release version info from the DaRIS
+   download page
+
 Version 0.9.4
 -------------
  - Implemented checking of the installed Mediaflux version

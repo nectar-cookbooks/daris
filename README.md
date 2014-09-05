@@ -131,31 +131,30 @@ Meanwhile, if you are using a NeCTAR virtual, we recommend that you manage the f
 DaRIS versions
 ==============
 
-The current mechanism for determining what version of DaRIS to install, is fragile and clunky.  There is currently a mapping that lists the "known" versions of DaRIS and their respective components and version numbers.  This information is used to generate the URL pathnames for downloading the various ZIP files from the DaRIS download site.
+DaRIS downloads are a bit of a problem.
 
-The problem is two-fold:
+  - Each "version" consists of a bunch of downloadables.  Most of these have 
+    (independent) version numbers in the file name.  Some of these names also 
+    include a Mediaflux version number.
+  - There is no official "manifest" file.  Instead, you are supposed to
+    figure out the filenames from the web page.
+  - The web page only shows the "latest" and current "stable" versions.  Older
+    versions are not shown.  (And in fact, I don't think they are even stored.)
+     
+The way we deal with this is as follows:
 
-*  The mapping of known versions is hard-wired into the recipe's ruby code: see "site-cookbooks/daris/libraries/daris_urls.rb".  It will break when there is a new "stable", and it does break when a version number changes in one of the "latest" components.
+  1. We check to see if the DaRIS release we are trying to installed is 
+     "latest", or the current stable release.  
+  1. If it is, we "scrape" the URLs from the download web page, and download
+     those (if required).
+  1. If not, we consult the DARIS_RELEASES table in the "daris_urls.rb" library
+     and use the version numbers recorded to infer names of the components.
+     These can't be downloaded, so we have to rely on them having been 
+     downloaded previously, and cached in "/opt/mediaflux_installers".
 
-*  The download site only has the downloadables for the latest "latest" and for the current "stable".  If you needed some other version, you would need to email the DaRIS developers.  Obviously, that can't be scripted.
-
-The way that the recipes currently deal with these issues is to cache the downloadables, and only attempt to re-download if we don't have a copy at all.  That means that the recipes don't normally pick up the latest versions of "latest" (for instance).  But at least, this way the recipes are like to work from one day to the next.
-
-There are a couple of other things that you can do to work around these problems when necessary:
-
-* If you have old copies of the required "installables", you can manually copy them into the "installers" cache directory.
-
-* If you want to use a specific version of an installable rather the one that the "mappings" say, you can specify this using node attributes.  For example:
-        
-        "daris": {
-          "pssd": "stable/mfpkg-pssd-2.03-mf3.8.029-stable.zip"
-        },
-        
-  tells the recipe to use PSSD 2.03, irrespective of what the other component versions are.  (A download would likely fail, but that's a different issue.)
-
-Note that if you are using "local_builds" release, the package version numbers
-are determined by the "build.properties" file from the checkout.  The problem
-with hard-wired version numbers (see above) does not apply.
+Note that if you are using "local_builds" as the release name, the package 
+version numbers are determined by the "build.properties" file from the 
+checkout.  
 
 Using the build recipes
 =======================
