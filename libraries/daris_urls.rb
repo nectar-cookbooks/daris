@@ -266,6 +266,9 @@ module DarisUrls
     version = node['daris']['version']
     auth = [node['daris']['download_user'], node['daris']['download_password']]
     download_url = node['daris']['download_url']
+    # (This is to prevent a redirect that messes up OpenURI's handling
+    #  of the authentication.)
+    download_url += "/" unless download_url.end_with?("/")
     if version != 'latest' then
       # Check that the current 'stable' build is the one we want.
       stable = nil
