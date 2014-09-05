@@ -315,11 +315,12 @@ module DarisUrls
       # Note that the following regexes don't insist on specific stuff 
       # (e.g. '-'s) before or after the version numbers, because the
       # DaRIS component filenames are a bit inconsistent.
-      m = /.+([0-9.]+)-mf([0-9.]+).*/.match(url)
+      file = /[^\/]+$/.match(url)[0]
+      m = /.+([0-9.]+)-mf([0-9.]+).*/.match(file)
       if m then
         release[key] = [m[1], m[2]]
       else
-        m = /.+([0-9.]+).*/.match(url)
+        m = /.+([0-9.]+).*/.match(file)
         if m then 
           release[key] = [m[1]]
         end
