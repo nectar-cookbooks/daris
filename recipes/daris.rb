@@ -33,6 +33,8 @@ include_recipe "minc-toolkit"
 include_recipe "daris::common"
 
 ::Chef::Recipe.send(:include, DarisUrls)
+::Chef::Recipe.send(:include, ScrapeUrl)
+
 ::Chef::Resource::RubyBlock.send(:include, DarisUrls)
 ::Chef::Resource::RubyBlock.send(:include, MfluxHelpers)
 
