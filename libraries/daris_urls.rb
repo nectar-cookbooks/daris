@@ -274,7 +274,7 @@ module DarisUrls
     if version != 'latest' then
       # Check that the current 'stable' build is the one we want.
       stable = nil
-      OpenURI.open_uri(download_url, options) do |f|
+      OpenURI.open_uri(download_url, *options) do |f|
         if f.status[0] != '200' then
           raise "Unable to fetch page #{page_url}: status = #{f.status}"
         end
@@ -307,7 +307,7 @@ module DarisUrls
       'sinks' => "#{type}/mfpkg-nig_sinks",
       'transform' => "#{type}/mfpkg-transform"
     }
-    urls = scrapeUrls(regexes, download_url, options)
+    urls = scrapeUrls(regexes, download_url, *options)
     release = { 'type' => type }
     urls.each do |key, url|
       m = /.+-([0-9.]+)-mf([0-9.]+)-.*/.match(url)
