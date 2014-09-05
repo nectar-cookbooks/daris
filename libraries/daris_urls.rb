@@ -269,8 +269,7 @@ module DarisUrls
     download_url = node['daris']['download_url']
     options = {
       :http_basic_authentication => [download_user, download_password],
-      :ssl_verify_mode => OpenSSL::SSL::VERIFY_NONE ,
-      :redirect => false
+      :ssl_verify_mode => OpenSSL::SSL::VERIFY_NONE
     }
     if version != 'latest' then
       # Check that the current 'stable' build is the one we want.
