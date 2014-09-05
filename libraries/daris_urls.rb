@@ -263,7 +263,7 @@ module DarisUrls
   end
 
   def scrapeRelease(node)
-    version = node['daris']['version']
+    version = node['daris']['release']
     auth = [node['daris']['download_user'], node['daris']['download_password']]
     download_url = node['daris']['download_url']
     # (This is to prevent a redirect that messes up OpenURI's handling
