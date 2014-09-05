@@ -106,21 +106,7 @@ module DarisUrls
       'nig-commons' => ['0.42', '4.0.010'],
       'sinks' => ['0.07', '4.0.010'],
       'transform' => ['1.3.07', '4.0.010']
-    },
-    'latest' => {
-      'type' => 'latest',
-      'nig_essentials' => ['0.23', '4.0.010'],
-      'nig_transcode' => ['0.36', '4.0.010'],
-      'pssd' => ['2.18', '4.0.010'],
-      'daris_portal' => ['0.47', '4.0.005'],
-      'server_config' => ['1.0'],
-      'pvupload' => ['0.35'],
-      'dicom_client' => ['1.0'],
-      'dcmtools' => ['0.29'],
-      'nig-commons' => ['0.42', '4.0.010'],
-      'sinks' => ['0.07', '4.0.005'],
-      'transform' => ['1.3.07', '4.0.010']
-      }
+    }
   }
   
   DARIS_PATTERNS = {
@@ -236,9 +222,10 @@ module DarisUrls
     if relname == 'local_builds' then
       release = _extractReleaseInfoFromCheckout(node)
     else
-      release = DARIS_RELEASES[relname]
+      release = _scrapeReleaseInfo(node, relname) || DARIS_RELEASES[relname]
       if ! release then
-        raise "There is no 'releases' entry for release '#{relname}'"
+        raise "Release #{relname} is not current, and there is no "
+              "entry for it in 'releases'"
       end
     end
     return release
@@ -262,14 +249,13 @@ module DarisUrls
     return version
   end
 
-  def scrapeRelease(node)
-    version = node['daris']['release']
+  def _scrapeReleaseInfo(node, relname)
     auth = [node['daris']['download_user'], node['daris']['download_password']]
     download_url = node['daris']['download_url']
     # (This is to prevent a redirect that messes up OpenURI's handling
     #  of the authentication.)
     download_url += "/" unless download_url.end_with?("/")
-    if version != 'latest' then
+    if relname != 'latest' then
       # Check that the current 'stable' build is the one we want.
       stable = nil
       OpenURI.open_uri(download_url, 
@@ -287,13 +273,11 @@ module DarisUrls
         end
         raise "Found no multiple 'Stable Builds' lines" unless stable
       end
-      if stable != version then
-        Chef::Log.warn("The current DaRIS stable build is " +
-                       "#{stable} not #{version}")
+      if stable != relname then
         return nil
       end
     end
-    type = version == 'latest' ? 'latest' : 'stable'
+    type = relname == 'latest' ? 'latest' : 'stable'
     regexes = {
       'nig_essentials' => "#{type}/mfpkg-nig_essentials",
       'nig_transcode' => "#{type}/mfpkg-nig_transcode",
@@ -310,7 +294,7 @@ module DarisUrls
     urls = scrapeUrls(regexes, download_url, 
                       http_basic_authentication: auth,
                       ssl_verify_mode: OpenSSL::SSL::VERIFY_NONE)
-    release = { 'type' => type }
+    release = { 'type' => type, 'name' => relname }
     urls.each do |key, url|
       file = /[^\/]+$/.match(url)[0]
       m = /.+-([0-9.]+)-mf([0-9.]+)-.*/.match(file)
@@ -333,7 +317,7 @@ module DarisUrls
     if ! File.exists?(checkout_dir) then
       raise "Can't find the checkout directory #{checkout_dir}"
     end
-    release = DARIS_RELEASES['latest'].clone()
+    release = _scrapeReleaseInfo(mode, 'latest')
     CHECKOUTS.each() do |pkg, details|
       checkout = "#{checkout_dir}/#{details[0]}"
       if File.exists?(checkout) then
