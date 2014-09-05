@@ -37,6 +37,7 @@ include_recipe "daris::common"
 
 ::Chef::Resource::RubyBlock.send(:include, DarisUrls)
 ::Chef::Resource::RubyBlock.send(:include, MfluxHelpers)
+::Chef::Resource::RubyBlock.send(:include, ScrapeUrl)
 
 mflux_home = node['mediaflux']['home']
 mflux_bin = node['mediaflux']['bin'] || "#{mflux_home}/bin"
