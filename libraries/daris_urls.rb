@@ -282,8 +282,8 @@ module DarisUrls
           m = /Stable Builds \(([^)]+)\)/.match(line)
           if m then
             raise "Found multiple 'Stable Builds' lines" if stable
+            stable = m[1]
           end
-          stable = m[1]
         end
         raise "Found no multiple 'Stable Builds' lines" unless stable
       end
