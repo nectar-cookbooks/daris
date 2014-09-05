@@ -312,17 +312,16 @@ module DarisUrls
                       ssl_verify_mode: OpenSSL::SSL::VERIFY_NONE)
     release = { 'type' => type }
     urls.each do |key, url|
-      # Note that the following regexes don't insist on specific stuff 
-      # (e.g. '-'s) before or after the version numbers, because the
-      # DaRIS component filenames are a bit inconsistent.
       file = /[^\/]+$/.match(url)[0]
-      m = /.+([0-9.]+)-mf([0-9.]+).*/.match(file)
+      m = /.+-([0-9.]+)-mf([0-9.]+)-.*/.match(file)
       if m then
         release[key] = [m[1], m[2]]
       else
-        m = /.+([0-9.]+).*/.match(file)
+        m = /.+-([0-9.]+)-.*/.match(file)
         if m then 
           release[key] = [m[1]]
+        else
+          release[key] = [] # no version number; e.g. nig-commons
         end
       end
     end
