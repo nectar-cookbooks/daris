@@ -235,10 +235,10 @@ does wrong, you are likely to see an ugly Mediaflux stacktrace.  This is
 unfortunate, but it would difficult to extract decent diagnostics from 
 the script output.
 
-The mfsink-auth command
+The mfremote-auth command
 -----------------------
 
-The "mfsink-auth" command is designed to be installed on a Linux 
+The "mfremote-auth" command is designed to be installed on a Linux 
 system, and run by a Mediaflux / DaRIS user to allow SSH Sink access to the
 user's filespace from their DaRIS account.  It does the following:
 

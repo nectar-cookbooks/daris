@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: daris
-# Recipe:: mfsink-auth
+# Recipe:: mfremote-auth
 #
 # Copyright (c) 2013, 2014, The University of Queensland
 # All rights reserved.
@@ -36,9 +36,9 @@ include_recipe "mediaflux::aterm"
 mflux_home = node['mediaflux']['home']
 mflux_bin = node['mediaflux']['bin'] || "#{mflux_home}/bin"
 
-cookbook_file "#{mflux_bin}/mfsink-auth" do
+cookbook_file "#{mflux_bin}/mfremote-auth" do
   user 'root'
-  source "mfsink-auth.sh"
+  source "mfremote-auth.sh"
   mode 0755
 end
 

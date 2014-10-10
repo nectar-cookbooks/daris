@@ -1,11 +1,13 @@
 #!/bin/sh
 #
 # Command for configuring access to the user's filespace by a remote 
-# Mediaflux instance using an SSH sink.  This entails: 
+# Mediaflux instance using an SSH sink, or a Kepler workflows launched via 
+# DaRIS's Kepler workflow integration.  This entails: 
 #   1) Creating a new SSH key pair for the user
 #   2) Adding the public key to the user's "authorized_keys" file
 #   3) Logging into Mediaflux as the user and adding the private key
-#      to the user's secure wallet.
+#      to the user's secure wallet.  (The wallet entries depend on whether
+#      you want sink or kepler workflow access.
 
 if [ -r /etc/mediaflux/mfluxrc ] ; then
     . /etc/mediaflux/mfluxrc
